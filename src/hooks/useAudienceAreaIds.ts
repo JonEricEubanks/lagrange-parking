@@ -42,8 +42,8 @@ export function useAudienceAreaIds(
         const query = table.createQuery();
         query.where = ruleWhere;
         query.outFields = [config.keyField];
-        query.returnDistinctValues = true;
         query.returnGeometry = false;
+        // Dedupe client-side rather than returnDistinctValues (more broadly supported).
         return table.queryFeatures(query);
       })
       .then((res) => {
