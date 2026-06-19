@@ -52,11 +52,14 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   const audienceIds = useAudienceAreaIds(profile.relatedRules, activeTabDef?.ruleWhere);
 
   const memberFilter = useMemo(() => {
-    if (!activeTabDef?.ruleWhere) return activeTabDef?.where ?? '';
-    if (!audienceIds || audienceIds.length === 0) return '1=0'; // loading or none
-    const idField = profile.layer.idField ?? 'AREAID';
-    const list = audienceIds.map((v) => `'${v.replace(/'/g, "''")}'`).join(',');
-    return `${idField} IN (${list})`;
+    // Prefer precise rules-derived membership; fall back to the HAS* flag so the
+    // map always shows lots even while the rules query loads (or if it fails).
+    if (audienceIds && audienceIds.length > 0) {
+      const idField = profile.layer.idField ?? 'AREAID';
+      const list = audienceIds.map((v) => `'${v.replace(/'/g, "''")}'`).join(',');
+      return `${idField} IN (${list})`;
+    }
+    return activeTabDef?.where ?? '';
   }, [activeTabDef, audienceIds, profile.layer.idField]);
 
   // Filter that defines the current audience/tab feature set (no legend filter).

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Map from '@arcgis/core/Map.js';
 import MapView from '@arcgis/core/views/MapView.js';
+import TileLayer from '@arcgis/core/layers/TileLayer.js';
 import MapImageLayer from '@arcgis/core/layers/MapImageLayer.js';
 import FeatureLayerModule from '@arcgis/core/layers/FeatureLayer.js';
 import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
@@ -61,11 +62,18 @@ export function MapPanel({
   useEffect(() => {
     if (!containerRef.current || !featureLayer) return;
 
-    // Full GISC dynamic basemap (self-hosted at ags.gisconsortium.org — public, so
-    // no ArcGIS API key or sign-in is needed). The tiled GISC basemap on
-    // tiles.arcgis.com requires a key for tile access, which would force a login on
-    // this public app, so we don't use it. Default sublayer visibility = light canvas.
-    const dynamicLayer = new MapImageLayer({ url: profile.basemap.dynamicUrl });
+    // GISC Light Canvas tiled basemap (needs the ArcGIS API key in .env) + the
+    // dynamic GISC layer for street-name labels / important places on top.
+    const basemapTile = new TileLayer({ url: profile.basemap.tileUrl });
+
+    const dynamicLayer = new MapImageLayer({
+      url: profile.basemap.dynamicUrl,
+      sublayers: profile.basemap.sublayers.map((s) => ({
+        id: s.id,
+        title: s.title,
+        visible: s.visible,
+      })),
+    });
 
     // Build overlay layers (e.g., CBD boundary)
     const overlayMap = new globalThis.Map<string, FeatureLayer>();
@@ -91,7 +99,7 @@ export function MapPanel({
     overlayLayersRef.current = overlayMap;
 
     const map = new Map({
-      layers: [dynamicLayer, ...overlays, featureLayer],
+      layers: [basemapTile, dynamicLayer, ...overlays, featureLayer],
     });
 
     const ext = profile.extent;

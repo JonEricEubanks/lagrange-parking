@@ -94,6 +94,7 @@
       "label": "Residents",
       "enabled": true,
       "audience": ["RESIDENT"],
+      "where": "HASRESIDENT = 1",
       "ruleWhere": "PERMITZONE IN ('A','B','C','D','2A','5A','9A') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE IN ('OVERNIGHT_RESIDENT','DAYTIME_RESIDENT'))",
       "guide": {
         "who": "Parking for La Grange residents with a residential permit (permit zones A–D and lot 5A). Overnight on-street parking from 2 a.m.–6 a.m. requires a resident permit."
@@ -104,6 +105,7 @@
       "label": "Commuter & LT Students",
       "enabled": true,
       "audience": ["COMMUTER", "STUDENT"],
+      "where": "HASCOMMUTER = 1",
       "ruleWhere": "PERMITZONE IN ('E','G','H') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE = 'COMMUTER_DECAL')",
       "guide": {
         "who": "Parking for Metra commuters and Lyons Township High School students — commuter permit zones E and G, the LTHS student zone (H), and the commuter lots.",
@@ -115,6 +117,7 @@
       "label": "Employees",
       "enabled": true,
       "audience": ["EMPLOYEE"],
+      "where": "HASCBD = 1",
       "ruleWhere": "PERMITZONE IN ('CBD','WBD') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE IN ('CBD_DECAL','BUSINESS_DECAL'))",
       "guide": {
         "who": "Parking for people who work downtown — Central Business District (CBD) and West Business District (WBD) employee permits."

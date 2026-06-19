@@ -64,10 +64,13 @@ export function GuidedFinder({
 
   const memberFilter = useMemo(() => {
     if (!chosen) return '1=0';
-    if (!chosen.ruleWhere) return chosen.where ?? '';
-    if (!audienceIds || audienceIds.length === 0) return '1=0';
-    const list = audienceIds.map((v) => `'${v.replace(/'/g, "''")}'`).join(',');
-    return `${idField} IN (${list})`;
+    // Prefer precise rules-derived membership; fall back to the HAS* flag so lots
+    // always show while the rules query loads (or if it fails).
+    if (audienceIds && audienceIds.length > 0) {
+      const list = audienceIds.map((v) => `'${v.replace(/'/g, "''")}'`).join(',');
+      return `${idField} IN (${list})`;
+    }
+    return chosen.where ?? '';
   }, [chosen, audienceIds, idField]);
 
   const listWhere = useMemo(

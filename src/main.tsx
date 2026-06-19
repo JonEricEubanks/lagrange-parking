@@ -1,21 +1,21 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import esriConfig from '@arcgis/core/config.js';
 import { App } from './components/App';
 import './styles/index.css';
 
-// Public, anonymous app: the basemaps and feature layers are all shared publicly,
-// so never attach a credential or prompt for sign-in. Setting an empty apiKey would
-// send an invalid token and trigger a login dialog — so only set it when present
-// (it's only needed if a profile turns on the walk-time routing feature).
+// NOTE: intentionally NOT wrapped in <StrictMode>. StrictMode double-invokes effects
+// in dev (mount → cleanup → mount), which churns the ArcGIS MapView lifecycle
+// (create → destroy → create) and breaks FeatureLayer layerviews on remount-heavy
+// views like the Guided Finder. The SDK's imperative view lifecycle doesn't tolerate
+// it. (StrictMode is dev-only, so this also makes dev match production behavior.)
+
+// Public, anonymous app: basemaps + feature layers are shared publicly. Only set an
+// API key when present (an empty one sends an invalid token and triggers a sign-in
+// dialog). The GISC tiled basemap needs the key; routing would too if enabled.
 esriConfig.request.useIdentity = false;
 const apiKey = import.meta.env.VITE_ARCGIS_API_KEY as string | undefined;
 if (apiKey) {
   esriConfig.apiKey = apiKey;
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+createRoot(document.getElementById('root')!).render(<App />);
