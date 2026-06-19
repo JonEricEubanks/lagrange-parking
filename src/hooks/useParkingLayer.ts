@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer.js';
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer.js';
 import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
+import TextSymbol from '@arcgis/core/symbols/TextSymbol.js';
+import LabelClass from '@arcgis/core/layers/support/LabelClass.js';
 import type { EffectScaleStop } from '@arcgis/core/layers/support/FeatureEffect.js';
 import type { ParkingProfile } from '../config/types';
 
@@ -49,6 +51,23 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
       value: e.value,
     }));
 
+    // Label each parking area with its name (e.g. "Lot 11") so the map reads on
+    // its own. White halo keeps it legible over the light-canvas basemap.
+    const labelClass = new LabelClass({
+      labelExpressionInfo: { expression: `$feature.${profile.layer.nameField}` },
+      labelPlacement: 'always-horizontal',
+      deconflictionStrategy: 'static',
+      // Map labels render from Esri's hosted font service — web fonts (Nunito
+      // Sans) 404 there, so use Arial Bold (confirmed hosted) for a strong,
+      // legible lot label over the light-canvas basemap.
+      symbol: new TextSymbol({
+        color: [0, 48, 108, 1],
+        haloColor: [255, 255, 255, 0.95],
+        haloSize: 1.8,
+        font: { size: 11, family: 'Arial', weight: 'bold' },
+      }),
+    });
+
     const newLayer = new FeatureLayer({
       url: profile.layer.url,
       outFields: ['*'],
@@ -56,6 +75,8 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
       opacity: profile.layer.opacity,
       popupEnabled: false,
       effect: featureEffect,
+      labelingInfo: [labelClass],
+      labelsVisible: true,
       // Apply the experience-wide filter (e.g. USERCLASS = 'PERMIT') up front so
       // the layer never flashes the full inventory before the tab filter lands.
       definitionExpression: profile.layer.baseWhere || undefined,

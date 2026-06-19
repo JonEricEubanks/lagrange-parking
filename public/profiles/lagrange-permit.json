@@ -75,10 +75,29 @@
     "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
     "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
     "sublayers": [
-      { "id": 19, "title": "Street Labels", "visible": true },
-      { "id": 10, "title": "Important Places", "visible": true }
+      { "id": 19, "title": "Street Labels", "visible": true }
     ]
   },
+
+  "referenceLayers": [
+    {
+      "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrangeImportantPlaces_ParkingContext_/FeatureServer/0",
+      "title": "Important Places",
+      "opacity": 1,
+      "categoryField": "category",
+      "categories": [
+        { "value": "Metra Station", "fill": [126, 78, 156, 0.5], "outline": [126, 78, 156, 1] },
+        { "value": "Civic / Public", "fill": [156, 146, 132, 0.4], "outline": [120, 110, 96, 1] },
+        { "value": "Park / Open Space", "fill": [120, 165, 95, 0.45], "outline": [120, 165, 95, 1] },
+        { "value": "Landmark", "fill": [190, 150, 80, 0.45], "outline": [190, 150, 80, 1] }
+      ],
+      "labelField": "name",
+      "labelColor": [90, 90, 90, 1],
+      "labelHaloColor": [255, 255, 255, 0.8],
+      "labelSize": 9,
+      "labelItalic": true
+    }
+  ],
 
   "extent": {
     "xmin": -87.892,

@@ -11,8 +11,13 @@ export function useAllRules(config: RelatedRulesConfig | undefined): Map<string,
     if (!config) return;
     let cancelled = false;
     const table = new FeatureLayer({ url: config.url, outFields: ['*'] });
+    // NB: chain queryFeatures off load() with native .then so the FeatureSet is
+    // flattened. layer.when(cb) does NOT flatten a promise returned by cb, so
+    // res.features would be undefined and the grouping silently produced an
+    // empty map (no audience badges, every filter matched nothing).
     table
-      .when(() => {
+      .load()
+      .then(() => {
         const q = table.createQuery();
         q.where = '1=1';
         q.outFields = ['*'];

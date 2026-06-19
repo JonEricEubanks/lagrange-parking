@@ -41,8 +41,11 @@ export function useRelatedRules(
     const clauses = [`${config.keyField} = ${idValue}`];
     if (ruleWhere && ruleWhere.trim()) clauses.push(`(${ruleWhere})`);
 
+    // Chain queryFeatures off load() with native .then so the FeatureSet is
+    // flattened — layer.when(cb) does not flatten a promise returned by cb.
     table
-      .when(() => {
+      .load()
+      .then(() => {
         const query = table.createQuery();
         query.where = clauses.join(' AND ');
         query.outFields = ['*'];

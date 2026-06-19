@@ -79,6 +79,36 @@ export interface OverlayLayer {
   fillColor?: [number, number, number, number];
 }
 
+/** One category of a reference layer's polygon renderer (alpha 0–1). */
+export interface ReferenceCategory {
+  value: string;
+  fill: [number, number, number, number];
+  outline: [number, number, number, number];
+}
+
+/**
+ * A contextual polygon layer drawn under the parking polygons (e.g. Important
+ * Places — parks, civic buildings, the Metra station). Categorized by a field,
+ * with optional name labels. Always visible (unlike the scale-limited GISC
+ * dynamic sublayers), matching the AGOL web map.
+ */
+export interface ReferenceLayer {
+  url: string;
+  title: string;
+  opacity?: number;
+  /** Field the renderer categorizes on (e.g. category). */
+  categoryField: string;
+  categories: ReferenceCategory[];
+  /** Field used for labels (e.g. name). Omit to draw no labels. */
+  labelField?: string;
+  labelColor?: [number, number, number, number];
+  labelHaloColor?: [number, number, number, number];
+  labelSize?: number;
+  labelItalic?: boolean;
+  /** Hide when zoomed out beyond this scale (omit = always visible). */
+  minScale?: number;
+}
+
 /** Configuration for the related ParkingRule table (1:many off the parking-area key). */
 export interface RelatedRulesConfig {
   url: string;
@@ -144,6 +174,8 @@ export interface ParkingProfile {
   ruleSymbology?: SymbologyEntry[];
   effects: EffectEntry[];
   overlayLayers?: OverlayLayer[];
+  /** Contextual polygon layers (e.g. Important Places) drawn under the parking polygons. */
+  referenceLayers?: ReferenceLayer[];
 
   basemap: {
     tileUrl: string;

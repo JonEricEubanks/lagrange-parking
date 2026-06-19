@@ -1321,6 +1321,7 @@ body,
 /* ─── Guided Finder ─── */
 .finder {
   height: 100vh;
+  height: 100dvh; /* dvh excludes mobile browser chrome so the bottom sheet stays on-screen */
   display: flex;
   flex-direction: column;
 }
@@ -1478,9 +1479,15 @@ body,
   font-family: var(--font-body);
 }
 
+/* Bottom-sheet drag handle — only shown on mobile (see media query below) */
+.sheet-handle {
+  display: none;
+}
+
 /* ─── Parking Directory ─── */
 .directory {
   height: 100vh;
+  height: 100dvh; /* dvh excludes mobile browser chrome so the bottom sheet stays on-screen */
   display: flex;
   flex-direction: column;
 }
@@ -1659,20 +1666,80 @@ body,
     grid-template-columns: 1fr;
   }
 
+  /* Map fills the whole body; the results become a bottom sheet floating over it. */
   .finder-body {
     flex-direction: column;
+    position: relative;
   }
 
   .finder-map {
-    height: 42vh;
+    position: absolute;
+    inset: 0;
+    height: auto;
     flex: none;
   }
 
   .finder-results {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-    flex: 1;
+    max-height: 60dvh;
+    flex: none;
     border-left: none;
     border-top: 1px solid #e3eaf0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -6px 22px rgba(0, 48, 108, 0.16);
+    padding-top: 0;
+    /* clear the iOS home indicator so the last row/handle isn't cut off */
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    transition: max-height 0.25s ease;
+    z-index: 5;
+  }
+
+  /* When a lot is selected, give the detail card most of the screen so its
+     rules are easy to scroll on a small phone. */
+  .finder-results--detail {
+    max-height: 88dvh;
+  }
+
+  /* Collapsed: only the handle bar stays visible, pinned to the bottom edge. */
+  .finder-results--collapsed,
+  .finder-results--collapsed.finder-results--detail {
+    max-height: calc(52px + env(safe-area-inset-bottom));
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .sheet-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 9px 0 8px;
+    background: #fafcfe;
+    border: none;
+    border-radius: 16px 16px 0 0;
+    cursor: pointer;
+    font-family: var(--font-body);
+    z-index: 1;
+  }
+
+  .sheet-handle-grip {
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: #c3d2e0;
+  }
+
+  .sheet-handle-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--lf-midnight);
   }
 
   .dir-body {

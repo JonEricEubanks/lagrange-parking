@@ -58,6 +58,9 @@ export function GuidedFinder({
   const tabs = useMemo(() => profile.tabs.filter((t) => t.id !== 'walk-time'), [profile.tabs]);
   const [chosen, setChosen] = useState<TabDef | null>(tabs.length === 1 ? tabs[0] : null);
   const [mapView, setMapView] = useState<MapView | null>(null);
+  // Mobile only: the results panel is a bottom sheet that can collapse to give
+  // the map (nearly) the full screen. Ignored by the desktop layout.
+  const [sheetCollapsed, setSheetCollapsed] = useState(false);
 
   const idField = profile.layer.idField ?? 'AREAID';
   const audienceIds = useAudienceAreaIds(profile.relatedRules, chosen?.ruleWhere);
@@ -87,6 +90,16 @@ export function GuidedFinder({
   useEffect(() => {
     if (layer) setDefinitionExpression(listWhere);
   }, [layer, listWhere, setDefinitionExpression]);
+
+  // Selecting a lot (tap on map / list) opens the sheet so its details show on mobile.
+  const selectByClick = (g: Graphic) => {
+    setSheetCollapsed(false);
+    lot.selectByClick(g);
+  };
+  const selectByIndex = (i: number) => {
+    setSheetCollapsed(false);
+    lot.selectByIndex(i);
+  };
 
   useEffect(() => {
     if (!mapView || !layer || listWhere === '1=0') return;
@@ -149,11 +162,30 @@ export function GuidedFinder({
             profile={profile}
             featureLayer={layer}
             selectedFeature={lot.selectedFeature}
-            onFeatureClick={(g: Graphic) => lot.selectByClick(g)}
+            onFeatureClick={selectByClick}
             onViewReady={setMapView}
           />
         </div>
-        <aside className="finder-results">
+        <aside
+          className={`finder-results${lot.selectedFeature ? ' finder-results--detail' : ''}${
+            sheetCollapsed ? ' finder-results--collapsed' : ''
+          }`}
+        >
+          <button
+            className="sheet-handle"
+            onClick={() => setSheetCollapsed((c) => !c)}
+            aria-label={sheetCollapsed ? 'Expand panel' : 'Collapse panel'}
+            aria-expanded={!sheetCollapsed}
+          >
+            <span className="sheet-handle-grip" aria-hidden="true" />
+            <span className="sheet-handle-label">
+              {sheetCollapsed
+                ? lot.selectedFeature
+                  ? String(lot.selectedFeature.attributes[profile.layer.nameField] ?? 'Details')
+                  : `${lot.totalCount} place${lot.totalCount === 1 ? '' : 's'} to park`
+                : 'Hide'}
+            </span>
+          </button>
           {chosen.guide?.who && <p className="finder-results-intro">{chosen.guide.who}</p>}
           {apply && (
             <a className="guide-apply-btn" href={apply.url} target="_blank" rel="noopener noreferrer">
@@ -183,7 +215,7 @@ export function GuidedFinder({
               <ul className="finder-list">
                 {lot.allFeatures.map((f, i) => (
                   <li key={f.attributes.OBJECTID}>
-                    <button className="finder-list-item" onClick={() => lot.selectByIndex(i)}>
+                    <button className="finder-list-item" onClick={() => selectByIndex(i)}>
                       <span className="finder-list-name">
                         {String(f.attributes[profile.layer.nameField] ?? 'Parking area')}
                       </span>

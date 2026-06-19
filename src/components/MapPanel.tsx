@@ -6,6 +6,9 @@ import MapImageLayer from '@arcgis/core/layers/MapImageLayer.js';
 import FeatureLayerModule from '@arcgis/core/layers/FeatureLayer.js';
 import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer.js';
+import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer.js';
+import TextSymbol from '@arcgis/core/symbols/TextSymbol.js';
+import LabelClass from '@arcgis/core/layers/support/LabelClass.js';
 import Home from '@arcgis/core/widgets/Home.js';
 import type Point from '@arcgis/core/geometry/Point.js';
 import type FeatureLayer from '@arcgis/core/layers/FeatureLayer.js';
@@ -98,8 +101,54 @@ export function MapPanel({
     });
     overlayLayersRef.current = overlayMap;
 
+    // Reference layers (e.g. Important Places — parks, civic buildings, Metra).
+    // Categorized fill + name labels, drawn under the parking polygons. Loaded
+    // from the public hosted feature layer so they show at every scale.
+    const rgba = (c: [number, number, number, number]) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${c[3]})`;
+    const referenceLayers = (profile.referenceLayers ?? []).map((rl) => {
+      const renderer = new UniqueValueRenderer({
+        field: rl.categoryField,
+        uniqueValueInfos: rl.categories.map((c) => ({
+          value: c.value,
+          symbol: new SimpleFillSymbol({
+            color: rgba(c.fill),
+            outline: { color: rgba(c.outline), width: 1 },
+          }),
+        })),
+      });
+
+      const labelingInfo = rl.labelField
+        ? [
+            new LabelClass({
+              labelExpressionInfo: { expression: `$feature.${rl.labelField}` },
+              symbol: new TextSymbol({
+                color: rgba(rl.labelColor ?? [90, 90, 90, 1]),
+                haloColor: rgba(rl.labelHaloColor ?? [255, 255, 255, 0.8]),
+                haloSize: 1,
+                font: {
+                  size: rl.labelSize ?? 9,
+                  family: 'Arial',
+                  style: rl.labelItalic ? 'italic' : 'normal',
+                },
+              }),
+            }),
+          ]
+        : undefined;
+
+      return new FeatureLayerModule({
+        url: rl.url,
+        title: rl.title,
+        opacity: rl.opacity ?? 1,
+        renderer,
+        labelingInfo,
+        labelsVisible: !!rl.labelField,
+        popupEnabled: false,
+        minScale: rl.minScale ?? 0,
+      });
+    });
+
     const map = new Map({
-      layers: [basemapTile, dynamicLayer, ...overlays, featureLayer],
+      layers: [basemapTile, dynamicLayer, ...overlays, ...referenceLayers, featureLayer],
     });
 
     const ext = profile.extent;

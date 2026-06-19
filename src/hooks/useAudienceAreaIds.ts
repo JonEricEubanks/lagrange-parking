@@ -37,8 +37,11 @@ export function useAudienceAreaIds(
     let cancelled = false;
     setIds(null); // reset so we don't briefly show the previous tab's areas
 
+    // Chain queryFeatures off load() with native .then so the FeatureSet is
+    // flattened — layer.when(cb) does not flatten a promise returned by cb.
     table
-      .when(() => {
+      .load()
+      .then(() => {
         const query = table.createQuery();
         query.where = ruleWhere;
         query.outFields = [config.keyField];
