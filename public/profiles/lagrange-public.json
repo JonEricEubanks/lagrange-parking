@@ -1,0 +1,115 @@
+{
+  "id": "lagrange-public",
+  "title": "Visitor Parking Map",
+  "community": "Village of La Grange",
+  "lastUpdated": "2026-06-19",
+  "enableWalkTime": false,
+
+  "welcome": {
+    "heading": "Visitor Parking in La Grange",
+    "body": "Find public parking downtown and see how long you can stay. Areas are color-coded by time limit — click any area for details.",
+    "hint": "Tip: evenings and weekends are often free. Check each area's rules."
+  },
+  "legendTitle": "Time Limit",
+
+  "layer": {
+    "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
+    "itemId": "f13e7fa3199141a2be6c2eea816de8d4",
+    "nameField": "AREANAME",
+    "rendererField": "PRIMARYRULE",
+    "idField": "AREAID",
+    "spacesField": "MAXSPACES",
+    "baseWhere": "USERCLASS IN ('VISITOR','RESTRICTED')",
+    "opacity": 0.7,
+    "outlineColor": [40, 40, 40, 1],
+    "outlineWidth": 1.2
+  },
+
+  "fields": {
+    "display": [
+      { "field": "FACILITYTYPE", "label": "Facility" },
+      { "field": "MAXSPACES", "label": "Spaces", "format": "integer" },
+      { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail" }
+    ]
+  },
+
+  "relatedRules": {
+    "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/3",
+    "keyField": "AREAID",
+    "labelField": "RULETYPE",
+    "orderByFields": ["ENFORCE_START"],
+    "display": [
+      { "field": "MAXDURATION", "label": "Time limit" },
+      { "field": "ENFORCE_TEXT", "label": "When enforced" }
+    ]
+  },
+
+  "ruleSymbology": [
+    { "value": "FREE_15MIN", "label": "15 Minute", "color": [67, 183, 73, 1] },
+    { "value": "FREE_30MIN", "label": "30 Minute", "color": [127, 194, 65, 1] },
+    { "value": "FREE_1HR", "label": "1 Hour", "color": [19, 172, 225, 1] },
+    { "value": "FREE_2HR", "label": "2 Hour", "color": [30, 144, 200, 1] },
+    { "value": "FREE_3HR", "label": "3 Hour", "color": [18, 107, 181, 1] },
+    { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
+    { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
+    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] },
+    { "value": "NO_PARKING", "label": "No Parking", "color": [120, 120, 120, 1] }
+  ],
+
+  "symbology": [
+    { "value": "FREE_15MIN", "label": "15 Minute", "color": [67, 183, 73, 1] },
+    { "value": "FREE_30MIN", "label": "30 Minute", "color": [127, 194, 65, 1] },
+    { "value": "FREE_1HR", "label": "1 Hour", "color": [19, 172, 225, 1] },
+    { "value": "FREE_2HR", "label": "2 Hour", "color": [30, 144, 200, 1] },
+    { "value": "FREE_3HR", "label": "3 Hour", "color": [18, 107, 181, 1] },
+    { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
+    { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
+    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] },
+    { "value": "NO_PARKING", "label": "No Parking", "color": [120, 120, 120, 1] },
+    { "value": "_default", "label": "Other", "color": [200, 205, 210, 1], "tooltip": "Areas with a rule type not listed above" }
+  ],
+
+  "effects": [
+    { "scale": 16000, "value": "drop-shadow(0.75px, 0.75px, 1.125px, rgba(0,0,0,0.5))" },
+    { "scale": 4000, "value": "drop-shadow(1.5px, 1.5px, 2.25px, rgba(0,0,0,0.5))" },
+    { "scale": 1000, "value": "drop-shadow(3px, 3px, 4.5px, rgba(0,0,0,0.5))" }
+  ],
+
+  "basemap": {
+    "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
+    "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
+    "sublayers": [
+      { "id": 19, "title": "Street Labels", "visible": true },
+      { "id": 10, "title": "Important Places", "visible": true }
+    ]
+  },
+
+  "extent": {
+    "xmin": -87.892,
+    "ymin": 41.793,
+    "xmax": -87.846,
+    "ymax": 41.824,
+    "spatialReference": { "wkid": 4326 }
+  },
+
+  "tabs": [
+    { "id": "all", "label": "Where can I park?", "enabled": true }
+  ],
+
+  "branding": {
+    "midnight": "#00306C",
+    "primary": "#126BB5",
+    "secondary": "#126BB5",
+    "greenGray": "#A8E0F8",
+    "lightGray": "#dfeaf2",
+    "white": "#ffffff",
+    "fontHeader": "'Oswald', 'Nunito Sans', 'Segoe UI', sans-serif",
+    "fontBody": "'Nunito Sans', 'Segoe UI', Calibri, sans-serif",
+    "logo": "assets/lagrange-mark.png",
+    "mgpLogo": "assets/mgp-logo.png"
+  },
+
+  "portal": {
+    "url": "https://lagrangeil.maps.arcgis.com"
+  }
+}
