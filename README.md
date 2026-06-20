@@ -39,14 +39,20 @@ The "paths to the maps" live in the **profile JSON** (`layer.url`, `relatedRules
 
 ```bash
 npm install
-npm run dev            # permit app  → http://localhost:5173/lagrange-parking/
-npm run dev:public     # public app  → http://localhost:5173/lagrange-parking-public/
+npm run dev            # permit app  → http://localhost:5173/
+npm run dev:public     # public app  → http://localhost:5173/ (next free port if permit is up)
 npm run build          # builds both → dist/permit and dist/public
 npm run build:permit
 npm run build:public
 ```
 
 Profile selection, base path and output dir are set per build mode in `.env.permit` / `.env.public`.
+
+## Deployment
+
+Both apps are deployed as separate **Azure Static Web Apps (Free)**. See
+**[DEPLOY.md](DEPLOY.md)** for resources, build/deploy commands, custom domains, and
+prerequisites (AGOL public sharing, ArcGIS key referrer restriction).
 
 ## Tech stack
 
