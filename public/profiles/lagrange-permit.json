@@ -75,7 +75,12 @@
     "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
     "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
     "sublayers": [
-      { "id": 19, "title": "Street Labels", "visible": true }
+      { "id": 14, "title": "Municipal Boundary", "visible": true, "definitionExpression": "COMMUNITYNAME = 'LA GRANGE'" },
+      { "id": 16, "title": "Municipal Boundary Mask", "visible": true, "definitionExpression": "GEODBID = '024'" },
+      { "id": 17, "title": "Interstate Highway Labels", "visible": true },
+      { "id": 18, "title": "Major Road Labels", "visible": true },
+      { "id": 191, "mapLayerId": 19, "title": "Collector Street Labels", "visible": true, "definitionExpression": "CLASS = 3", "minScale": 16000 },
+      { "id": 192, "mapLayerId": 19, "title": "Local Street Labels", "visible": true, "definitionExpression": "CLASS IN (0, 4, 6)", "minScale": 8000 }
     ]
   },
 

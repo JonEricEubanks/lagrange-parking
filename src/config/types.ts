@@ -22,6 +22,18 @@ export interface Sublayer {
   id: number;
   title: string;
   visible: boolean;
+  /** Service map-layer id to draw from, when it differs from `id`. Lets two
+   *  sublayers render the same source layer at different scales/filters (e.g.
+   *  collector vs local street labels, both from layer 19). Defaults to `id`. */
+  mapLayerId?: number;
+  /** Optional server-side filter for this dynamic sublayer (e.g. limit a boundary
+   *  layer to one community, or street labels to a road class). */
+  definitionExpression?: string;
+  /** Hide when zoomed out beyond this scale. Use to reveal local-street labels
+   *  only once zoomed in (Google-Maps-style road-class tiering). */
+  minScale?: number;
+  /** Hide when zoomed in past this scale. */
+  maxScale?: number;
 }
 
 export interface TabDef {

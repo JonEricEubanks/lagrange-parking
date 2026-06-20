@@ -71,10 +71,18 @@ export function MapPanel({
 
     const dynamicLayer = new MapImageLayer({
       url: profile.basemap.dynamicUrl,
+      // Only include minScale/maxScale when set — passing `undefined` breaks
+      // Esri's scale-visibility check and culls every sublayer (blank dynamic layer).
       sublayers: profile.basemap.sublayers.map((s) => ({
         id: s.id,
         title: s.title,
         visible: s.visible,
+        ...(s.mapLayerId != null
+          ? { source: { type: 'map-layer' as const, mapLayerId: s.mapLayerId } }
+          : {}),
+        ...(s.definitionExpression ? { definitionExpression: s.definitionExpression } : {}),
+        ...(s.minScale != null ? { minScale: s.minScale } : {}),
+        ...(s.maxScale != null ? { maxScale: s.maxScale } : {}),
       })),
     });
 
