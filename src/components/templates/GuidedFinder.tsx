@@ -59,8 +59,9 @@ export function GuidedFinder({
   const [chosen, setChosen] = useState<TabDef | null>(tabs.length === 1 ? tabs[0] : null);
   const [mapView, setMapView] = useState<MapView | null>(null);
   // Mobile only: the results panel is a bottom sheet that can collapse to give
-  // the map (nearly) the full screen. Ignored by the desktop layout.
-  const [sheetCollapsed, setSheetCollapsed] = useState(false);
+  // the map (nearly) the full screen. Starts collapsed so the map leads; tapping
+  // a lot (or the handle) expands it. Ignored by the desktop layout.
+  const [sheetCollapsed, setSheetCollapsed] = useState(true);
 
   const idField = profile.layer.idField ?? 'AREAID';
   const audienceIds = useAudienceAreaIds(profile.relatedRules, chosen?.ruleWhere);
