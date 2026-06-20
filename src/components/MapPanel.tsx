@@ -10,6 +10,7 @@ import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer.js';
 import TextSymbol from '@arcgis/core/symbols/TextSymbol.js';
 import LabelClass from '@arcgis/core/layers/support/LabelClass.js';
 import Home from '@arcgis/core/widgets/Home.js';
+import Locate from '@arcgis/core/widgets/Locate.js';
 import type Point from '@arcgis/core/geometry/Point.js';
 import type FeatureLayer from '@arcgis/core/layers/FeatureLayer.js';
 import type FeatureLayerView from '@arcgis/core/views/layers/FeatureLayerView.js';
@@ -177,6 +178,11 @@ export function MapPanel({
 
     const home = new Home({ view });
     view.ui.add(home, 'top-left');
+
+    // "Locate me" — geolocates the visitor and zooms to their spot. Sits with the
+    // zoom/home buttons. (Geolocation needs a secure context: https or localhost.)
+    const locate = new Locate({ view });
+    view.ui.add(locate, 'top-left');
 
     // Click handler — uses refs so it always sees current mode/callbacks
     view.on('click', async (event) => {
