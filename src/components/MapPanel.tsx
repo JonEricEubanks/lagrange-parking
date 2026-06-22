@@ -214,6 +214,12 @@ export function MapPanel({
     onViewReady?.(view);
 
     return () => {
+      // view.destroy() destroys view.map, which destroys *all* its layers. The
+      // basemap/overlay layers are rebuilt on every mount so that's fine, but the
+      // parking featureLayer is shared (owned by useParkingLayer) and reused across
+      // remounts — detach it first so it survives. Otherwise the next mount gets a
+      // destroyed layer and the SDK fails with "Failed to create layerview".
+      map.remove(featureLayer);
       view.destroy();
       viewRef.current = null;
       layerViewRef.current = null;
