@@ -142,7 +142,7 @@
       "label": "Resident Overnight Only",
       "enabled": true,
       "audience": ["RESIDENT"],
-      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
       "where": "HASRESIDENT = 1",
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT')",
       "guide": {
@@ -193,12 +193,7 @@
               { "text": "Maximum of 2 permits per household / residential unit. You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space per permit." }
             ]
           }
-        ],
-        "pending": {
-          "title": "Lot 15 — new Village lot",
-          "body": "Lot 15 is approved for West End resident and employee permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
-          "image": "assets/exhibits/lot15-new-village-lot.jpg"
-        }
+        ]
       }
     },
     {
@@ -206,7 +201,7 @@
       "label": "Resident Day/Night (24 hr.)",
       "enabled": true,
       "audience": ["RESIDENT"],
-      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
       "where": "HASRESIDENT = 1",
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
@@ -261,11 +256,6 @@
           "tabId": "resident-overnight",
           "label": "See the overnight parking areas",
           "text": "Between 2 a.m. and 6 a.m. you must park in the designated overnight areas."
-        },
-        "pending": {
-          "title": "Lot 15 — new Village lot",
-          "body": "Lot 15 is approved for West End resident and employee permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
-          "image": "assets/exhibits/lot15-new-village-lot.jpg"
         }
       }
     },
@@ -330,6 +320,7 @@
         "LOT2",
         "LOT5",
         "VILLAGEHALLPARKINGSTRUCTURE",
+        "LOT15",
         "OS115798",
         "OS115799",
         "OS115797",
@@ -377,12 +368,7 @@
               { "text": "Maximum of 1 permit per person. You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space." }
             ]
           }
-        ],
-        "pending": {
-          "title": "Lot 15 — new Village lot",
-          "body": "Lot 15 is approved for West End (WBD) employee and resident permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
-          "image": "assets/exhibits/lot15-new-village-lot.jpg"
-        }
+        ]
       }
     }
   ],
