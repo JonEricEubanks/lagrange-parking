@@ -68,8 +68,12 @@ The permit app has **four pages**, one per permit type: resident overnight, resi
 
 ### Basemap
 
-`basemap.imageryUrl` adds a Map/Aerial toggle. The GISC aerial shares the canvas basemap's tiling
-scheme so it drops straight in. On aerial the parking polygons drop to `layer.imageryOpacity`, their
+`basemap.imageryUrl` adds a Map/Aerial toggle. Use **`COUNTY_IMAGERY_COOK_2025_Project`** — the
+`GISC_IMAGERY_*` mosaics return 404 for every tile over La Grange even though their service metadata
+reads fine, so metadata is not proof of coverage. `scripts/verify-basemaps.mjs` fetches a real
+deepest-zoom tile per profile to catch that. The Cook service shares the canvas basemap's tiling
+scheme exactly (wkid 3435, 512 px, same origin, L0–L13), so it drops straight in as an alternate
+basemap. On aerial the parking polygons drop to `layer.imageryOpacity`, their
 labels go light-on-dark (`useParkingLayer.setBasemapMode` — the layer's owner restyles it, MapPanel
 only reports the choice), and the Important Places reference layer hides.
 

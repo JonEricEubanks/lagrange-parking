@@ -81,7 +81,7 @@
 
   "basemap": {
     "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
-    "imageryUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_IMAGERY_2026_Project/MapServer",
+    "imageryUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/COUNTY_IMAGERY_COOK_2025_Project/MapServer",
     "imageryLabel": "Aerial",
     "default": "canvas",
     "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
