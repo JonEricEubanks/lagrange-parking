@@ -1,6 +1,7 @@
 import type Graphic from '@arcgis/core/Graphic.js';
 import type Point from '@arcgis/core/geometry/Point.js';
 import type {
+  AreaExhibit,
   FieldDef,
   SymbologyEntry,
   LayerFields,
@@ -24,6 +25,7 @@ interface DetailPanelProps {
   rules?: RuleRow[];
   ruleConfig?: RelatedRulesConfig;
   ruleSymbology?: SymbologyEntry[];
+  exhibit?: AreaExhibit;
   welcome?: { heading: string; body: string; hint?: string };
   legendFilter?: string | null;
   onPrev: () => void;
@@ -50,6 +52,7 @@ export function DetailPanel({
   rules,
   ruleConfig,
   ruleSymbology,
+  exhibit,
   welcome,
   legendFilter,
   onPrev,
@@ -82,6 +85,7 @@ export function DetailPanel({
           rules={rules}
           ruleConfig={ruleConfig}
           ruleSymbology={ruleSymbology}
+          exhibit={exhibit}
           onWalkHere={!walkMode ? onWalkHere : undefined}
           walkMode={walkMode}
           walkStep={walkStep}

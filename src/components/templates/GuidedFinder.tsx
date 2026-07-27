@@ -6,8 +6,10 @@ import { useParkingLayer } from '../../hooks/useParkingLayer';
 import { useSelectedLot } from '../../hooks/useSelectedLot';
 import { useAudienceAreaIds } from '../../hooks/useAudienceAreaIds';
 import { useRelatedRules } from '../../hooks/useRelatedRules';
+import { areaDisplayName, explicitAreaWhere } from '../../config/lots';
 import { MapPanel } from '../MapPanel';
 import { LotDetailCard } from '../LotDetailCard';
+import { PermitInfo } from '../PermitInfo';
 
 function TopBar({
   profile,
@@ -40,7 +42,7 @@ function TopBar({
       </div>
       {onChange && (
         <button className="tpl-change-btn" onClick={onChange}>
-          Change
+          ← Go Back
         </button>
       )}
     </header>
@@ -54,7 +56,7 @@ export function GuidedFinder({
   profile: ParkingProfile;
   onHome?: () => void;
 }) {
-  const { layer, setDefinitionExpression } = useParkingLayer(profile);
+  const { layer, setDefinitionExpression, setBasemapMode } = useParkingLayer(profile);
   const tabs = useMemo(() => profile.tabs.filter((t) => t.id !== 'walk-time'), [profile.tabs]);
   const [chosen, setChosen] = useState<TabDef | null>(tabs.length === 1 ? tabs[0] : null);
   const [mapView, setMapView] = useState<MapView | null>(null);
@@ -64,18 +66,25 @@ export function GuidedFinder({
   const [sheetCollapsed, setSheetCollapsed] = useState(true);
 
   const idField = profile.layer.idField ?? 'AREAID';
-  const audienceIds = useAudienceAreaIds(profile.relatedRules, chosen?.ruleWhere);
+  // Only fall back to the rules-derived lookup for tabs without an explicit list.
+  const explicitWhere = explicitAreaWhere(profile, chosen);
+  const audienceIds = useAudienceAreaIds(
+    profile.relatedRules,
+    explicitWhere ? undefined : chosen?.ruleWhere
+  );
 
   const memberFilter = useMemo(() => {
     if (!chosen) return '1=0';
-    // Prefer precise rules-derived membership; fall back to the HAS* flag so lots
-    // always show while the rules query loads (or if it fails).
+    // The Village's own lot list wins: "map should only show the following lots".
+    if (explicitWhere) return explicitWhere;
+    // Otherwise prefer precise rules-derived membership, falling back to the HAS*
+    // flag so lots always show while the rules query loads (or if it fails).
     if (audienceIds && audienceIds.length > 0) {
       const list = audienceIds.map((v) => `'${v.replace(/'/g, "''")}'`).join(',');
       return `${idField} IN (${list})`;
     }
     return chosen.where ?? '';
-  }, [chosen, audienceIds, idField]);
+  }, [chosen, explicitWhere, audienceIds, idField]);
 
   const listWhere = useMemo(
     () =>
@@ -121,21 +130,37 @@ export function GuidedFinder({
     rendererField: profile.layer.rendererField,
     idField: profile.layer.idField,
     spacesField: profile.layer.spacesField,
+    nameOverrides: profile.nameOverrides,
   };
   const selectedAreaId = profile.layer.idField
     ? lot.selectedFeature?.attributes?.[profile.layer.idField]
     : undefined;
   const rules = useRelatedRules(profile.relatedRules, selectedAreaId, chosen?.ruleWhere);
   const apply = chosen?.guide?.apply ?? profile.apply;
+  const exhibit = selectedAreaId ? profile.areaExhibits?.[String(selectedAreaId)] : undefined;
+  const nameOf = (attrs: Record<string, unknown> | undefined) =>
+    areaDisplayName(attrs, profile.layer.nameField, profile.layer.idField, profile.nameOverrides);
+
+  // "Between 2 a.m. and 6 a.m. park in the designated overnight areas" is only
+  // useful if you can get to that page from here.
+  const goToTab = (tabId: string) => {
+    const next = tabs.find((t) => t.id === tabId);
+    if (!next) return;
+    lot.clear();
+    setSheetCollapsed(true);
+    setChosen(next);
+  };
 
   if (!chosen) {
     return (
       <div className="finder">
         <TopBar profile={profile} onHome={onHome} />
         <div className="finder-picker">
-          <h1 className="finder-q">Who are you?</h1>
-          <p className="finder-sub">Pick the option that fits you to see where you can park.</p>
-          <div className="finder-choices">
+          <h1 className="finder-q">{profile.picker?.heading ?? 'Who are you?'}</h1>
+          <p className="finder-sub">
+            {profile.picker?.sub ?? 'Pick the option that fits you to see where you can park.'}
+          </p>
+          <div className={`finder-choices finder-choices--${tabs.length}`}>
             {tabs.map((t) => (
               <button key={t.id} className="finder-choice" onClick={() => setChosen(t)}>
                 <span className="finder-choice-title">{t.label}</span>
@@ -165,6 +190,7 @@ export function GuidedFinder({
             selectedFeature={lot.selectedFeature}
             onFeatureClick={selectByClick}
             onViewReady={setMapView}
+            onBasemapChange={setBasemapMode}
           />
         </div>
         <aside
@@ -182,11 +208,12 @@ export function GuidedFinder({
             <span className="sheet-handle-label">
               {sheetCollapsed
                 ? lot.selectedFeature
-                  ? String(lot.selectedFeature.attributes[profile.layer.nameField] ?? 'Details')
+                  ? nameOf(lot.selectedFeature.attributes)
                   : `${lot.totalCount} place${lot.totalCount === 1 ? '' : 's'} to park`
                 : 'Hide'}
             </span>
           </button>
+          <h2 className="finder-results-title">{chosen.label}</h2>
           {chosen.guide?.who && <p className="finder-results-intro">{chosen.guide.who}</p>}
           {apply && (
             <a className="guide-apply-btn" href={apply.url} target="_blank" rel="noopener noreferrer">
@@ -206,6 +233,7 @@ export function GuidedFinder({
                 rules={rules}
                 ruleConfig={profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
+                exhibit={exhibit}
               />
             </>
           ) : (
@@ -217,14 +245,13 @@ export function GuidedFinder({
                 {lot.allFeatures.map((f, i) => (
                   <li key={f.attributes.OBJECTID}>
                     <button className="finder-list-item" onClick={() => selectByIndex(i)}>
-                      <span className="finder-list-name">
-                        {String(f.attributes[profile.layer.nameField] ?? 'Parking area')}
-                      </span>
+                      <span className="finder-list-name">{nameOf(f.attributes)}</span>
                       <span className="finder-list-go">›</span>
                     </button>
                   </li>
                 ))}
               </ul>
+              <PermitInfo guide={chosen.guide} onGoToTab={goToTab} />
             </>
           )}
         </aside>

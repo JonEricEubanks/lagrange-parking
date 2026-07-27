@@ -10,6 +10,12 @@ import type { ParkingProfile } from '../config/types';
 export interface ParkingLayerResult {
   layer: FeatureLayer | null;
   setDefinitionExpression: (expr: string) => void;
+  /**
+   * Adapt the polygons to the active basemap. Over an aerial they have to be
+   * see-through (that is the whole point of the aerial) and their labels
+   * light-on-dark, or neither the imagery nor the labels read.
+   */
+  setBasemapMode: (aerial: boolean) => void;
 }
 
 export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerResult {
@@ -53,8 +59,19 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
 
     // Label each parking area with its name (e.g. "Lot 11") so the map reads on
     // its own. White halo keeps it legible over the light-canvas basemap.
+    // nameOverrides let the Village relabel an area without a hosted-data edit
+    // (e.g. "Village Hall Parking Structure" → "VH Garage").
+    const overrides = Object.entries(profile.nameOverrides ?? {});
+    const idField = profile.layer.idField;
+    const nameExpression =
+      overrides.length && idField
+        ? `When(${overrides
+            .map(([id, name]) => `$feature.${idField} == '${id}', '${name.replace(/'/g, "\\'")}'`)
+            .join(', ')}, $feature.${profile.layer.nameField})`
+        : `$feature.${profile.layer.nameField}`;
+
     const labelClass = new LabelClass({
-      labelExpressionInfo: { expression: `$feature.${profile.layer.nameField}` },
+      labelExpressionInfo: { expression: nameExpression },
       labelPlacement: 'always-horizontal',
       deconflictionStrategy: 'static',
       // Map labels render from Esri's hosted font service — web fonts (Nunito
@@ -100,5 +117,29 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
     []
   );
 
-  return { layer, setDefinitionExpression };
+  const setBasemapMode = useCallback(
+    (aerial: boolean) => {
+      const target = layerRef.current;
+      if (!target || !profile) return;
+
+      target.opacity = aerial
+        ? profile.layer.imageryOpacity ?? profile.layer.opacity
+        : profile.layer.opacity;
+
+      const existing = target.labelingInfo?.[0];
+      if (existing) {
+        const relabelled = existing.clone();
+        relabelled.symbol = new TextSymbol({
+          color: aerial ? [255, 255, 255, 1] : [0, 48, 108, 1],
+          haloColor: aerial ? [0, 0, 0, 0.85] : [255, 255, 255, 0.95],
+          haloSize: aerial ? 2 : 1.8,
+          font: { size: 11, family: 'Arial', weight: 'bold' },
+        });
+        target.labelingInfo = [relabelled];
+      }
+    },
+    [profile]
+  );
+
+  return { layer, setDefinitionExpression, setBasemapMode };
 }

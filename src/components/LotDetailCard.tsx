@@ -2,6 +2,7 @@ import type Graphic from '@arcgis/core/Graphic.js';
 import type Point from '@arcgis/core/geometry/Point.js';
 import type Polygon from '@arcgis/core/geometry/Polygon.js';
 import type {
+  AreaExhibit,
   FieldDef,
   SymbologyEntry,
   LayerFields,
@@ -9,6 +10,7 @@ import type {
   WalkTimeStep,
   WalkTimeRouteInfo,
 } from '../config/types';
+import { areaDisplayName } from '../config/lots';
 import type { RuleRow } from '../hooks/useRelatedRules';
 
 function formatValue(value: unknown, format?: string): string {
@@ -26,6 +28,7 @@ export function LotDetailCard({
   rules,
   ruleConfig,
   ruleSymbology,
+  exhibit,
   onWalkHere,
   walkMode,
   walkStep,
@@ -41,6 +44,8 @@ export function LotDetailCard({
   rules?: RuleRow[];
   ruleConfig?: RelatedRulesConfig;
   ruleSymbology?: SymbologyEntry[];
+  /** Diagram of the designated spaces inside this lot, when one exists. */
+  exhibit?: AreaExhibit;
   onWalkHere?: (centroid: Point) => void;
   walkMode?: boolean;
   walkStep?: WalkTimeStep;
@@ -50,7 +55,12 @@ export function LotDetailCard({
   onWalkCancel?: () => void;
 }) {
   const attrs = feature.attributes;
-  const lotName = String(attrs[layerFields.nameField] ?? attrs.AREANAME ?? 'Parking Area');
+  const lotName = areaDisplayName(
+    attrs,
+    layerFields.nameField,
+    layerFields.idField,
+    layerFields.nameOverrides
+  );
   const restriction = attrs[layerFields.rendererField] || '';
 
   const symMatch =
@@ -128,6 +138,27 @@ export function LotDetailCard({
             );
           })}
         </div>
+      )}
+
+      {/* Some permits are only valid in specific spaces inside a lot — show the
+          Village's designated-space diagram rather than trying to describe it. */}
+      {exhibit && (
+        <figure className="lot-card-exhibit">
+          <h4 className="lot-card-details-heading">Designated spaces</h4>
+          <a href={import.meta.env.BASE_URL + exhibit.image} target="_blank" rel="noopener noreferrer">
+            <img
+              className="lot-card-exhibit-img"
+              src={import.meta.env.BASE_URL + exhibit.image}
+              alt={exhibit.caption ?? `Designated parking spaces in ${lotName}`}
+            />
+          </a>
+          {(exhibit.caption || exhibit.credit) && (
+            <figcaption className="lot-card-exhibit-caption">
+              {exhibit.caption}
+              {exhibit.credit && <span className="lot-card-exhibit-credit">{exhibit.credit}</span>}
+            </figcaption>
+          )}
+        </figure>
       )}
 
       {detailFields.length > 0 && (

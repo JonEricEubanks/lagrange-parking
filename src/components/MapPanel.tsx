@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Map from '@arcgis/core/Map.js';
 import MapView from '@arcgis/core/views/MapView.js';
 import TileLayer from '@arcgis/core/layers/TileLayer.js';
@@ -27,6 +27,8 @@ interface MapPanelProps {
   onMapClick?: (mapPoint: Point) => void;
   onViewReady?: (view: MapView) => void;
   overlayVisibility?: Record<string, boolean>;
+  /** Reports the active basemap so the parking layer's owner can restyle it. */
+  onBasemapChange?: (aerial: boolean) => void;
 }
 
 export function MapPanel({
@@ -38,12 +40,23 @@ export function MapPanel({
   onMapClick,
   onViewReady,
   overlayVisibility,
+  onBasemapChange,
 }: MapPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<MapView | null>(null);
   const highlightRef = useRef<ResourceHandle | null>(null);
   const layerViewRef = useRef<FeatureLayerView | null>(null);
   const overlayLayersRef = useRef(new globalThis.Map<string, FeatureLayer>());
+
+  // Basemap choice. An aerial helps people orient themselves ("is that my
+  // building?"), so the parking polygons go semi-transparent over it and the
+  // Important Places fills step aside — otherwise they fight the imagery.
+  const imageryUrl = profile.basemap.imageryUrl;
+  const startAerial = !!imageryUrl && profile.basemap.default === 'imagery';
+  const [aerial, setAerial] = useState(startAerial);
+  const canvasTileRef = useRef<TileLayer | null>(null);
+  const imageryTileRef = useRef<TileLayer | null>(null);
+  const referenceLayersRef = useRef<FeatureLayer[]>([]);
 
   // Refs to avoid stale closures in the click handler
   const walkTimeModeRef = useRef(walkTimeMode);
@@ -68,7 +81,17 @@ export function MapPanel({
 
     // GISC Light Canvas tiled basemap (needs the ArcGIS API key in .env) + the
     // dynamic GISC layer for street-name labels / important places on top.
-    const basemapTile = new TileLayer({ url: profile.basemap.tileUrl });
+    // The GISC aerial shares the same tiling scheme, so it drops straight in as
+    // an alternate basemap — only one of the two is ever visible.
+    const basemapTile = new TileLayer({
+      url: profile.basemap.tileUrl,
+      visible: !startAerial,
+    });
+    const imageryTile = imageryUrl
+      ? new TileLayer({ url: imageryUrl, visible: startAerial })
+      : null;
+    canvasTileRef.current = basemapTile;
+    imageryTileRef.current = imageryTile;
 
     const dynamicLayer = new MapImageLayer({
       url: profile.basemap.dynamicUrl,
@@ -126,10 +149,19 @@ export function MapPanel({
         })),
       });
 
+      // Place-name labels are context, not content: keep them small, shorten the
+      // long ones and only draw them once zoomed in, so they stop sprawling far
+      // outside the polygon they belong to.
+      const max = rl.labelMaxLength;
+      const nameExpr = max
+        ? `IIf(Count($feature.${rl.labelField}) > ${max}, Left($feature.${rl.labelField}, ${max - 1}) + '…', $feature.${rl.labelField})`
+        : `$feature.${rl.labelField}`;
+
       const labelingInfo = rl.labelField
         ? [
             new LabelClass({
-              labelExpressionInfo: { expression: `$feature.${rl.labelField}` },
+              labelExpressionInfo: { expression: nameExpr },
+              ...(rl.labelMinScale != null ? { minScale: rl.labelMinScale } : {}),
               symbol: new TextSymbol({
                 color: rgba(rl.labelColor ?? [90, 90, 90, 1]),
                 haloColor: rgba(rl.labelHaloColor ?? [255, 255, 255, 0.8]),
@@ -153,11 +185,22 @@ export function MapPanel({
         labelsVisible: !!rl.labelField,
         popupEnabled: false,
         minScale: rl.minScale ?? 0,
+        // Over imagery these fills/labels are noise — the aerial already shows
+        // the parks and civic buildings they stand in for.
+        visible: !startAerial,
       });
     });
+    referenceLayersRef.current = referenceLayers;
 
     const map = new Map({
-      layers: [basemapTile, dynamicLayer, ...overlays, ...referenceLayers, featureLayer],
+      layers: [
+        basemapTile,
+        ...(imageryTile ? [imageryTile] : []),
+        dynamicLayer,
+        ...overlays,
+        ...referenceLayers,
+        featureLayer,
+      ],
     });
 
     const ext = profile.extent;
@@ -223,9 +266,22 @@ export function MapPanel({
       view.destroy();
       viewRef.current = null;
       layerViewRef.current = null;
+      canvasTileRef.current = null;
+      imageryTileRef.current = null;
+      referenceLayersRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featureLayer]);
+
+  // Swap basemaps, and tell the parking layer's owner to restyle for it.
+  useEffect(() => {
+    if (canvasTileRef.current) canvasTileRef.current.visible = !aerial;
+    if (imageryTileRef.current) imageryTileRef.current.visible = aerial;
+    referenceLayersRef.current.forEach((l) => {
+      l.visible = !aerial;
+    });
+    onBasemapChange?.(aerial);
+  }, [aerial, featureLayer, onBasemapChange]);
 
   // Sync overlay layer visibility
   useEffect(() => {
@@ -255,5 +311,29 @@ export function MapPanel({
     }
   }, [selectedFeature]);
 
-  return <div ref={containerRef} className="map-panel" />;
+  return (
+    <>
+      <div ref={containerRef} className="map-panel" />
+      {imageryUrl && (
+        <div className="basemap-toggle" role="group" aria-label="Basemap">
+          <button
+            type="button"
+            className={`basemap-toggle-btn${aerial ? '' : ' basemap-toggle-btn--active'}`}
+            aria-pressed={!aerial}
+            onClick={() => setAerial(false)}
+          >
+            Map
+          </button>
+          <button
+            type="button"
+            className={`basemap-toggle-btn${aerial ? ' basemap-toggle-btn--active' : ''}`}
+            aria-pressed={aerial}
+            onClick={() => setAerial(true)}
+          >
+            {profile.basemap.imageryLabel ?? 'Aerial'}
+          </button>
+        </div>
+      )}
+    </>
+  );
 }

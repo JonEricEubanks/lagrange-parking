@@ -49,9 +49,29 @@ main.tsx (esriConfig.apiKey) → App → useParkingProfile() → ParkingApp
 
 ### Audience model
 
-- **Which lots** per tab: exact, via `ParkingArea.HAS*` booleans (`HASRESIDENT`/`HASCOMMUTER`/`HASCBD`).
+The permit app has **four pages**, one per permit type: resident overnight, resident day/night
+(24 hr.), commuter & LTHS student, employee.
+
+- **Which lots** per tab: `tab.areaIds` — the Village's own list, verbatim. "Map should only show
+  the following lots" is policy, not something to infer from the data. Tabs without an explicit
+  list fall back to rules-derived membership (`useAudienceAreaIds`), then to the `HAS*` booleans.
+  `scripts/verify-permit-pages.mjs` checks every listed id still resolves against the live service.
 - **Which rules** per lot/tab: heuristic `tab.ruleWhere` (RULETYPE/PERMITZONE) until an `AUDIENCE`
   field is added to `ParkingRule`. Stakeholder content rules: **no pricing**, guidance over policy.
+- **Permit-wide info** (`tab.guide.sections`) renders in the side panel via `PermitInfo` — hours,
+  eligibility and limits that apply to every lot on the page. This is the primary sidebar content;
+  per-lot attributes only appear once a lot is selected.
+- **Display names**: `profile.nameOverrides` (keyed by area id) relabels an area in map labels,
+  lists and detail cards without editing hosted data.
+- **Designated spaces**: `profile.areaExhibits` attaches a diagram to a lot (some permits are only
+  valid in specific spaces inside a lot — see Lot 2).
+
+### Basemap
+
+`basemap.imageryUrl` adds a Map/Aerial toggle. The GISC aerial shares the canvas basemap's tiling
+scheme so it drops straight in. On aerial the parking polygons drop to `layer.imageryOpacity`, their
+labels go light-on-dark (`useParkingLayer.setBasemapMode` — the layer's owner restyles it, MapPanel
+only reports the choice), and the Important Places reference layer hides.
 
 ## Build modes / deploy
 

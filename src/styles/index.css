@@ -1329,7 +1329,7 @@ body,
 .finder-picker {
   flex: 1;
   overflow-y: auto;
-  max-width: 760px;
+  max-width: 1180px;
   width: 100%;
   margin: 0 auto;
   padding: 48px 24px;
@@ -1349,10 +1349,18 @@ body,
   margin: 10px 0 30px;
 }
 
+/* Side-by-side on a desktop screen (there is plenty of width for four cards),
+   stacking only once the columns would get too narrow to read. */
 .finder-choices {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: stretch;
   gap: 14px;
+}
+
+/* Three cards read better as one row than as 2 + 1. */
+.finder-choices--3 {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .finder-choice {
@@ -1387,6 +1395,8 @@ body,
   font-size: 13.5px;
   line-height: 1.5;
   color: #4a5560;
+  /* Keeps the "Show my parking →" row aligned across cards of unequal length. */
+  flex: 1;
 }
 
 .finder-choice-go {
@@ -1415,6 +1425,14 @@ body,
   border-left: 1px solid #e3eaf0;
   overflow-y: auto;
   padding: 16px;
+}
+
+.finder-results-title {
+  font-family: var(--font-header);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--lf-midnight);
+  margin-bottom: 6px;
 }
 
 .finder-results-intro {
@@ -1658,6 +1676,184 @@ body,
   overflow-y: auto;
   background: #fafcfe;
   border-top: 1px solid #e3eaf0;
+}
+
+/* ─── Permit information panel ─── */
+/* Everything that applies to every lot on a permit page. Grouped into short
+   labelled sections so a long policy list stays scannable in a narrow rail. */
+.permit-info {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e3eaf0;
+}
+
+.permit-info-h {
+  font-family: var(--font-header);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--lf-midnight);
+  margin-bottom: 10px;
+}
+
+.permit-info-section {
+  margin-bottom: 14px;
+}
+
+.permit-info-title {
+  font-family: var(--font-header);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lf-primary);
+  margin-bottom: 5px;
+}
+
+.permit-info-list {
+  list-style: disc;
+  padding-left: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3a444e;
+}
+
+.permit-info-sublist {
+  list-style: circle;
+  padding-left: 16px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #4a5560;
+}
+
+.permit-info-seealso {
+  margin: 14px 0;
+  padding: 11px 12px;
+  background: var(--lf-light-gray);
+  border-radius: 8px;
+}
+
+.permit-info-seealso-text {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #3a444e;
+  margin-bottom: 8px;
+}
+
+.permit-info-seealso-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lf-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.permit-info-seealso-btn:hover {
+  color: var(--lf-midnight);
+  text-decoration: underline;
+}
+
+/* Parking the Village has approved but that is not in the GIS yet. */
+.permit-info-pending {
+  margin-top: 14px;
+  padding: 11px 12px;
+  border: 1px dashed var(--lf-primary);
+  border-radius: 8px;
+  background: #f7fbfe;
+}
+
+.permit-info-pending-title {
+  font-family: var(--font-header);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lf-midnight);
+  margin-bottom: 5px;
+}
+
+.permit-info-pending-body {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #4a5560;
+}
+
+.permit-info-pending-img {
+  width: 100%;
+  margin-top: 9px;
+  border: 1px solid #e3eaf0;
+  border-radius: 6px;
+}
+
+/* ─── Basemap toggle ─── */
+.basemap-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  background: var(--lf-white);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.basemap-toggle-btn {
+  background: var(--lf-white);
+  border: none;
+  padding: 7px 13px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--lf-midnight);
+  cursor: pointer;
+}
+
+.basemap-toggle-btn:hover {
+  background: var(--lf-light-gray);
+}
+
+.basemap-toggle-btn--active {
+  background: var(--lf-primary);
+  color: var(--lf-white);
+}
+
+.basemap-toggle-btn--active:hover {
+  background: var(--lf-midnight);
+}
+
+/* ─── Designated-space exhibit ─── */
+.lot-card-exhibit {
+  margin-top: 12px;
+}
+
+.lot-card-exhibit-img {
+  width: 100%;
+  border: 1px solid #e3eaf0;
+  border-radius: 6px;
+  background: var(--lf-white);
+  cursor: zoom-in;
+}
+
+.lot-card-exhibit-caption {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #4a5560;
+}
+
+.lot-card-exhibit-credit {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-style: italic;
+  color: #7a838d;
 }
 
 /* ─── Templates: tablet / mobile ─── */

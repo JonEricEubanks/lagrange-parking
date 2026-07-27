@@ -2,7 +2,7 @@
   "id": "lagrange-public",
   "title": "Visitor Parking Map",
   "community": "Village of La Grange",
-  "lastUpdated": "2026-06-19",
+  "lastUpdated": "2026-07-27",
   "enableWalkTime": false,
 
   "welcome": {
@@ -11,6 +11,9 @@
     "hint": "Tip: evenings and weekends are often free. Check each area's rules."
   },
   "legendTitle": "Time Limit",
+  "nameOverrides": {
+    "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage"
+  },
 
   "layer": {
     "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
@@ -21,6 +24,7 @@
     "spacesField": "MAXSPACES",
     "baseWhere": "USERCLASS IN ('VISITOR','RESTRICTED')",
     "opacity": 0.7,
+    "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
     "outlineWidth": 1.2
   },
@@ -77,6 +81,9 @@
 
   "basemap": {
     "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
+    "imageryUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_IMAGERY_2026_Project/MapServer",
+    "imageryLabel": "Aerial",
+    "default": "canvas",
     "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
     "sublayers": [
       { "id": 14, "title": "Municipal Boundary", "visible": true, "definitionExpression": "COMMUNITYNAME = 'LA GRANGE'" },
@@ -101,18 +108,20 @@
         { "value": "Landmark", "fill": [190, 150, 80, 0.45], "outline": [190, 150, 80, 1] }
       ],
       "labelField": "name",
-      "labelColor": [90, 90, 90, 1],
-      "labelHaloColor": [255, 255, 255, 0.8],
-      "labelSize": 9,
-      "labelItalic": true
+      "labelColor": [110, 110, 110, 1],
+      "labelHaloColor": [255, 255, 255, 0.85],
+      "labelSize": 7.5,
+      "labelItalic": true,
+      "labelMinScale": 6000,
+      "labelMaxLength": 22
     }
   ],
 
   "extent": {
-    "xmin": -87.892,
-    "ymin": 41.793,
-    "xmax": -87.846,
-    "ymax": 41.824,
+    "xmin": -87.8845,
+    "ymin": 41.811,
+    "xmax": -87.8645,
+    "ymax": 41.8201,
     "spatialReference": { "wkid": 4326 }
   },
 

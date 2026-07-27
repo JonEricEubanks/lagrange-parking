@@ -1,4 +1,5 @@
 import type { SymbologyEntry, AudienceGuideContent, ApplyLink } from '../config/types';
+import { PermitInfo } from './PermitInfo';
 
 interface AudienceGuideProps {
   /** Audience/section name shown as the rail heading (e.g. "Residents"). */
@@ -15,6 +16,8 @@ interface AudienceGuideProps {
   activeFilter?: string | null;
   onFilterToggle?: (value: string) => void;
   isOpen?: boolean;
+  /** Lets a guide's "see also" pointer switch to another permit tab. */
+  onGoToTab?: (tabId: string) => void;
 }
 
 export function AudienceGuide({
@@ -28,6 +31,7 @@ export function AudienceGuide({
   activeFilter = null,
   onFilterToggle,
   isOpen,
+  onGoToTab,
 }: AudienceGuideProps) {
   const knownValues = new Set(symbology.filter((s) => s.value !== '_default').map((s) => s.value));
   const hasUnknown = [...presentValues].some((v) => !knownValues.has(v));
@@ -75,6 +79,8 @@ export function AudienceGuide({
           </div>
         )
       )}
+
+      <PermitInfo guide={guide} onGoToTab={onGoToTab} />
 
       <div className="guide-legend">
         <h3 className="legend-title">{legendTitle}</h3>

@@ -2,16 +2,36 @@
   "id": "lagrange-permit",
   "title": "Parking Permit Map",
   "community": "Village of La Grange",
-  "lastUpdated": "2026-06-19",
+  "lastUpdated": "2026-07-27",
   "enableWalkTime": false,
 
   "welcome": {
     "heading": "La Grange Parking Permits",
-    "body": "Choose your group above to see only the lots and rules that apply to you — residents, commuters & LT students, or downtown employees. Click a lot for who can park there and how to apply.",
-    "hint": "Use the legend to filter by permit type."
+    "body": "Choose your permit type above to see only the lots and rules that apply to it — resident overnight, resident day/night, commuter & LTHS student, or employee. Click a lot for its details.",
+    "hint": "Use the legend to filter by parking type."
   },
   "legendTitle": "Parking Type",
-  "apply": { "label": "How to get a permit →", "url": "https://www.villageoflagrange.com/" },
+  "picker": {
+    "heading": "What type of permit are you looking for?",
+    "sub": "Pick the permit that fits you to see where you can park and the rules that apply."
+  },
+  "apply": { "label": "Apply for a Permit Now →", "url": "https://www.villageoflagrange.com/" },
+
+  "nameOverrides": {
+    "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
+    "OS115798": "Harris Ave (CBD spaces)",
+    "OS115799": "Calendar Ave (CBD spaces)",
+    "OS115797": "Waiola Ave (WBD spaces)",
+    "OS118723": "Hillgrove Ave (WBD spaces)"
+  },
+
+  "areaExhibits": {
+    "LOT2": {
+      "image": "assets/exhibits/lot2-overnight-resident-spaces.png",
+      "caption": "Designated overnight resident spaces in Lot 2 (74 spaces, shaded).",
+      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 1 of 5"
+    }
+  },
 
   "layer": {
     "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
@@ -22,6 +42,7 @@
     "spacesField": "MAXSPACES",
     "baseWhere": "USERCLASS = 'PERMIT'",
     "opacity": 0.7,
+    "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
     "outlineWidth": 1.2
   },
@@ -29,7 +50,6 @@
   "fields": {
     "display": [
       { "field": "FACILITYTYPE", "label": "Facility" },
-      { "field": "OWNERSHIP", "label": "Ownership" },
       { "field": "MAXSPACES", "label": "Spaces", "format": "integer" },
       { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail" },
       { "field": "LOCDESC", "label": "Location", "section": "detail" }
@@ -43,25 +63,24 @@
     "orderByFields": ["RULETYPE"],
     "purchaseUrlField": "PURCHASEURL",
     "display": [
-      { "field": "PERMITNAME", "label": "Permit" },
       { "field": "ENFORCE_TEXT", "label": "When" },
       { "field": "MAXDURATION", "label": "Time limit" }
     ]
   },
 
   "ruleSymbology": [
-    { "value": "OVERNIGHT_RESIDENT", "label": "Overnight Resident Permit", "color": [0, 48, 108, 1] },
+    { "value": "OVERNIGHT_RESIDENT", "label": "Resident Permit Parking", "color": [0, 48, 108, 1] },
     { "value": "DAYTIME_RESIDENT", "label": "Daytime Resident Permit", "color": [18, 107, 181, 1] },
     { "value": "DECAL_ZONE", "label": "Permit Zone", "color": [19, 172, 225, 1] },
     { "value": "COMMUTER_DECAL", "label": "Commuter Permit", "color": [67, 183, 73, 1] },
     { "value": "CBD_DECAL", "label": "CBD Employee Permit", "color": [216, 120, 50, 1] },
-    { "value": "BUSINESS_DECAL", "label": "Business Permit", "color": [120, 90, 160, 1] }
+    { "value": "BUSINESS_DECAL", "label": "WBD Employee Permit", "color": [120, 90, 160, 1] }
   ],
 
   "symbology": [
     { "value": "Lot", "label": "Parking Lot", "color": [18, 107, 181, 1] },
     { "value": "Garage", "label": "Parking Garage", "color": [0, 48, 108, 1] },
-    { "value": "On-Street", "label": "On-Street Permit Zone", "color": [67, 183, 73, 1] },
+    { "value": "On-Street", "label": "On-Street Permit Spaces", "color": [67, 183, 73, 1] },
     { "value": "_default", "label": "Other", "color": [150, 150, 150, 1] }
   ],
 
@@ -73,6 +92,9 @@
 
   "basemap": {
     "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
+    "imageryUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_IMAGERY_2026_Project/MapServer",
+    "imageryLabel": "Aerial",
+    "default": "imagery",
     "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
     "sublayers": [
       { "id": 14, "title": "Municipal Boundary", "visible": true, "definitionExpression": "COMMUNITYNAME = 'LA GRANGE'" },
@@ -97,43 +119,206 @@
         { "value": "Landmark", "fill": [190, 150, 80, 0.45], "outline": [190, 150, 80, 1] }
       ],
       "labelField": "name",
-      "labelColor": [90, 90, 90, 1],
-      "labelHaloColor": [255, 255, 255, 0.8],
-      "labelSize": 9,
-      "labelItalic": true
+      "labelColor": [110, 110, 110, 1],
+      "labelHaloColor": [255, 255, 255, 0.85],
+      "labelSize": 7.5,
+      "labelItalic": true,
+      "labelMinScale": 6000,
+      "labelMaxLength": 22
     }
   ],
 
   "extent": {
-    "xmin": -87.892,
-    "ymin": 41.793,
-    "xmax": -87.846,
-    "ymax": 41.824,
+    "xmin": -87.8905,
+    "ymin": 41.8092,
+    "xmax": -87.865,
+    "ymax": 41.8201,
     "spatialReference": { "wkid": 4326 }
   },
 
   "tabs": [
     {
-      "id": "residents",
-      "label": "Residents",
+      "id": "resident-overnight",
+      "label": "Resident Overnight Only",
       "enabled": true,
       "audience": ["RESIDENT"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13"],
       "where": "HASRESIDENT = 1",
-      "ruleWhere": "PERMITZONE IN ('A','B','C','D','2A','5A','9A') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE IN ('OVERNIGHT_RESIDENT','DAYTIME_RESIDENT'))",
+      "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT')",
       "guide": {
-        "who": "Parking for La Grange residents with a residential permit (permit zones A–D and lot 5A). Overnight on-street parking from 2 a.m.–6 a.m. requires a resident permit."
+        "who": "Parking from 2 a.m. to 6 a.m. for residents of older buildings near downtown La Grange and the West End.",
+        "sections": [
+          {
+            "title": "How it works",
+            "bullets": [
+              { "text": "The Village makes a limited number of public parking spaces available to residents of older buildings near the downtown." },
+              { "text": "Permit holders must park only in the spaces designated as available for overnight parking. No specific lots or parking spaces are assigned." }
+            ]
+          },
+          {
+            "title": "Where you can park",
+            "bullets": [
+              {
+                "text": "There are two types of resident overnight parking permits:",
+                "items": [
+                  "West End permits are valid in Lots 13 and 15 only.",
+                  "Central Business District (CBD) permits are valid in Lots 2, 5, 11 and 12 and the Village Hall Garage."
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Hours",
+            "bullets": [
+              { "text": "Permit holders are entitled to park between 2 a.m. and 6 a.m. Overnight parking is allowed by permit only." },
+              { "text": "Most Village public parking is time limited from 6 a.m. to 8 p.m. and not time limited after 8 p.m." }
+            ]
+          },
+          {
+            "title": "Who is eligible",
+            "bullets": [
+              {
+                "text": "You must meet all of the following:",
+                "items": [
+                  "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
+                  "Live in a building built prior to 1993.",
+                  "Residents of single family detached homes are only eligible if their property has no on-site parking."
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Limits",
+            "bullets": [
+              { "text": "Maximum of 2 permits per household / residential unit. You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space per permit." }
+            ]
+          }
+        ],
+        "pending": {
+          "title": "Lot 15 — new Village lot",
+          "body": "Lot 15 is approved for West End resident and employee permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
+          "image": "assets/exhibits/lot15-new-village-lot.jpg"
+        }
+      }
+    },
+    {
+      "id": "resident-24hr",
+      "label": "Resident Day/Night (24 hr.)",
+      "enabled": true,
+      "audience": ["RESIDENT"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE"],
+      "where": "HASRESIDENT = 1",
+      "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
+      "guide": {
+        "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",
+        "apply": { "label": "Purchase a Permit →", "url": "https://www.villageoflagrange.com/" },
+        "sections": [
+          {
+            "title": "How it works",
+            "bullets": [
+              { "text": "The Village makes a limited number of public parking spaces available to residents of older buildings near the downtown that have no parking on their private properties." },
+              { "text": "There are two types of resident 24 hr. permits: Central Business District (CBD) and West End." }
+            ]
+          },
+          {
+            "title": "Where you can park",
+            "bullets": [
+              { "text": "Permits are issued for a specific lot. Permit holders may park anywhere within their lot during the day; between 2 a.m. and 6 a.m. they must park within the designated overnight parking areas. No specific parking spaces are assigned." },
+              { "text": "If you cannot find parking in your lot, overflow parking is available on Levels 2 and 3 of the Village Hall Garage." }
+            ]
+          },
+          {
+            "title": "Hours",
+            "bullets": [
+              { "text": "Permit holders are entitled to park any time with no time limits." },
+              { "text": "Most Village public parking is time limited from 6 a.m. to 8 p.m. and not time limited after 8 p.m." }
+            ]
+          },
+          {
+            "title": "Who is eligible",
+            "bullets": [
+              {
+                "text": "You must meet all of the following:",
+                "items": [
+                  "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
+                  "Live in a building built prior to 1993.",
+                  "Live in a residential building with no on-site parking, or in a mixed use (commercial & residential) building.",
+                  "Residents of single family detached homes are only eligible if their property has no on-site parking."
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Limits",
+            "bullets": [
+              { "text": "Maximum of 2 permits per household / residential unit. You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space per permit." },
+              { "text": "Vehicles must move at least every 5 days. No tarped vehicles." },
+              { "text": "No commercial vehicles, or vehicles with logos in excess of one square foot." }
+            ]
+          }
+        ],
+        "seeAlso": {
+          "tabId": "resident-overnight",
+          "label": "See the overnight parking areas",
+          "text": "Between 2 a.m. and 6 a.m. you must park in the designated overnight areas."
+        },
+        "pending": {
+          "title": "Lot 15 — new Village lot",
+          "body": "Lot 15 is approved for West End resident and employee permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
+          "image": "assets/exhibits/lot15-new-village-lot.jpg"
+        }
       }
     },
     {
       "id": "commuter",
-      "label": "Commuter & LT Students",
+      "label": "Commuter & LTHS Students",
       "enabled": true,
       "audience": ["COMMUTER", "STUDENT"],
+      "areaIds": [
+        "LOT2",
+        "LOT12",
+        "LOT13",
+        "LOT14",
+        "OS115790",
+        "OS115755",
+        "OS115761",
+        "OS115687",
+        "OS115681",
+        "OS115680",
+        "OS115800"
+      ],
       "where": "HASCOMMUTER = 1",
-      "ruleWhere": "PERMITZONE IN ('E','G','H') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE = 'COMMUTER_DECAL')",
+      "ruleWhere": "RULETYPE = 'COMMUTER_DECAL' OR PERMITZONE IN ('A', 'B', 'C', 'D', 'E', 'G', 'H')",
       "guide": {
-        "who": "Parking for Metra commuters and Lyons Township High School students — commuter permit zones E and G, the LTHS student zone (H), and the commuter lots.",
-        "note": "Some commuter lots require a valid Metra train pass."
+        "who": "Daytime parking for Metra commuters and Lyons Township High School students.",
+        "sections": [
+          {
+            "title": "Hours",
+            "bullets": [
+              { "text": "Commuter permit holders are entitled to park 6 a.m. to 6 p.m., Monday–Friday." },
+              { "text": "LTHS student permit holders are entitled to park 6 a.m. to 6 p.m., Monday–Friday, during the school year only." }
+            ]
+          },
+          {
+            "title": "Where you can park",
+            "bullets": [
+              { "text": "Permits are issued for a specific lot or zone. Permit holders may park anywhere within their lot/zone — no specific parking spaces are assigned." },
+              { "text": "If you cannot find parking in your lot/zone, overflow parking is available in any nearby time-limited space. You must contact the Parking Enforcement Division at (708) 352-2131 to advise them of the need for temporary alternate parking." }
+            ]
+          },
+          {
+            "title": "Who is eligible",
+            "bullets": [
+              { "text": "Permits for Lot 13 require verification of commuter status at application and renewal." }
+            ]
+          },
+          {
+            "title": "Limits",
+            "bullets": [
+              { "text": "You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space per permit." }
+            ]
+          }
+        ]
       }
     },
     {
@@ -141,10 +326,63 @@
       "label": "Employees",
       "enabled": true,
       "audience": ["EMPLOYEE"],
+      "areaIds": [
+        "LOT2",
+        "LOT5",
+        "VILLAGEHALLPARKINGSTRUCTURE",
+        "OS115798",
+        "OS115799",
+        "OS115797",
+        "OS118723"
+      ],
       "where": "HASCBD = 1",
-      "ruleWhere": "PERMITZONE IN ('CBD','WBD') OR ((PERMITZONE IS NULL OR PERMITZONE IN ('NONE','')) AND RULETYPE IN ('CBD_DECAL','BUSINESS_DECAL'))",
+      "ruleWhere": "RULETYPE IN ('CBD_DECAL', 'BUSINESS_DECAL') OR PERMITZONE IN ('CBD', 'WBD')",
       "guide": {
-        "who": "Parking for people who work downtown — Central Business District (CBD) and West Business District (WBD) employee permits."
+        "who": "Parking for people who work downtown — Central Business District (CBD) and West End Business District (WBD) employee permits.",
+        "sections": [
+          {
+            "title": "How it works",
+            "bullets": [
+              { "text": "Permit holders must park only in the spaces designated as available for employee parking. No specific parking spaces are assigned." }
+            ]
+          },
+          {
+            "title": "Where you can park",
+            "bullets": [
+              {
+                "text": "There are two types of employee parking permits:",
+                "items": [
+                  "CBD permits are valid anywhere within Lot 2, in designated spaces only in Lot 5 and on-street on Calendar Ave. and Harris Ave., and on Levels 2 and 3 of the Village Hall Garage.",
+                  "WBD permits are valid anywhere in Lot 15, as well as designated on-street spaces on Waiola Ave. and Hillgrove Ave."
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Hours",
+            "bullets": [
+              { "text": "Permit holders are entitled to park with no time limit between 6 a.m. and 8 p.m." },
+              { "text": "Most Village public parking is time limited from 6 a.m. to 8 p.m. and not time limited after 8 p.m. Overnight parking (2 a.m. to 6 a.m.) is prohibited." }
+            ]
+          },
+          {
+            "title": "Who is eligible",
+            "bullets": [
+              { "text": "You must be an employee of a business within the eligible CBD or WBD area. Proof of employment is required at application and renewal." }
+            ]
+          },
+          {
+            "title": "Limits",
+            "bullets": [
+              { "text": "Maximum of 1 permit per person. You may register a primary and an alternate vehicle on one permit, but are entitled to only one parking space." }
+            ]
+          }
+        ],
+        "pending": {
+          "title": "Lot 15 — new Village lot",
+          "body": "Lot 15 is approved for West End (WBD) employee and resident permit parking but is not in the Village GIS yet, so it cannot be drawn on the map. It will appear here once the parking layer is updated.",
+          "image": "assets/exhibits/lot15-new-village-lot.jpg"
+        }
       }
     }
   ],

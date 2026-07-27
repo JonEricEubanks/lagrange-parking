@@ -6,20 +6,21 @@ import { useParkingLayer } from '../../hooks/useParkingLayer';
 import { useSelectedLot } from '../../hooks/useSelectedLot';
 import { useAllRules } from '../../hooks/useAllRules';
 import { ruleAudience, type Audience } from '../../config/audience';
+import { areaDisplayName } from '../../config/lots';
 import { MapPanel } from '../MapPanel';
 import { LotDetailCard } from '../LotDetailCard';
 
 const AUD_LABEL: Partial<Record<Audience, string>> = {
   RESIDENT: 'Residents',
   COMMUTER: 'Commuter',
-  STUDENT: 'LT Students',
+  STUDENT: 'LTHS Students',
   EMPLOYEE: 'Employees',
   VISITOR: 'Visitor',
 };
 const AUD_ORDER: Audience[] = ['RESIDENT', 'COMMUTER', 'STUDENT', 'EMPLOYEE', 'VISITOR'];
 
 export function Directory({ profile, onHome }: { profile: ParkingProfile; onHome?: () => void }) {
-  const { layer, setDefinitionExpression } = useParkingLayer(profile);
+  const { layer, setDefinitionExpression, setBasemapMode } = useParkingLayer(profile);
   const base = profile.layer.baseWhere ?? '1=1';
   const lot = useSelectedLot(layer, base, profile.layer.nameField);
   const rulesByArea = useAllRules(profile.relatedRules);
@@ -83,19 +84,29 @@ export function Directory({ profile, onHome }: { profile: ParkingProfile; onHome
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      items = items.filter(({ f }) => String(f.attributes[nameField] ?? '').toLowerCase().includes(q));
+      items = items.filter(({ f }) =>
+        areaDisplayName(f.attributes, nameField, idField, profile.nameOverrides)
+          .toLowerCase()
+          .includes(q)
+      );
     }
     return items;
-  }, [lot.allFeatures, chip, chips, areaAud, idField, search, nameField]);
+  }, [lot.allFeatures, chip, chips, areaAud, idField, search, nameField, profile.nameOverrides]);
 
   const layerFields: LayerFields = {
     nameField,
     rendererField: facilityField,
     idField: profile.layer.idField,
     spacesField: profile.layer.spacesField,
+    nameOverrides: profile.nameOverrides,
   };
   const selectedAreaId = lot.selectedFeature?.attributes?.[idField];
   const selectedRules = selectedAreaId ? rulesByArea.get(String(selectedAreaId)) ?? [] : [];
+  const selectedExhibit = selectedAreaId
+    ? profile.areaExhibits?.[String(selectedAreaId)]
+    : undefined;
+  const nameOf = (attrs: Record<string, unknown>) =>
+    areaDisplayName(attrs, nameField, idField, profile.nameOverrides);
 
   const badgesFor = (g: Graphic) => {
     const a = areaAud.get(String(g.attributes[idField]));
@@ -167,7 +178,7 @@ export function Directory({ profile, onHome }: { profile: ParkingProfile; onHome
                 onClick={() => lot.selectByIndex(i)}
               >
                 <div className="dir-card-top">
-                  <span className="dir-card-name">{String(f.attributes[nameField] ?? 'Parking area')}</span>
+                  <span className="dir-card-name">{nameOf(f.attributes)}</span>
                   <span className="dir-card-facility">{String(f.attributes[facilityField] ?? '')}</span>
                 </div>
                 <div className="dir-card-badges">
@@ -191,6 +202,7 @@ export function Directory({ profile, onHome }: { profile: ParkingProfile; onHome
               selectedFeature={lot.selectedFeature}
               onFeatureClick={(g: Graphic) => lot.selectByClick(g)}
               onViewReady={setMapView}
+              onBasemapChange={setBasemapMode}
             />
           </div>
           <div className="dir-detail-panel">
@@ -203,6 +215,7 @@ export function Directory({ profile, onHome }: { profile: ParkingProfile; onHome
                 rules={selectedRules}
                 ruleConfig={profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
+                exhibit={selectedExhibit}
               />
             ) : (
               <p className="dir-hint">Select a parking area to see who can park there and the rules.</p>

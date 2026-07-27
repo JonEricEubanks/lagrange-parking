@@ -51,6 +51,13 @@ export interface TabDef {
   /** Definition expression applied to the parking-area layer for this audience/tab. */
   where?: string;
   /**
+   * Exact list of area ids this page shows, authored by the Village rather than
+   * derived from the data. When present it wins over `where` and over the
+   * rules-derived audience lookup — "map should only show the following lots"
+   * is a policy statement, not something to infer from RULETYPE/PERMITZONE.
+   */
+  areaIds?: string[];
+  /**
    * Definition expression applied to the related ParkingRule table when a lot is
    * selected on this tab — so each audience sees only its own rules.
    */
@@ -67,6 +74,18 @@ export interface ApplyLink {
   url: string;
 }
 
+/** One bullet of permit-wide guidance, optionally with nested sub-bullets. */
+export interface GuideBullet {
+  text: string;
+  items?: string[];
+}
+
+/** A labelled group of bullets ("Where you can park", "Who's eligible", …). */
+export interface GuideSection {
+  title: string;
+  bullets: GuideBullet[];
+}
+
 export interface AudienceGuideContent {
   /** Plain-language "who can park here" for this group. */
   who?: string;
@@ -74,6 +93,19 @@ export interface AudienceGuideContent {
   note?: string;
   /** Per-audience apply link; falls back to the profile-level `apply`. */
   apply?: ApplyLink;
+  /**
+   * Permit-wide information that applies to every lot on this page, grouped into
+   * short labelled sections. Shown in the side panel instead of per-lot detail,
+   * which is what permit holders actually need to read.
+   */
+  sections?: GuideSection[];
+  /** Pointer to a sibling permit page (e.g. 24-hr → the overnight designated areas). */
+  seeAlso?: { tabId: string; label: string; text?: string };
+  /**
+   * Parking the Village has approved but that is not in the GIS data yet, so it
+   * cannot be drawn. Surfaced as a callout instead of silently missing.
+   */
+  pending?: { title: string; body: string; image?: string };
 }
 
 export type WalkTimeStep = 'set-start' | 'set-end' | 'solving' | 'result' | 'error';
@@ -119,6 +151,11 @@ export interface ReferenceLayer {
   labelItalic?: boolean;
   /** Hide when zoomed out beyond this scale (omit = always visible). */
   minScale?: number;
+  /** Draw labels only once zoomed in past this scale. Keeps place names from
+   *  sprawling far outside their polygon at village-wide zooms. */
+  labelMinScale?: number;
+  /** Truncate labels longer than this many characters (with an ellipsis). */
+  labelMaxLength?: number;
 }
 
 /** Configuration for the related ParkingRule table (1:many off the parking-area key). */
@@ -141,6 +178,15 @@ export interface LayerFields {
   rendererField: string;
   idField?: string;
   spacesField?: string;
+  /** Display-name overrides keyed by area id (see ParkingProfile.nameOverrides). */
+  nameOverrides?: Record<string, string>;
+}
+
+/** A scanned/engineered diagram of the designated spaces inside one lot. */
+export interface AreaExhibit {
+  image: string;
+  caption?: string;
+  credit?: string;
 }
 
 export interface ParkingProfile {
@@ -156,6 +202,16 @@ export interface ParkingProfile {
   legendTitle?: string;
   /** Profile-level "how to apply" link (a tab guide may override it). */
   apply?: ApplyLink;
+  /** Heading + sub-heading for the guided-finder audience picker. */
+  picker?: { heading: string; sub?: string };
+  /**
+   * Display names the Village wants shown in place of the source AREANAME,
+   * keyed by area id (e.g. VILLAGEHALLPARKINGSTRUCTURE → "VH Garage"). Applied
+   * to map labels, lists and detail cards so no hosted-data edit is needed.
+   */
+  nameOverrides?: Record<string, string>;
+  /** Designated-space diagrams keyed by area id, shown with that lot's detail. */
+  areaExhibits?: Record<string, AreaExhibit>;
 
   layer: {
     url: string;
@@ -171,6 +227,9 @@ export interface ParkingProfile {
     /** Always-applied filter for this experience (e.g. USERCLASS = 'PERMIT'). */
     baseWhere?: string;
     opacity: number;
+    /** Opacity used while the aerial basemap is on — the imagery has to read
+     *  through the polygons for people to orient themselves. */
+    imageryOpacity?: number;
     outlineColor: [number, number, number, number];
     outlineWidth: number;
   };
@@ -193,6 +252,12 @@ export interface ParkingProfile {
     tileUrl: string;
     dynamicUrl: string;
     sublayers: Sublayer[];
+    /** Aerial tile service. Present = the map shows a Map/Aerial toggle. */
+    imageryUrl?: string;
+    /** Label for the aerial option (e.g. "Aerial (2026)"). */
+    imageryLabel?: string;
+    /** Which basemap the map opens with. Defaults to 'canvas'. */
+    default?: 'canvas' | 'imagery';
   };
 
   extent: {

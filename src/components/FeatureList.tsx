@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type Graphic from '@arcgis/core/Graphic.js';
 import type { SymbologyEntry, LayerFields } from '../config/types';
+import { areaDisplayName } from '../config/lots';
 
 type SortKey = 'name' | 'spaces' | 'restriction';
 
@@ -19,12 +20,12 @@ export function FeatureList({
   legendFilter?: string | null;
   layerFields: LayerFields;
 }) {
-  const { nameField, rendererField, spacesField } = layerFields;
+  const { nameField, rendererField, spacesField, idField, nameOverrides } = layerFields;
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
 
   const nameOf = (g: Graphic): string =>
-    String(g.attributes[nameField] ?? g.attributes.AREANAME ?? '');
+    areaDisplayName(g.attributes, nameField, idField, nameOverrides);
 
   const symMap = useMemo(() => {
     const map = new Map<string, SymbologyEntry>();

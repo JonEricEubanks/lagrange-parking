@@ -7,6 +7,7 @@ import { useSelectedLot } from '../hooks/useSelectedLot';
 import { useRelatedRules } from '../hooks/useRelatedRules';
 import { useAudienceAreaIds } from '../hooks/useAudienceAreaIds';
 import { useWalkRoute } from '../hooks/useWalkRoute';
+import { explicitAreaWhere } from '../config/lots';
 import { Header } from './Header';
 import { TabBar } from './TabBar';
 import { AudienceGuide } from './AudienceGuide';
@@ -17,7 +18,7 @@ const and = (...parts: (string | undefined | null)[]) =>
   parts.filter((p) => p && p.trim()).map((p) => `(${p})`).join(' AND ');
 
 export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHome?: () => void }) {
-  const { layer: featureLayer, setDefinitionExpression } = useParkingLayer(profile);
+  const { layer: featureLayer, setDefinitionExpression, setBasemapMode } = useParkingLayer(profile);
 
   const layerFields: LayerFields = useMemo(
     () => ({
@@ -25,8 +26,9 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
       rendererField: profile.layer.rendererField,
       idField: profile.layer.idField,
       spacesField: profile.layer.spacesField,
+      nameOverrides: profile.nameOverrides,
     }),
-    [profile.layer]
+    [profile.layer, profile.nameOverrides]
   );
   const rField = profile.layer.rendererField;
 
@@ -47,11 +49,17 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
     [profile.tabs, activeTab]
   );
 
-  // Audience membership is derived from the rules (reliable PERMITZONE), not the
-  // source HAS* flags — so no hosted-data edit is needed for the tabs to be correct.
-  const audienceIds = useAudienceAreaIds(profile.relatedRules, activeTabDef?.ruleWhere);
+  // Tabs that carry the Village's own lot list use it verbatim; the rest fall
+  // back to membership derived from the rules (reliable PERMITZONE) rather than
+  // the source HAS* flags, so no hosted-data edit is needed for them to be right.
+  const explicitWhere = explicitAreaWhere(profile, activeTabDef);
+  const audienceIds = useAudienceAreaIds(
+    profile.relatedRules,
+    explicitWhere ? undefined : activeTabDef?.ruleWhere
+  );
 
   const memberFilter = useMemo(() => {
+    if (explicitWhere) return explicitWhere;
     // Prefer precise rules-derived membership; fall back to the HAS* flag so the
     // map always shows lots even while the rules query loads (or if it fails).
     if (audienceIds && audienceIds.length > 0) {
@@ -60,7 +68,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
       return `${idField} IN (${list})`;
     }
     return activeTabDef?.where ?? '';
-  }, [activeTabDef, audienceIds, profile.layer.idField]);
+  }, [activeTabDef, explicitWhere, audienceIds, profile.layer.idField]);
 
   // Filter that defines the current audience/tab feature set (no legend filter).
   const listWhere = useMemo(
@@ -122,6 +130,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
     ? lot.selectedFeature?.attributes?.[layerFields.idField]
     : undefined;
   const rules = useRelatedRules(profile.relatedRules, selectedAreaId, activeTabDef?.ruleWhere);
+  const exhibit = selectedAreaId ? profile.areaExhibits?.[String(selectedAreaId)] : undefined;
 
   const walkRoute = useWalkRoute(mapView, walkMode);
   const walkEnabled = !!profile.enableWalkTime;
@@ -215,6 +224,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
           activeFilter={legendFilter}
           onFilterToggle={handleFilterToggle}
           isOpen={legendOpen}
+          onGoToTab={handleTabClick}
         />
         <div className="map-panel-wrapper">
           <MapPanel
@@ -225,6 +235,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             walkTimeMode={walkMode}
             onMapClick={walkRoute.handleMapClick}
             onViewReady={setMapView}
+            onBasemapChange={setBasemapMode}
           />
           {walkMode && walkRoute.step === 'set-start' && (
             <div className="walk-map-toast">
@@ -251,6 +262,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             rules={rules}
             ruleConfig={profile.relatedRules}
             ruleSymbology={profile.ruleSymbology}
+            exhibit={exhibit}
             welcome={profile.welcome}
             legendFilter={legendFilter}
             onPrev={lot.prev}

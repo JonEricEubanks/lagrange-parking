@@ -6,7 +6,7 @@ const CARDS: { id: TemplateView; title: string; tag: string; desc: string; icon:
     id: 'finder',
     title: 'Guided Finder',
     tag: 'Answer one question',
-    desc: 'Tell us who you are and instantly see where you can park and the rules that apply. Easiest on a phone.',
+    desc: 'Tell us which permit you are looking for and instantly see where you can park and the rules that apply. Easiest on a phone.',
     icon: '🧭',
   },
   {
