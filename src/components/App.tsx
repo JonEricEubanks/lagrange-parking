@@ -1,21 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParkingProfile } from '../hooks/useParkingProfile';
-import { HomePage } from './HomePage';
 import { ParkingApp } from './ParkingApp';
 import { GuidedFinder } from './templates/GuidedFinder';
 import { Directory } from './templates/Directory';
 
 export type TemplateView = 'explorer' | 'finder' | 'directory';
-type View = 'home' | TemplateView;
 
-function parseHash(): View {
+/**
+ * The Guided Finder is *the* app. The Explorer and Directory were built as
+ * review alternatives and stay reachable at #/explorer and #/directory for
+ * internal comparison, but nothing links to them — visitors land straight on
+ * the finder rather than being asked to pick a layout first.
+ */
+const DEFAULT_VIEW: TemplateView = 'finder';
+
+function parseHash(): TemplateView {
   const h = window.location.hash.replace(/^#\/?/, '');
-  return h === 'explorer' || h === 'finder' || h === 'directory' ? h : 'home';
+  return h === 'explorer' || h === 'directory' || h === 'finder' ? h : DEFAULT_VIEW;
 }
 
 export function App() {
   const { profile, loading: profileLoading } = useParkingProfile();
-  const [view, setView] = useState<View>(parseHash());
+  const [view, setView] = useState<TemplateView>(parseHash());
 
   useEffect(() => {
     const onHash = () => setView(parseHash());
@@ -23,23 +29,16 @@ export function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const go = (v: View) => {
-    window.location.hash = v === 'home' ? '' : `/${v}`;
-  };
-  const home = () => go('home');
-
   if (profileLoading || !profile) {
     return <div className="loading-screen">Loading…</div>;
   }
 
   switch (view) {
     case 'explorer':
-      return <ParkingApp profile={profile} onHome={home} />;
-    case 'finder':
-      return <GuidedFinder profile={profile} onHome={home} />;
+      return <ParkingApp profile={profile} />;
     case 'directory':
-      return <Directory profile={profile} onHome={home} />;
+      return <Directory profile={profile} />;
     default:
-      return <HomePage profile={profile} onChoose={(v) => go(v)} />;
+      return <GuidedFinder profile={profile} />;
   }
 }

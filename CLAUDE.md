@@ -19,6 +19,14 @@ npm run lint
 
 No test framework is configured.
 
+## One app, not a layout chooser
+
+`App.tsx` renders the **Guided Finder** directly — that is the chosen experience and what the
+Village reviews. The Explorer and Directory were built as review alternatives and stay reachable at
+`#/explorer` and `#/directory` for internal comparison, but **nothing links to them**. There is no
+landing page asking the visitor to pick a layout (the old `HomePage.tsx` — in git history if needed).
+Do not reintroduce one.
+
 ## Architecture
 
 React 19 + TypeScript + Vite + ArcGIS JS SDK v5. No state library — React hooks. Custom CSS with
