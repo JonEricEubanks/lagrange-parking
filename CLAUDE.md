@@ -98,7 +98,7 @@ The permit app has **four pages**, one per permit type: resident overnight, resi
   page. **This is the primary content.** Per-lot detail is deliberately secondary: as of 2026-07-28
   the permit profile's `fields.display` is **empty**, so a selected lot shows only its name, its
   parking rules and any designated-space exhibit. That was Charity's call — don't add attribute rows
-  back without hers. (The public profile still shows Facility / Spaces / Location.)
+  back without hers. (The public profile still shows Facility / Spaces / Accessible Spaces.)
 - **Display names**: `profile.nameOverrides` (keyed by area id) relabels an area in map labels,
   lists and detail cards without editing hosted data.
 - **Designated spaces**: `profile.areaExhibits` attaches a diagram to a lot (some permits are only

@@ -28,8 +28,8 @@ is now **lot name + parking rules + designated-space exhibit**. No component cha
 > the `lot-card-header` block in `src/components/LotDetailCard.tsx`.
 
 > Only `lagrange-permit.json` changed. The **public** profile still shows Facility / Spaces /
-> Accessible Spaces / Location, since the meeting covered the permit app. Confirm whether the public
-> app should match.
+> Accessible Spaces (it has no Location row), since the meeting covered the permit app. Confirm
+> whether the public app should match.
 
 ### ☐ 2. Reduce the height of the lot boxes — not started
 
