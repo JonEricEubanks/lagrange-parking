@@ -54,51 +54,38 @@ Check on mobile too: the results list is a collapsible bottom sheet there (`shee
   `profile.community` so the breadcrumb stays short.
 - **Purchase/Apply button is green** (`--lf-accent-green` #43B749, hover `--lf-accent-green-dark`)
   so it stands out from the surrounding blue. `.guide-apply-btn` in `index.css`.
-- **Landing-page hero photo placeholder** — `picker.image`. Set `placeholder` for a dashed
-  "Village photo goes here" box; **swap in `src` when the Village supplies a real photo** and the
-  same slot renders the image (`.finder-hero` / `.finder-hero--placeholder`).
-- **Designated-space image placeholder** — `profile.exhibitPlaceholder`, shown on pages flagged
-  `tab.expectsDesignatedSpaces` for any lot with no `areaExhibits` entry.
+- **Cover image on the landing page** — `picker.image`. Renders a dashed "Village photo goes here"
+  box today; **when the Village supplies a photo, drop it in `public/assets/` and set `src`** and the
+  same slot renders it (`.finder-hero` / `.finder-hero--placeholder` in `index.css`). This is the
+  only image placeholder in the app — it is a page cover, not a per-lot diagram.
 
-### ✅ 3a. Designated-space diagrams wired for 5 of 7 overnight lots — DONE 2026-07-28
+### ✋ Not doing: static PDF exhibits per lot
 
-Charity's `Res Overnight Permits - Designated Spaces.pdf` (Heuer and Associates, **dated
-12/30/2016**, sheets **1–4 of 5**) was extracted to `public/assets/exhibits/` and wired into
-`areaExhibits`:
+Charity's `Res Overnight Permits - Designated Spaces.pdf` (Heuer and Associates, sheets 1–4 of 5)
+arrived 2026-07-28. The sheets for Lots 5, 11, 12 and 13 were briefly extracted and wired into
+`areaExhibits`, then **removed on JK's call** — the designated areas are going to be **drawn as real
+GIS features** (item 3 below), so scanned drawings are not the deliverable and would only have to be
+retired again.
 
-| Lot | Sheet | Designated spaces |
-|---|---|---|
-| Lot 2 | 1 of 5 | 74 |
-| Lot 5 | 2 of 5 | 36 |
-| Lot 12 | 3 of 5 (top) | 21 (12 + 9) |
-| Lot 11 | 3 of 5 (bottom) | 10 |
-| Lot 13 | 4 of 5 | 31 |
+The **Lot 2** exhibit predates this and stays, since it came out of Charity's 7/27 review.
 
-Sheet 3 carries two lots on one page and was split into two crops. Extraction used PyMuPDF from
-`C:\Users\jkenny\AppData\Local\ESRI\conda\envs\mgp-agol-mcp\python.exe` (150 dpi; clip rects
-`(55,58,565,322)` for Lot 12 and `(55,325,565,700)` for Lot 11).
+Also decided: **do not show space counts.** Captions no longer carry them, and `SPACECOUNT` was
+dropped from the proposed layer schema below.
 
-**Still showing the placeholder:** the **VH Garage** and **Lot 15**.
-
-Open questions on this set:
-- **Sheet 5 of 5 was not in the PDF** — presumably the VH Garage. Ask Charity.
-- **Lot 15 postdates these drawings** (it is a 2026 lot), so it will never be in this set.
-- **Sheet 3's legend reads "21 SPACES"**, which matches Lot 12's 12 + 9 but excludes Lot 11's 10 —
-  so the legend appears to describe only the upper map. Captions therefore use each map's own
-  labels, not the legend total. Worth confirming.
-- **These drawings are ten years old (12/30/2016).** Confirm they still reflect current striping
-  before treating them as authoritative.
-- The **Employees** page also references designated spaces in its guide text ("designated spaces
-  only in Lot 5", "designated on-street spaces on Waiola Ave"), but no employee diagrams exist, so
-  `expectsDesignatedSpaces` was deliberately **not** set there — it would show 8 placeholders.
+The source PDF is in JK's `Downloads`; re-extract with PyMuPDF if it is ever wanted (sheet 3 carries
+Lots 12 and 11 on one page and needs splitting). Two things noticed while reading it, still worth
+raising with Charity:
+- **Sheet 5 of 5 was not in the PDF** — presumably the VH Garage.
+- **The drawings are dated 12/30/2016.** Confirm they still reflect current striping before
+  digitizing from them.
 
 ### ☐ 3. Designated overnight parking areas as real GIS features — NEXT, JK to digitize
 
-The static exhibits above are the **interim**. The agreed end state is to draw the designated areas
-as real geometry so they render on the map instead of as a scanned diagram, shaded **green where the
-permit is valid and red where it is not**.
+The end state is to draw the designated areas as **real geometry** so they render on the map rather
+than as a scanned diagram, shaded **green where the permit is valid and red where it is not**. This
+supersedes the static-exhibit approach entirely.
 
-Step 1 is done — Charity's drawings arrived 2026-07-28. Remaining:
+Charity's drawings arrived 2026-07-28, so the inputs are in hand. Remaining:
 
 1. **JK digitizes the areas in ArcGIS Pro**, tracing the Heuer sheets against the Cook 2025 aerial.
    The drawings are 2016 CAD-derived and **not georeferenced**, so this is heads-up digitizing; the
@@ -123,9 +110,9 @@ Suggested schema (build it in `ParkingPermits.gdb` so it lives with the rest, th
 | `AREAID` | FK to `ParkingArea` — **must match exactly** (`LOT2`, `LOT15`, …) |
 | `DESIGNATION` | `ALLOWED` / `NOT_ALLOWED` — drives the green/red symbology. Use a coded domain. |
 | `PERMITTYPE` | Which permit the area applies to. **Needed** — Lot 2 and Lot 5 have both overnight-resident *and* CBD-employee designated spaces, and each page must show only its own. |
-| `SPACECOUNT` | Spaces in the band, per the drawing — lets us cross-check the totals |
-| `LABEL` | Optional on-map label, e.g. "17 spaces" |
 | `SOURCEREF` | Provenance, e.g. "Heuer sheet 3 of 5, 12/30/2016" |
+
+**No space-count field** — the Village does not want counts surfaced (2026-07-28).
 
 `PERMITTYPE` is the field most likely to be forgotten and the most expensive to add later — without
 it the Employees page would show the overnight bands.
@@ -140,11 +127,12 @@ the static `areaExhibits` entries can be retired lot by lot as each is digitized
 | # | Item | Blocked on |
 |---|---|---|
 | 1 | **Apply / purchase URL is a placeholder.** `profile.apply.url` (and the `resident-24hr` page's own `guide.apply.url`) both point at `https://www.villageoflagrange.com/`. `PURCHASEURL` is null on every rule row. The "Apply for a Permit Now →" button therefore goes to the Village homepage. | Charity — real Passport/permit URL |
-| 2 | **Lot 15 space counts.** `MAXSPACES` / `NUMHANDICAP` are null. Now moot on the permit card (capacity no longer shown) but still wrong in the data. | Charity |
+| 2 | **Lot 15 capacity is null** (`MAXSPACES` / `NUMHANDICAP`). Moot for display — the permit card no longer shows capacity and the Village does not want space counts surfaced — but still wrong in the data. Low priority. | Charity |
 | 3 | **Lot 4** is CBD employee parking in the data but absent from Charity's employee lot list — currently shown nowhere. Confirm it should stay dropped. | Charity |
 | 4 | **`ATT` lot** has all audience flags 0 and appears nowhere. Retired, or should it show? | Charity |
 | 5 | **Eligibility-area boundaries** — Charity's own open question, never actioned. The `PermitEligibilityZone` convex hulls overshoot (a point inside the hull is not necessarily eligible); the authoritative data is the address list. Options: drop the hull, label it "approximate", or snap to real parcels. | Charity |
-| 6 | **Heuer designated-space sheets 2–5 of 5** | Charity — likely folded into item 3 above |
+| 6 | **Heuer sheet 5 of 5** was missing from the set she sent (sheets 1–4 arrived) — presumably the VH Garage. Needed as a digitizing input for item 3. | Charity |
+| 7 | **A cover photo for the landing page.** The Village offered to supply one; a labelled placeholder holds the slot. | Charity |
 
 ---
 

@@ -29,7 +29,6 @@ export function LotDetailCard({
   ruleConfig,
   ruleSymbology,
   exhibit,
-  exhibitPlaceholder,
   onWalkHere,
   walkMode,
   walkStep,
@@ -47,8 +46,6 @@ export function LotDetailCard({
   ruleSymbology?: SymbologyEntry[];
   /** Diagram of the designated spaces inside this lot, when one exists. */
   exhibit?: AreaExhibit;
-  /** Reserves the exhibit spot when this page expects a diagram but none exists yet. */
-  exhibitPlaceholder?: { title: string; text: string };
   onWalkHere?: (centroid: Point) => void;
   walkMode?: boolean;
   walkStep?: WalkTimeStep;
@@ -186,14 +183,6 @@ export function LotDetailCard({
         </figure>
       )}
 
-      {/* No diagram yet for a lot on a page that expects one — hold the space
-          so the Village can see where it will land. */}
-      {!exhibit && exhibitPlaceholder && (
-        <div className="lot-card-exhibit">
-          <h4 className="lot-card-details-heading">{exhibitPlaceholder.title}</h4>
-          <div className="lot-card-exhibit-placeholder">{exhibitPlaceholder.text}</div>
-        </div>
-      )}
 
       {detailFields.length > 0 && (
         <>

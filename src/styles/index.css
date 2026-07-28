@@ -1750,22 +1750,6 @@ body,
   color: #7a838d;
 }
 
-/* Holds the exhibit's place on a lot whose diagram hasn't arrived yet. */
-.lot-card-exhibit-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 110px;
-  padding: 16px;
-  border: 2px dashed var(--lf-border);
-  border-radius: 6px;
-  background: var(--lf-card-bg);
-  color: #6b7480;
-  font-size: 12.5px;
-  font-style: italic;
-  text-align: center;
-}
-
 /* ─── Templates: tablet / mobile ─── */
 @media (max-width: 900px) {
   /* Map fills the whole body; the results become a bottom sheet floating over it. */

@@ -33,34 +33,9 @@
   "areaExhibits": {
     "LOT2": {
       "image": "assets/exhibits/lot2-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 2 (74 spaces, shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 1 of 5 (12/30/2016)"
-    },
-    "LOT5": {
-      "image": "assets/exhibits/lot5-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 5 (36 spaces, shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 2 of 5 (12/30/2016)"
-    },
-    "LOT12": {
-      "image": "assets/exhibits/lot12-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 12 (21 spaces, shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 3 of 5 (12/30/2016)"
-    },
-    "LOT11": {
-      "image": "assets/exhibits/lot11-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 11 (10 spaces, shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 3 of 5 (12/30/2016)"
-    },
-    "LOT13": {
-      "image": "assets/exhibits/lot13-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 13 (31 spaces, shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 4 of 5 (12/30/2016)"
+      "caption": "Designated overnight resident spaces in Lot 2 (shaded).",
+      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 1 of 5"
     }
-  },
-
-  "exhibitPlaceholder": {
-    "title": "Designated spaces",
-    "text": "Image goes here — the designated-space diagram for this lot is still to come."
   },
 
   "layer": {
@@ -169,7 +144,6 @@
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
       "where": "HASRESIDENT = 1",
-      "expectsDesignatedSpaces": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT')",
       "guide": {
         "who": "Parking from 2 a.m. to 6 a.m. for residents of older buildings near downtown La Grange and the West End.",
@@ -229,7 +203,6 @@
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
       "where": "HASRESIDENT = 1",
-      "expectsDesignatedSpaces": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
         "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",

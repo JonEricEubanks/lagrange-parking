@@ -250,9 +250,6 @@ export function GuidedFinder({
                 ruleConfig={profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
                 exhibit={exhibit}
-                exhibitPlaceholder={
-                  chosen.expectsDesignatedSpaces ? profile.exhibitPlaceholder : undefined
-                }
               />
             </>
           ) : (
