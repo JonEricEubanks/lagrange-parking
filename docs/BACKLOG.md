@@ -31,21 +31,38 @@ is now **lot name + parking rules + designated-space exhibit**. No component cha
 > Accessible Spaces (it has no Location row), since the meeting covered the permit app. Confirm
 > whether the public app should match.
 
-### ☐ 2. Reduce the height of the lot boxes — not started
+### ✅ 2. Reduce the height of the lot boxes — DONE 2026-07-28
 
 On the results list ("**7 places to park**"), the lot boxes are tall enough that the
 "**What you need to know**" panel below is pushed out of view. Charity wants the boxes shorter so
 more of that panel is visible without scrolling.
 
-Where to change it:
-- The boxes are **`.finder-list-item`** in `src/styles/index.css` (`padding: 13px 14px`), with
-  `.finder-list-name` / `.finder-list-go`. **Not** `.feature-list-item` — that belongs to the
-  `FeatureList` component, which only the Explorer/Directory templates use.
-- The "N places to park" heading is `src/components/templates/GuidedFinder.tsx` **lines 212 / 242**.
-- "What you need to know" is `src/components/PermitInfo.tsx` **line 26**.
+`PermitInfo` renders **after** the lot list in `GuidedFinder`, so the list's height directly
+determines how far down the guide starts. Tightened in `src/styles/index.css`:
 
-Check on mobile too: the results list is a collapsible bottom sheet there (`sheetCollapsed` in
-`GuidedFinder.tsx`).
+| | Before | After |
+|---|---|---|
+| `.finder-list-item` padding | `13px 14px` | `8px 12px` |
+| `.finder-list-item` font-size | 15px | 14px (explicit `line-height: 1.25`) |
+| `.finder-list-go` chevron | 20px | 16px (`line-height: 1`) |
+| `.finder-list` gap | 8px | 6px |
+| `.finder-results-h` margin | `14px 0 8px` | `10px 0 6px` |
+
+Row height 48px → 36px; **the 7-lot Resident Overnight page reclaims ~106px**, which is what lifts
+"What you need to know" into view.
+
+The chevron mattered more than it looks: at 20px it set the row's line-box floor, so reducing the
+padding alone would not have shrunk the row.
+
+Note the boxes are **`.finder-list-item`** — *not* `.feature-list-item`, which belongs to the
+`FeatureList` component that only the Explorer/Directory templates use. Editing the wrong one
+changes nothing in the live app.
+
+Width was left alone: the boxes are `width: 100%` of the results panel, so narrowing them would add
+dead space without recovering any vertical room.
+
+Still the biggest available lever if she wants more: **`PermitInfo` could move above the lot list**.
+Not done — Charity framed the fix as shrinking the boxes, and reordering would bury the lots instead.
 
 ### ✅ 3b. Second round of stylistic changes — DONE 2026-07-28
 

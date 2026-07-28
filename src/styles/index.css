@@ -1340,14 +1340,16 @@ body,
   font-family: var(--font-header);
   font-size: 16px;
   color: var(--lf-midnight);
-  margin: 14px 0 8px;
+  margin: 10px 0 6px;
 }
 
+/* The lot list sits above "What you need to know", so every pixel it spends
+   pushes the guide further under the fold. Kept deliberately compact. */
 .finder-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .finder-list-item {
@@ -1357,11 +1359,12 @@ body,
   justify-content: space-between;
   background: var(--lf-white);
   border: 1px solid #e3eaf0;
-  border-radius: 10px;
-  padding: 13px 14px;
+  border-radius: 8px;
+  padding: 8px 12px;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .finder-list-item:hover {
@@ -1374,10 +1377,13 @@ body,
   color: var(--lf-midnight);
 }
 
+/* Sized to sit inside the row's line box — a larger glyph silently set the
+   row height floor and undid the padding reduction. */
 .finder-list-go {
   color: var(--lf-primary);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
+  line-height: 1;
 }
 
 .finder-back {
