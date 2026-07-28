@@ -11,13 +11,26 @@
 
 ---
 
+## Documentation
+
+This repo is **self-contained** — the project history that used to live only on the MGP `X:` drive
+has been ported in, so no network-share access is needed to pick the project up.
+
+| Doc | What's in it |
+|---|---|
+| [`CLAUDE.md`](CLAUDE.md) | Architecture, conventions, and agent guidance — **start here** |
+| [`docs/PROJECT-CONTEXT.md`](docs/PROJECT-CONTEXT.md) | Client, stakeholders, how the deliverable got its shape, content rules |
+| [`docs/DATA.md`](docs/DATA.md) | Data model, LGDM→FGDB→AGOL pipeline, known data defects, verification |
+| [`docs/BACKLOG.md`](docs/BACKLOG.md) | Open items and the latest stakeholder meeting |
+| [`DEPLOY.md`](DEPLOY.md) | Azure resources and the manual deploy commands |
+
 ## Two experiences, one codebase
 
 Per the stakeholder reframe, the old "single map with everything" is replaced by **two separate, audience-targeted apps**, each driven by its own profile JSON:
 
 | App | Profile | Audience | Filter |
 |-----|---------|----------|--------|
-| **Permit** | `public/profiles/lagrange-permit.json` | Residents · Commuter & LT Students · Employees (one tab each) | `USERCLASS = 'PERMIT'`, then per-tab `HASRESIDENT` / `HASCOMMUTER` / `HASCBD` |
+| **Permit** | `public/profiles/lagrange-permit.json` | Four permit-type pages: Resident Overnight Only · Resident Day/Night (24 hr.) · Commuter & LTHS Students · Employees | `USERCLASS = 'PERMIT'`, then the page's explicit `areaIds` list |
 | **Public** | `public/profiles/lagrange-public.json` | Visitors / shoppers / diners | `USERCLASS IN ('VISITOR','RESTRICTED')`, color-coded by time limit |
 
 Each map shows **only what is relevant to its audience** — applicable lots, zones and rules — and the public map contains **no permit content** at all.
@@ -31,7 +44,8 @@ Hosted feature service **`LaGrange_Parking_Permits`** on the La Grange AGOL org
 - `…/FeatureServer/3` — **ParkingRule** (related table, 1:many on `AREAID`)
 
 > ⚠️ **The layers must be shared publicly in AGOL** for these anonymous public apps to load them.
-> Today the service is shared to the org only.
+> They are public today — but **republishing the service resets sharing to org-only** and both apps
+> break instantly with `Token Required`. Re-test anonymous access after every republish.
 
 The "paths to the maps" live in the **profile JSON** (`layer.url`, `relatedRules.url`, `itemId`), not in `.env`.
 
@@ -67,23 +81,38 @@ Medium Blue `#13ACE1`, Green `#43B749`, Light Blue `#A8E0F8`, Mint `#D8ECD4`. Fo
 
 ## Audience filtering (verified against live data)
 
-- **Which lots** per tab: exact, via `ParkingArea.HASRESIDENT` / `HASCOMMUTER` / `HASCBD`.
-- **Which rules** per lot: filtered by **`PERMITZONE`-first** predicates in each tab's `ruleWhere`
-  (residential `A,B,C,D,5A`/`2A`/`9A`; commuter `E,G`; LTHS student `H`; employee `CBD,WBD`; with a
-  `RULETYPE` fallback only when there is no zone code). This is exact on today's data and correctly
-  rescues mislabeled rows.
+- **Which lots** per page: the Village's own verbatim list in `tab.areaIds` — "the map should only
+  show the following lots" is policy, not something to infer. This **overrides** both the
+  rules-derived lookup and the `HAS*` booleans (each tab still carries a `where` as a fallback for
+  tabs that have no explicit list; for all four current pages it is inert).
+- **Which rules** per lot/page: `PERMITZONE`-first predicates in each page's `ruleWhere`
+  (residential `5A`/`2A`/`9A`; commuter `A–E,G`; LTHS student `H`; employee `CBD,WBD`), with a
+  `RULETYPE` fallback where there is no zone code.
 
 ### Data-quality findings (flag to the data owner)
-1. **`RULETYPE` is a noisy heuristic** — e.g. `COMMUTER_DECAL` is tagged on residential zones A–D.
-   We therefore trust `PERMITZONE` over `RULETYPE`. This is the project doc's "rule classifier needs
-   QA" item; a cleanup pass would let us drop the fallback entirely.
-2. **The `AT&T` (`ATT`) permit lot has all `HAS*` flags = 0**, so it currently appears in **no**
-   permit tab. Set its audience flag(s) if it should be visible.
+1. **`RULETYPE` is a noisy heuristic.** Because `ruleWhere` keys off it where no `PERMITZONE`
+   exists, a mislabeled row drops a lot out of its own page. Three lots currently return **no rules**
+   and so show an **empty detail card** — caught by `verify-permit-pages.mjs`:
+   - **Lot 13** on *Commuter & LTHS Students* — its rules are typed `OVERNIGHT_RESIDENT` even though
+     `LOCDESC` reads "Commuter Parking Only" and the page guide references Lot 13 commuter verification.
+   - **Lot 2** and **VH Garage** on *Employees* — the guide states CBD permits are valid in both, but
+     Lot 2's CBD rule is typed `COMMUTER_DECAL` with no zone, and the Garage has no employee rule at all.
+2. Conversely, four employee on-street rows are typed `COMMUTER_DECAL` but rescued by
+   `PERMITZONE IN ('CBD','WBD')` — they render on the Employees page **titled "Commuter Permit"**,
+   because the rule heading is driven by `RULETYPE`.
+3. **The `AT&T` (`ATT`) permit lot has all `HAS*` flags = 0** and is on no page's `areaIds`, so it
+   appears in **no** permit page. **Lot 4** is `HASCBD = 1` ("CBD Permit Parking Only 6am to 6pm")
+   but is absent from the Village's employee list, so it is likewise not shown. Both are intentional
+   today — confirm with the Village.
+4. **Capacity is not inventoried for on-street areas** — `MAXSPACES = 0` on all of them (and 117 of
+   123 public-app features), and Lot 15 is `null`. The apps now suppress the spaces line rather than
+   print "0 spaces"; real counts would let it show everywhere.
 
 ### Optional durable fix — `AUDIENCE` field
 `scripts/add_audience_field.py` adds + populates an `AUDIENCE` field on `ParkingRule` (PERMITZONE-first
-logic, dry-run by default). Once run, simplify each tab's `ruleWhere` to:
-`AUDIENCE = 'RESIDENT'` · `AUDIENCE IN ('COMMUTER','STUDENT')` · `AUDIENCE = 'EMPLOYEE'`.
+logic, dry-run by default) — **not yet run; the field does not exist on the live table.** Once run,
+each page's `ruleWhere` simplifies to `AUDIENCE = 'RESIDENT'` · `IN ('COMMUTER','STUDENT')` ·
+`= 'EMPLOYEE'`. Note its `HAS*`-recompute half is now superseded by the explicit `areaIds` lists.
 
 ### Diagnostics
 `scripts/inspect-service.mjs` (schema + value distributions) and `scripts/verify-filters.mjs`

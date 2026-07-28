@@ -48,12 +48,7 @@
   },
 
   "fields": {
-    "display": [
-      { "field": "FACILITYTYPE", "label": "Facility" },
-      { "field": "MAXSPACES", "label": "Spaces", "format": "integer" },
-      { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail" },
-      { "field": "LOCDESC", "label": "Location", "section": "detail" }
-    ]
+    "display": []
   },
 
   "relatedRules": {

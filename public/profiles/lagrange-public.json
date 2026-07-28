@@ -32,8 +32,8 @@
   "fields": {
     "display": [
       { "field": "FACILITYTYPE", "label": "Facility" },
-      { "field": "MAXSPACES", "label": "Spaces", "format": "integer" },
-      { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail" }
+      { "field": "MAXSPACES", "label": "Spaces", "format": "integer", "hideZero": true },
+      { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail", "hideZero": true }
     ]
   },
 

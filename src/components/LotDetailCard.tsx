@@ -70,14 +70,36 @@ export function LotDetailCard({
   const symColor = symMatch?.color ?? [0, 0, 0, 0];
   const borderColor = `rgba(${symColor[0]}, ${symColor[1]}, ${symColor[2]}, ${symColor[3]})`;
 
-  const mainFields = fields.filter((f) => f.section !== 'detail');
-  const detailFields = fields.filter((f) => f.section === 'detail');
+  // A `hideZero` field drops out entirely when it has no usable value, so an
+  // un-inventoried area doesn't advertise "Spaces 0".
+  const shown = fields.filter((f) => !(f.hideZero && !Number(attrs[f.field])));
+  const mainFields = shown.filter((f) => f.section !== 'detail');
+  const detailFields = shown.filter((f) => f.section === 'detail');
 
   const ruleLabel = (r: RuleRow): string => {
     if (!ruleConfig) return 'Rule';
     const code = String(r[ruleConfig.labelField] ?? '');
     return (ruleSymbology?.find((s) => s.value === code)?.label ?? code) || 'Rule';
   };
+
+  // Does this row put anything on screen besides its heading?
+  const hasDetail = (row: RuleRow): boolean =>
+    !!ruleConfig &&
+    (ruleConfig.display.some((f) => formatValue(row[f.field], f.format) !== '--') ||
+      // An apply link is content too — never drop a row that carries one.
+      (!!ruleConfig.purchaseUrlField && !!row[ruleConfig.purchaseUrlField]));
+
+  // The hosted ParkingRule table carries bare rows — same rule type, no
+  // enforcement window and no duration — alongside a fully populated row for the
+  // same permit. Those render as a heading with nothing under it, so drop a
+  // detail-less row when another row for the same permit type does have detail.
+  // A bare row that is the only one of its type is kept, so a lot never loses
+  // its sole rule.
+  const visibleRules = (rules ?? []).filter((r, i, all) => {
+    if (!ruleConfig || hasDetail(r)) return true;
+    const label = ruleLabel(r);
+    return !all.some((o, j) => j !== i && ruleLabel(o) === label && hasDetail(o));
+  });
 
   const centroid = (feature.geometry as Polygon)?.centroid ?? null;
 
@@ -110,10 +132,10 @@ export function LotDetailCard({
       )}
 
       {/* Related parking rules — filtered per audience by the caller */}
-      {ruleConfig && rules && rules.length > 0 && (
+      {ruleConfig && visibleRules.length > 0 && (
         <div className="lot-card-rules">
           <h4 className="lot-card-details-heading">Parking rules</h4>
-          {rules.map((r, i) => {
+          {visibleRules.map((r, i) => {
             const url = ruleConfig.purchaseUrlField
               ? (r[ruleConfig.purchaseUrlField] as string | undefined)
               : undefined;

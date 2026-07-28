@@ -4,6 +4,12 @@ export interface FieldDef {
   format?: 'integer' | 'boolean';
   /** Which section of the detail card this field belongs in. Defaults to 'main'. */
   section?: 'main' | 'detail';
+  /**
+   * Hide the row when the value is zero. Capacity fields carry 0 for areas that
+   * were never inventoried (every on-street permit zone), where "0" reads as
+   * "no spaces here" rather than "not counted".
+   */
+  hideZero?: boolean;
 }
 
 export interface SymbologyEntry {

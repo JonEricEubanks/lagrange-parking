@@ -127,7 +127,9 @@ export function FeatureList({
                 </div>
                 <div className="feature-list-item-meta">
                   {sym?.label ?? restriction}
-                  {spaces != null && ` · ${Math.round(Number(spaces))} spaces`}
+                  {/* 0/null capacity means "never inventoried" (all on-street
+                      permit zones), not "no spaces" — say nothing instead. */}
+                  {Number(spaces) > 0 && ` · ${Math.round(Number(spaces))} spaces`}
                 </div>
               </li>
             );
