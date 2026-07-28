@@ -64,6 +64,12 @@ export interface TabDef {
    */
   areaIds?: string[];
   /**
+   * This permit is only valid in specific spaces inside a lot, so every lot on
+   * the page should show a designated-space diagram. Lots without one fall back
+   * to `profile.exhibitPlaceholder`.
+   */
+  expectsDesignatedSpaces?: boolean;
+  /**
    * Definition expression applied to the related ParkingRule table when a lot is
    * selected on this tab — so each audience sees only its own rules.
    */
@@ -209,7 +215,18 @@ export interface ParkingProfile {
   /** Profile-level "how to apply" link (a tab guide may override it). */
   apply?: ApplyLink;
   /** Heading + sub-heading for the guided-finder audience picker. */
-  picker?: { heading: string; sub?: string };
+  picker?: {
+    heading: string;
+    sub?: string;
+    /** Overrides the header title on the picker only (inner pages keep `community`). */
+    brandTitle?: string;
+    /**
+     * Hero photo above the choices. Set `src` to show a real image; set only
+     * `placeholder` to reserve the space with a labelled box until the Village
+     * supplies one.
+     */
+    image?: { src?: string; alt?: string; placeholder?: string };
+  };
   /**
    * Display names the Village wants shown in place of the source AREANAME,
    * keyed by area id (e.g. VILLAGEHALLPARKINGSTRUCTURE → "VH Garage"). Applied
@@ -218,6 +235,13 @@ export interface ParkingProfile {
   nameOverrides?: Record<string, string>;
   /** Designated-space diagrams keyed by area id, shown with that lot's detail. */
   areaExhibits?: Record<string, AreaExhibit>;
+
+  /**
+   * Shown in place of an `areaExhibits` entry on pages that opt in via
+   * `tab.expectsDesignatedSpaces`, so a lot whose diagram has not arrived yet
+   * still reserves the spot rather than silently showing nothing.
+   */
+  exhibitPlaceholder?: { title: string; text: string };
 
   layer: {
     url: string;

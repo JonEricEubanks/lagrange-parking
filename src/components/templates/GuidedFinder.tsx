@@ -16,11 +16,14 @@ function TopBar({
   onHome,
   crumb,
   onChange,
+  title,
 }: {
   profile: ParkingProfile;
   onHome?: () => void;
   crumb?: string;
   onChange?: () => void;
+  /** Overrides the community name in the header (the picker uses a longer title). */
+  title?: string;
 }) {
   return (
     <header className="tpl-topbar">
@@ -36,7 +39,7 @@ function TopBar({
           alt={profile.community}
         />
         <span className="tpl-topbar-title">
-          {profile.community}
+          {title ?? profile.community}
           {crumb && <span className="tpl-crumb"> · {crumb}</span>}
         </span>
       </div>
@@ -154,12 +157,25 @@ export function GuidedFinder({
   if (!chosen) {
     return (
       <div className="finder">
-        <TopBar profile={profile} onHome={onHome} />
+        <TopBar profile={profile} onHome={onHome} title={profile.picker?.brandTitle} />
         <div className="finder-picker">
           <h1 className="finder-q">{profile.picker?.heading ?? 'Who are you?'}</h1>
           <p className="finder-sub">
             {profile.picker?.sub ?? 'Pick the option that fits you to see where you can park.'}
           </p>
+          {profile.picker?.image?.src ? (
+            <img
+              className="finder-hero"
+              src={import.meta.env.BASE_URL + profile.picker.image.src}
+              alt={profile.picker.image.alt ?? ''}
+            />
+          ) : (
+            profile.picker?.image?.placeholder && (
+              <div className="finder-hero finder-hero--placeholder">
+                {profile.picker.image.placeholder}
+              </div>
+            )
+          )}
           <div className={`finder-choices finder-choices--${tabs.length}`}>
             {tabs.map((t) => (
               <button key={t.id} className="finder-choice" onClick={() => setChosen(t)}>
@@ -234,6 +250,9 @@ export function GuidedFinder({
                 ruleConfig={profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
                 exhibit={exhibit}
+                exhibitPlaceholder={
+                  chosen.expectsDesignatedSpaces ? profile.exhibitPlaceholder : undefined
+                }
               />
             </>
           ) : (

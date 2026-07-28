@@ -38,32 +38,100 @@ On the results list ("**7 places to park**"), the lot boxes are tall enough that
 more of that panel is visible without scrolling.
 
 Where to change it:
-- The boxes are `.feature-list-item` — `src/styles/index.css` around **line 842** (with
-  `.feature-list-item-main`, `-name`, `-meta` following).
+- The boxes are **`.finder-list-item`** in `src/styles/index.css` (`padding: 13px 14px`), with
+  `.finder-list-name` / `.finder-list-go`. **Not** `.feature-list-item` — that belongs to the
+  `FeatureList` component, which only the Explorer/Directory templates use.
 - The "N places to park" heading is `src/components/templates/GuidedFinder.tsx` **lines 212 / 242**.
 - "What you need to know" is `src/components/PermitInfo.tsx` **line 26**.
 
-Note the 2026-07-28 change above already removed the `· N spaces` text from the box's meta line for
-most lots, which shortens some boxes slightly — but the padding is the real driver. Check on mobile
-too: the results list is a collapsible bottom sheet there (`sheetCollapsed` in `GuidedFinder.tsx`).
+Check on mobile too: the results list is a collapsible bottom sheet there (`sheetCollapsed` in
+`GuidedFinder.tsx`).
 
-### ☐ 3. Designated overnight parking areas — BLOCKED on Charity
+### ✅ 3b. Second round of stylistic changes — DONE 2026-07-28
 
-**Every overnight lot has specific spaces where permit holders must park**, and those are not
-currently mapped. Today only Lot 2 has anything — a static diagram
-(`public/assets/exhibits/lot2-overnight-resident-spaces.png`, from Heuer and Associates sheet 1 of
-5), wired through `profile.areaExhibits`.
+- **Landing-page title** now reads "Village of La Grange Permit Parking" instead of "Village of
+  La Grange". Driven by `picker.brandTitle`; the header on the four inner pages still shows
+  `profile.community` so the breadcrumb stays short.
+- **Purchase/Apply button is green** (`--lf-accent-green` #43B749, hover `--lf-accent-green-dark`)
+  so it stands out from the surrounding blue. `.guide-apply-btn` in `index.css`.
+- **Landing-page hero photo placeholder** — `picker.image`. Set `placeholder` for a dashed
+  "Village photo goes here" box; **swap in `src` when the Village supplies a real photo** and the
+  same slot renders the image (`.finder-hero` / `.finder-hero--placeholder`).
+- **Designated-space image placeholder** — `profile.exhibitPlaceholder`, shown on pages flagged
+  `tab.expectsDesignatedSpaces` for any lot with no `areaExhibits` entry.
 
-Agreed plan:
-1. **Charity sends the document** defining the designated areas for the remaining lots.
-2. **JK digitizes them as a GIS feature** — a new polygon layer, not an attribute.
-3. The app links that information into the **"What you need to know"** panel as a designated-spaces
-   section.
+### ✅ 3a. Designated-space diagrams wired for 5 of 7 overnight lots — DONE 2026-07-28
 
-Nothing to build until step 1 lands. When it does, decide whether the new layer becomes another
-sublayer of `LaGrange_Parking_Permits` or a separate hosted layer — the app would reference it as a
-`referenceLayers` entry or a new profile block. The existing Heuer sheets **2–5 of 5** are probably
-part of what she is sending.
+Charity's `Res Overnight Permits - Designated Spaces.pdf` (Heuer and Associates, **dated
+12/30/2016**, sheets **1–4 of 5**) was extracted to `public/assets/exhibits/` and wired into
+`areaExhibits`:
+
+| Lot | Sheet | Designated spaces |
+|---|---|---|
+| Lot 2 | 1 of 5 | 74 |
+| Lot 5 | 2 of 5 | 36 |
+| Lot 12 | 3 of 5 (top) | 21 (12 + 9) |
+| Lot 11 | 3 of 5 (bottom) | 10 |
+| Lot 13 | 4 of 5 | 31 |
+
+Sheet 3 carries two lots on one page and was split into two crops. Extraction used PyMuPDF from
+`C:\Users\jkenny\AppData\Local\ESRI\conda\envs\mgp-agol-mcp\python.exe` (150 dpi; clip rects
+`(55,58,565,322)` for Lot 12 and `(55,325,565,700)` for Lot 11).
+
+**Still showing the placeholder:** the **VH Garage** and **Lot 15**.
+
+Open questions on this set:
+- **Sheet 5 of 5 was not in the PDF** — presumably the VH Garage. Ask Charity.
+- **Lot 15 postdates these drawings** (it is a 2026 lot), so it will never be in this set.
+- **Sheet 3's legend reads "21 SPACES"**, which matches Lot 12's 12 + 9 but excludes Lot 11's 10 —
+  so the legend appears to describe only the upper map. Captions therefore use each map's own
+  labels, not the legend total. Worth confirming.
+- **These drawings are ten years old (12/30/2016).** Confirm they still reflect current striping
+  before treating them as authoritative.
+- The **Employees** page also references designated spaces in its guide text ("designated spaces
+  only in Lot 5", "designated on-street spaces on Waiola Ave"), but no employee diagrams exist, so
+  `expectsDesignatedSpaces` was deliberately **not** set there — it would show 8 placeholders.
+
+### ☐ 3. Designated overnight parking areas as real GIS features — NEXT, JK to digitize
+
+The static exhibits above are the **interim**. The agreed end state is to draw the designated areas
+as real geometry so they render on the map instead of as a scanned diagram, shaded **green where the
+permit is valid and red where it is not**.
+
+Step 1 is done — Charity's drawings arrived 2026-07-28. Remaining:
+
+1. **JK digitizes the areas in ArcGIS Pro**, tracing the Heuer sheets against the Cook 2025 aerial.
+   The drawings are 2016 CAD-derived and **not georeferenced**, so this is heads-up digitizing; the
+   striped bands sit along identifiable lot edges, which makes it tractable.
+2. Publish, then reference the layer from the profile and surface it in **"What you need to know"**.
+
+**Recommended structure — a new standalone polygon feature class, published as its own hosted
+layer.** Reasons:
+
+- It is **sub-lot geometry**, a different granularity from `ParkingArea`; it cannot be an attribute.
+- Publishing it **separately** rather than as a new sublayer of `LaGrange_Parking_Permits` keeps the
+  existing service untouched. That matters here: overwriting that service **resets its public
+  sharing and breaks both apps** (`DATA.md` §2), and the profiles hardcode sublayer ids `/2` and
+  `/3`. A separate layer makes this change purely additive.
+- The app joins on `AREAID` anyway — it does not use the relationship class — so nothing is lost by
+  not being in the same service.
+
+Suggested schema (build it in `ParkingPermits.gdb` so it lives with the rest, then publish alone):
+
+| Field | Purpose |
+|---|---|
+| `AREAID` | FK to `ParkingArea` — **must match exactly** (`LOT2`, `LOT15`, …) |
+| `DESIGNATION` | `ALLOWED` / `NOT_ALLOWED` — drives the green/red symbology. Use a coded domain. |
+| `PERMITTYPE` | Which permit the area applies to. **Needed** — Lot 2 and Lot 5 have both overnight-resident *and* CBD-employee designated spaces, and each page must show only its own. |
+| `SPACECOUNT` | Spaces in the band, per the drawing — lets us cross-check the totals |
+| `LABEL` | Optional on-map label, e.g. "17 spaces" |
+| `SOURCEREF` | Provenance, e.g. "Heuer sheet 3 of 5, 12/30/2016" |
+
+`PERMITTYPE` is the field most likely to be forgotten and the most expensive to add later — without
+it the Employees page would show the overnight bands.
+
+Once live, the app filters the layer by the selected lot **and** the current page's permit type, and
+the static `areaExhibits` entries can be retired lot by lot as each is digitized.
 
 ---
 

@@ -12,6 +12,7 @@
   --lf-card-bg: #EAF4FB;    /* light blue card tint */
   --lf-border: #A8E0F8;
   --lf-accent-green: #43B749; /* La Grange Green */
+  --lf-accent-green-dark: #35913b; /* hover/active state for green CTAs */
   --font-header: 'Oswald', 'Nunito Sans', 'Segoe UI', sans-serif;
   --font-body: 'Nunito Sans', 'Segoe UI', Calibri, sans-serif;
   --header-height: 60px;
@@ -386,11 +387,13 @@ body,
   margin-top: 7px;
 }
 
+/* Green rather than brand blue so the purchase CTA stands out from the
+   surrounding blue UI (Village request, 2026-07-28). */
 .guide-apply-btn {
   display: inline-block;
   margin-top: 12px;
   padding: 8px 14px;
-  background: var(--lf-primary);
+  background: var(--lf-accent-green);
   color: var(--lf-white);
   border-radius: 6px;
   font-size: 12.5px;
@@ -399,7 +402,7 @@ body,
 }
 
 .guide-apply-btn:hover {
-  background: var(--lf-midnight);
+  background: var(--lf-accent-green-dark);
 }
 
 .guide-legend {
@@ -1217,6 +1220,29 @@ body,
   margin: 10px 0 30px;
 }
 
+/* Optional hero photo above the permit-type choices. Capped in height so it
+   never pushes the choices below the fold on a laptop. */
+.finder-hero {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  margin: 0 auto 30px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.finder-hero--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  border: 2px dashed var(--lf-border);
+  background: var(--lf-card-bg);
+  color: #6b7480;
+  font-size: 14px;
+  font-style: italic;
+}
+
 /* Side-by-side on a desktop screen (there is plenty of width for four cards),
    stacking only once the columns would get too narrow to read. */
 .finder-choices {
@@ -1722,6 +1748,22 @@ body,
   font-size: 11px;
   font-style: italic;
   color: #7a838d;
+}
+
+/* Holds the exhibit's place on a lot whose diagram hasn't arrived yet. */
+.lot-card-exhibit-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  padding: 16px;
+  border: 2px dashed var(--lf-border);
+  border-radius: 6px;
+  background: var(--lf-card-bg);
+  color: #6b7480;
+  font-size: 12.5px;
+  font-style: italic;
+  text-align: center;
 }
 
 /* ─── Templates: tablet / mobile ─── */
