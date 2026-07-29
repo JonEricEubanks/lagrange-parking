@@ -30,6 +30,17 @@
     "OS118723": "Hillgrove Ave (WBD spaces)"
   },
 
+  "subzones": {
+    "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Overnight_Resident_Subzones/FeatureServer/0",
+    "keyField": "AREAID",
+    "title": "Designated overnight parking",
+    "minScale": 4000,
+    "fill": [67, 183, 73, 0.5],
+    "outline": [30, 115, 36, 1],
+    "outlineWidth": 1.6,
+    "note": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
+  },
+
   "areaExhibits": {
     "LOT2": {
       "image": "assets/exhibits/lot2-overnight-resident-spaces.png",
@@ -144,6 +155,7 @@
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
       "where": "HASRESIDENT = 1",
+      "showSubzones": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT')",
       "guide": {
         "who": "Parking from 2 a.m. to 6 a.m. for residents of older buildings near downtown La Grange and the West End.",
@@ -203,6 +215,7 @@
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
       "where": "HASRESIDENT = 1",
+      "showSubzones": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
         "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",

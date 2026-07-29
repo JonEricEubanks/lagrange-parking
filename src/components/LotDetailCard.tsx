@@ -29,6 +29,7 @@ export function LotDetailCard({
   ruleConfig,
   ruleSymbology,
   exhibit,
+  subzoneNote,
   onWalkHere,
   walkMode,
   walkStep,
@@ -46,6 +47,12 @@ export function LotDetailCard({
   ruleSymbology?: SymbologyEntry[];
   /** Diagram of the designated spaces inside this lot, when one exists. */
   exhibit?: AreaExhibit;
+  /**
+   * The "park only in the highlighted areas" rule. Only passed for lots that
+   * actually have designated areas drawn — on a lot without them it would read
+   * as "you cannot park here at all".
+   */
+  subzoneNote?: string;
   onWalkHere?: (centroid: Point) => void;
   walkMode?: boolean;
   walkStep?: WalkTimeStep;
@@ -117,6 +124,11 @@ export function LotDetailCard({
           {friendlyLabel}
         </span>
       </div>
+
+      {/* Only the marked areas inside this lot are permitted, and the map shows
+          which. Stated in words because "no green here" is not something a
+          visitor should have to infer. */}
+      {subzoneNote && <p className="lot-card-subzone-note">{subzoneNote}</p>}
 
       {mainFields.length > 0 && (
         <table className="lot-card-table">

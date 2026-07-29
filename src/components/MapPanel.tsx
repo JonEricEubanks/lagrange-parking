@@ -29,6 +29,12 @@ interface MapPanelProps {
   overlayVisibility?: Record<string, boolean>;
   /** Reports the active basemap so the parking layer's owner can restyle it. */
   onBasemapChange?: (aerial: boolean) => void;
+  /** Draw `profile.subzones` on this page (set per audience tab). */
+  subzonesEnabled?: boolean;
+  /** Area id of the selected lot — the subzone layer filters to it. */
+  selectedAreaId?: string | number | null;
+  /** Whether that lot actually has designated areas drawn. */
+  selectedHasSubzones?: boolean;
 }
 
 export function MapPanel({
@@ -41,6 +47,9 @@ export function MapPanel({
   onViewReady,
   overlayVisibility,
   onBasemapChange,
+  subzonesEnabled = false,
+  selectedAreaId = null,
+  selectedHasSubzones = false,
 }: MapPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<MapView | null>(null);
@@ -57,6 +66,7 @@ export function MapPanel({
   const canvasTileRef = useRef<TileLayer | null>(null);
   const imageryTileRef = useRef<TileLayer | null>(null);
   const referenceLayersRef = useRef<FeatureLayer[]>([]);
+  const subzoneLayerRef = useRef<FeatureLayer | null>(null);
 
   // Refs to avoid stale closures in the click handler
   const walkTimeModeRef = useRef(walkTimeMode);
@@ -192,6 +202,28 @@ export function MapPanel({
     });
     referenceLayersRef.current = referenceLayers;
 
+    // Designated sub-lot areas. Created once and kept hidden; the effect below
+    // filters it to the selected lot and shows it. `minScale` keeps the bands
+    // off the map when zoomed out over the whole downtown, where they'd be
+    // illegible clutter rather than guidance.
+    const sz = profile.subzones;
+    const subzoneLayer = sz
+      ? new FeatureLayerModule({
+          url: sz.url,
+          title: sz.title ?? 'Designated spaces',
+          popupEnabled: false,
+          visible: false,
+          minScale: sz.minScale ?? 0,
+          renderer: new SimpleRenderer({
+            symbol: new SimpleFillSymbol({
+              color: rgba(sz.fill),
+              outline: { color: rgba(sz.outline), width: sz.outlineWidth ?? 1.5 },
+            }),
+          }),
+        })
+      : null;
+    subzoneLayerRef.current = subzoneLayer;
+
     const map = new Map({
       layers: [
         basemapTile,
@@ -200,6 +232,8 @@ export function MapPanel({
         ...overlays,
         ...referenceLayers,
         featureLayer,
+        // Above the parking polygons — it marks a part of one.
+        ...(subzoneLayer ? [subzoneLayer] : []),
       ],
     });
 
@@ -303,13 +337,38 @@ export function MapPanel({
     highlightRef.current = layerViewRef.current.highlight(selectedFeature);
 
     if (selectedFeature.geometry) {
-      viewRef.current
-        .goTo({ target: selectedFeature.geometry, zoom: viewRef.current.zoom }, { duration: 400 })
-        .catch(() => {
-          /* goTo interrupted by another navigation — ignore */
-        });
+      const view = viewRef.current;
+      // Normally keep the visitor's zoom and just recentre. The exception is a
+      // lot with designated areas: those are gated on `minScale`, so at an
+      // overview zoom selecting the lot would highlight nothing. Frame the lot
+      // instead, which puts the view well inside the threshold.
+      const min = profile.subzones?.minScale ?? 0;
+      const needsCloserLook =
+        subzonesEnabled && selectedHasSubzones && min > 0 && view.scale > min;
+      const target = needsCloserLook
+        ? { target: selectedFeature.geometry }
+        : { target: selectedFeature.geometry, zoom: view.zoom };
+      view.goTo(target, { duration: 400 }).catch(() => {
+        /* goTo interrupted by another navigation — ignore */
+      });
     }
-  }, [selectedFeature]);
+  }, [selectedFeature, subzonesEnabled, selectedHasSubzones, profile.subzones?.minScale]);
+
+  // Filter the subzone layer to the selected lot. Hidden whenever the page does
+  // not use subzones or nothing is selected — these are "here specifically",
+  // not a layer to browse.
+  useEffect(() => {
+    const layer = subzoneLayerRef.current;
+    if (!layer) return;
+    const keyField = profile.subzones?.keyField;
+    if (!subzonesEnabled || selectedAreaId == null || !keyField) {
+      layer.visible = false;
+      return;
+    }
+    const id = String(selectedAreaId).replace(/'/g, "''");
+    layer.definitionExpression = `${keyField} = '${id}'`;
+    layer.visible = true;
+  }, [subzonesEnabled, selectedAreaId, profile.subzones?.keyField]);
 
   return (
     <>

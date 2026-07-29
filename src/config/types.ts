@@ -64,6 +64,11 @@ export interface TabDef {
    */
   areaIds?: string[];
   /**
+   * This permit is only valid in designated areas inside each lot, so show
+   * `profile.subzones` on this page.
+   */
+  showSubzones?: boolean;
+  /**
    * Definition expression applied to the related ParkingRule table when a lot is
    * selected on this tab — so each audience sees only its own rules.
    */
@@ -189,6 +194,29 @@ export interface LayerFields {
 }
 
 /** A scanned/engineered diagram of the designated spaces inside one lot. */
+/**
+ * Designated sub-lot areas: where a permit is actually valid *inside* a lot.
+ * Only permitted areas are mapped — absence means "not permitted" — so the app
+ * has to state that rule in words, and must not imply it for a lot whose areas
+ * simply have not been drawn yet. See docs/DATA.md §3.6.
+ */
+export interface SubzoneConfig {
+  url: string;
+  /** Field on the subzone layer joining to `layer.idField` (e.g. AREAID). */
+  keyField: string;
+  title?: string;
+  /**
+   * Only draw at this scale or closer. The bands are a few thousand square feet
+   * and turn to noise when zoomed out over the whole downtown.
+   */
+  minScale?: number;
+  fill: [number, number, number, number];
+  outline: [number, number, number, number];
+  outlineWidth?: number;
+  /** Rule sentence shown on the lot card, but only for lots that have areas. */
+  note?: string;
+}
+
 export interface AreaExhibit {
   image: string;
   caption?: string;
@@ -229,6 +257,9 @@ export interface ParkingProfile {
   nameOverrides?: Record<string, string>;
   /** Designated-space diagrams keyed by area id, shown with that lot's detail. */
   areaExhibits?: Record<string, AreaExhibit>;
+
+  /** Designated sub-lot areas, shown on pages that opt in via `tab.showSubzones`. */
+  subzones?: SubzoneConfig;
 
   layer: {
     url: string;

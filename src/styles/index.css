@@ -1728,6 +1728,20 @@ body,
   background: var(--lf-midnight);
 }
 
+/* The "park only in the highlighted areas" rule. Green-keyed to match the
+   bands on the map, so the sentence and the shading read as one thing. */
+.lot-card-subzone-note {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-left: 3px solid var(--lf-accent-green);
+  border-radius: 4px;
+  background: #eef8ee;
+  color: #2b3d2c;
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
 /* ─── Designated-space exhibit ─── */
 .lot-card-exhibit {
   margin-top: 12px;

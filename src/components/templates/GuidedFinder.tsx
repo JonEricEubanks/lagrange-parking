@@ -5,6 +5,7 @@ import type { LayerFields, ParkingProfile, TabDef } from '../../config/types';
 import { useParkingLayer } from '../../hooks/useParkingLayer';
 import { useSelectedLot } from '../../hooks/useSelectedLot';
 import { useAudienceAreaIds } from '../../hooks/useAudienceAreaIds';
+import { useSubzoneAreaIds } from '../../hooks/useSubzoneAreaIds';
 import { useRelatedRules } from '../../hooks/useRelatedRules';
 import { areaDisplayName, explicitAreaWhere } from '../../config/lots';
 import { MapPanel } from '../MapPanel';
@@ -141,6 +142,13 @@ export function GuidedFinder({
   const rules = useRelatedRules(profile.relatedRules, selectedAreaId, chosen?.ruleWhere);
   const apply = chosen?.guide?.apply ?? profile.apply;
   const exhibit = selectedAreaId ? profile.areaExhibits?.[String(selectedAreaId)] : undefined;
+
+  // Which lots actually have designated areas drawn. Only permitted areas are
+  // mapped, so "no subzones" is ambiguous — see useSubzoneAreaIds.
+  const showSubzones = !!chosen?.showSubzones;
+  const subzoneIds = useSubzoneAreaIds(profile.subzones, showSubzones);
+  const lotHasSubzones =
+    showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
   const nameOf = (attrs: Record<string, unknown> | undefined) =>
     areaDisplayName(attrs, profile.layer.nameField, profile.layer.idField, profile.nameOverrides);
 
@@ -207,6 +215,9 @@ export function GuidedFinder({
             onFeatureClick={selectByClick}
             onViewReady={setMapView}
             onBasemapChange={setBasemapMode}
+            subzonesEnabled={showSubzones}
+            selectedAreaId={selectedAreaId}
+            selectedHasSubzones={lotHasSubzones}
           />
         </div>
         <aside
@@ -250,6 +261,7 @@ export function GuidedFinder({
                 ruleConfig={profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
                 exhibit={exhibit}
+                subzoneNote={lotHasSubzones ? profile.subzones?.note : undefined}
               />
             </>
           ) : (
