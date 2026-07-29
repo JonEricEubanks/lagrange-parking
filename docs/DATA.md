@@ -190,6 +190,82 @@ X: drive log under §2026-07-27.
 
 ---
 
+## 3.6 `OvernightResidentSubzones` — designated overnight parking areas
+
+**Digitized by JK 2026-07-28. In the FGDB only — not yet published, not yet used by the apps.**
+
+### Why this exists
+
+An overnight resident permit does **not** entitle the holder to park anywhere in the lot. Between
+2 a.m. and 6 a.m. they must park **only in specific designated spaces inside it**, and those spaces
+are a small fraction of the lot. Nothing in `ParkingArea` or `ParkingRule` can express that — both
+are lot-level, and this is sub-lot geometry.
+
+Charity Jones raised it at the 2026-07-28 meeting: the permit pages were telling residents *which
+lots* they may use while staying silent on *where inside the lot*, which is the part that actually
+gets people ticketed. She supplied the Village's engineering drawings
+(`Res Overnight Permits - Designated Spaces.pdf` — Heuer and Associates, sheets 1–4 of 5, dated
+12/30/2016) and asked that the areas be drawn as real map features rather than shown as scanned
+diagrams.
+
+### The YES-only decision
+
+The original plan was to draw both permitted (green) and prohibited (red) areas. **JK decided to
+digitize only the permitted areas.** The rule is simply *"you may park in these areas; anywhere else
+in the lot is not permitted"*, so the red polygons would be the entire remainder of every lot —
+far more digitizing for information the green areas already imply.
+
+⚠️ **This puts weight on the wording in the app.** Because absence of green is meaningful, the app
+must state the rule in words — "park only in the highlighted areas" — rather than let the user infer
+it. And critically, **absence of green is ambiguous in the data**: a lot with no subzones may mean
+"nothing is permitted here" *or* "not drawn yet". Two lots are currently in the second state (below),
+so the app must **only** show the highlight-and-rule treatment for lots that actually have subzones,
+and fall back to the existing generic guidance for the rest.
+
+### What was drawn
+
+`ParkingPermits.gdb\OvernightResidentSubzones` — 8 polygons, NAD 1983 StatePlane Illinois East (ft),
+EPSG 3435. Verified 2026-07-28: **every polygon's centroid falls inside its parent lot.**
+
+| Zone | Parent | Polys | Total sq ft | ~stalls @162 sq ft | Heuer sheet says |
+|---|---|---|---|---|---|
+| `2` | `LOT2` | 2 | 12,882 | ~80 | 74 |
+| `5` | `LOT5` | 2 | 6,407 | ~40 | 36 |
+| `11` | `LOT11` | 1 | 1,500 | ~9 | 10 |
+| `12` | `LOT12` | 2 | 2,914 | ~18 | 21 |
+| `13` | `LOT13` | 1 | 9,683 | **~60** | **31** |
+
+Lot 13's polygon implies roughly twice the spaces the drawing calls for — most likely a
+double-loaded row or the drive aisle caught inside the trace. Worth an eyeball; it does not block
+anything, since counts are not published.
+
+**Not drawn:** the **Village Hall Garage** (Heuer sheet 5 of 5 was missing from the set Charity
+sent) and **Lot 15** (a 2026 lot; the drawings are from 2016). Both need to be requested.
+
+### Schema and the join
+
+As drawn, the only attribute is `Zone` — a bare lot number as text (`"2"`, `"5"`, `"12"`). The apps
+join on `ParkingArea.AREAID` (`LOT2`, `VILLAGEHALLPARKINGSTRUCTURE`), so
+**`scripts/add_subzone_areaid.py` adds and populates a real `AREAID` field** (dry-run by default,
+`--commit` to write; all 8 rows resolve). Do not string-concatenate `"LOT" + Zone` in the browser —
+it breaks on the Village Hall Garage, which is the next area due.
+
+No `PERMITTYPE` field: the feature class is overnight-resident by definition, and the name carries
+that. **If employee designated spaces are ever drawn they must go in a separate feature class or
+gain a type field** — Lots 2 and 5 have both overnight-resident *and* CBD-employee designated
+spaces, and each permit page must show only its own.
+
+No space-count field, per the Village (2026-07-28).
+
+### Publishing
+
+Publish as its **own hosted feature layer**, not as a new sublayer of `LaGrange_Parking_Permits` —
+overwriting that service resets its public sharing and takes both live apps down (§2), and the
+profiles hardcode sublayer ids `/2` and `/3`. A standalone layer keeps this purely additive. It must
+be **shared publicly** like the main service.
+
+---
+
 ## 4. Verifying against live data
 
 All read-only, no credentials, plain `node`. **Run these before showing the apps to the Village.**

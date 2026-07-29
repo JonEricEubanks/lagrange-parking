@@ -96,46 +96,65 @@ raising with Charity:
 - **The drawings are dated 12/30/2016.** Confirm they still reflect current striping before
   digitizing from them.
 
-### ☐ 3. Designated overnight parking areas as real GIS features — NEXT, JK to digitize
+### ◐ 3. Designated overnight parking areas as real GIS features — DIGITIZED, not yet published
 
-The end state is to draw the designated areas as **real geometry** so they render on the map rather
-than as a scanned diagram, shaded **green where the permit is valid and red where it is not**. This
-supersedes the static-exhibit approach entirely.
+**What these are and why Charity asked for them is documented in full in [`DATA.md` §3.6](DATA.md).**
+Short version: an overnight resident permit only lets you park in specific designated spaces
+*inside* a lot, not anywhere in it. The permit pages were telling residents which *lots* they could
+use while staying silent on where inside the lot — which is the part that actually gets people
+ticketed. Charity supplied the Village's engineering drawings (Heuer and Associates, sheets 1–4 of
+5, dated 12/30/2016) and asked that the areas be drawn as real map features rather than shown as
+scanned diagrams.
 
-Charity's drawings arrived 2026-07-28, so the inputs are in hand. Remaining:
+**Done 2026-07-28 —** JK digitized `OvernightResidentSubzones` into `ParkingPermits.gdb`: 8 polygons
+covering Lots 2, 5, 11, 12 and 13, EPSG 3435. Verified: every polygon's centroid falls inside its
+parent lot, and the areas track the sheet counts (Lot 13 is the one outlier at roughly 2× — probably
+a double-loaded row or the drive aisle inside the trace; worth an eyeball, blocks nothing).
 
-1. **JK digitizes the areas in ArcGIS Pro**, tracing the Heuer sheets against the Cook 2025 aerial.
-   The drawings are 2016 CAD-derived and **not georeferenced**, so this is heads-up digitizing; the
-   striped bands sit along identifiable lot edges, which makes it tractable.
-2. Publish, then reference the layer from the profile and surface it in **"What you need to know"**.
+**Scope decision — only the permitted areas were drawn**, not the prohibited ones. The rule is
+"park in these areas, nowhere else in the lot", so red polygons would have meant digitizing the
+entire remainder of every lot to express what the green areas already imply. Two consequences the
+app must handle, both covered below.
 
-**Recommended structure — a new standalone polygon feature class, published as its own hosted
-layer.** Reasons:
+**Not drawn:** the **VH Garage** (Heuer sheet 5 of 5 was missing from the set Charity sent) and
+**Lot 15** (a 2026 lot; these drawings are from 2016). Both need requesting.
 
-- It is **sub-lot geometry**, a different granularity from `ParkingArea`; it cannot be an attribute.
-- Publishing it **separately** rather than as a new sublayer of `LaGrange_Parking_Permits` keeps the
-  existing service untouched. That matters here: overwriting that service **resets its public
-  sharing and breaks both apps** (`DATA.md` §2), and the profiles hardcode sublayer ids `/2` and
-  `/3`. A separate layer makes this change purely additive.
-- The app joins on `AREAID` anyway — it does not use the relationship class — so nothing is lost by
-  not being in the same service.
+Remaining:
 
-Suggested schema (build it in `ParkingPermits.gdb` so it lives with the rest, then publish alone):
+1. **Add the join key** — `python scripts/add_subzone_areaid.py --commit`. As drawn the only
+   attribute is `Zone` ("2", "5", "12"); the app joins on `AREAID`. Dry run passes, all 8 resolve.
+   Do not concatenate `"LOT" + Zone` in the browser — it breaks on the VH Garage, which is next up.
+2. **Publish as its own hosted feature layer**, shared publicly. **Not** as a new sublayer of
+   `LaGrange_Parking_Permits` — overwriting that service resets its sharing and takes both live apps
+   down (`DATA.md` §2), and the profiles hardcode sublayer ids `/2` and `/3`.
+3. **Wire up the app** — design below.
 
-| Field | Purpose |
-|---|---|
-| `AREAID` | FK to `ParkingArea` — **must match exactly** (`LOT2`, `LOT15`, …) |
-| `DESIGNATION` | `ALLOWED` / `NOT_ALLOWED` — drives the green/red symbology. Use a coded domain. |
-| `PERMITTYPE` | Which permit the area applies to. **Needed** — Lot 2 and Lot 5 have both overnight-resident *and* CBD-employee designated spaces, and each page must show only its own. |
-| `SOURCEREF` | Provenance, e.g. "Heuer sheet 3 of 5, 12/30/2016" |
+Note there is **no `PERMITTYPE` field**: the feature class is overnight-resident by definition. If
+employee designated spaces are ever drawn they need a separate feature class or a type field — Lots
+2 and 5 have both overnight-resident *and* CBD-employee designated spaces, and each page must show
+only its own.
 
-**No space-count field** — the Village does not want counts surfaced (2026-07-28).
+### App-side design for the subzones
 
-`PERMITTYPE` is the field most likely to be forgotten and the most expensive to add later — without
-it the Employees page would show the overnight bands.
+Charity's requirement: the subzones should show **when you click into a lot and are zoomed in**, not
+across the whole downtown, "so it isn't messy". That is two independent gates, and both are needed:
 
-Once live, the app filters the layer by the selected lot **and** the current page's permit type, and
-the static `areaExhibits` entries can be retired lot by lot as each is digitized.
+- **Scale** — a `minScale` so the bands never draw when zoomed out. They are 1,200–10,000 sq ft and
+  illegible above roughly **1:4000**. Make it profile-driven so it can be tuned without a rebuild.
+- **Selection** — filter to the selected lot's `AREAID`, so only the lot being viewed highlights.
+
+Both belong in the profile — e.g. a `subzones` block with `url`, `keyField`, `minScale`, fill and
+outline. Keep it generic; no hardcoded field names (`CLAUDE.md`).
+
+⚠️ **The YES-only decision has a trap.** Because absence of green now carries meaning, the app has
+to state the rule in words ("park only in the highlighted areas") rather than let users infer it —
+**and** absence of green is ambiguous in the data: it can mean "nothing is permitted here" or "not
+drawn yet". The VH Garage and Lot 15 are in the second state. **Gate the message on the lot actually
+having subzones**, and leave those two on the existing generic guidance until their drawings arrive.
+Showing "park only in the highlighted areas" on a lot with no highlights would read as "you cannot
+park anywhere here", which is wrong.
+
+Once live, the Lot 2 `areaExhibits` diagram can be retired.
 
 ---
 
