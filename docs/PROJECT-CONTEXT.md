@@ -51,12 +51,30 @@ Worth knowing, because the repo still contains artifacts from earlier phases.
 5. **2026-06-19:** this repo forked from `clf-cbd-parking`; both apps built and deployed to Azure.
 6. **2026-07-27:** Charity's 8-page map-comments PDF applied; the permit app became **four
    permit-type pages**; Lot 15 added; the Guided Finder became the only layout.
-7. **2026-07-28:** detail-card slimming (this session) — see `BACKLOG.md` for what came out of that
-   meeting.
+7. **2026-07-28:** meeting with Charity — detail-card slimming, shorter lot boxes, landing-page
+   restyle. See `BACKLOG.md`.
+8. **2026-07-29:** **designated overnight parking areas went live** — digitized, published as their
+   own hosted layer, and wired into the two resident pages (`DATA.md` §3.6).
+9. **2026-08-05:** repo moved to `E:\lagrange-parking`; docs re-verified against live services.
 
 **StoryMaps are not the current deliverable.** The two React apps superseded them. The AGOL web maps
 from step 3 still exist and are useful for QA in ArcGIS, but nothing in this repo depends on them —
 the apps query the hosted **feature service** directly.
+
+### Current state — as of 2026-08-05
+
+**Both apps are live and working.** Verified this date against the live services: `ParkingArea`
+returns 144 features anonymously, and the subzone layer returns all 8 rows with `AREAID` populated.
+`npm install` + `npm run build` both succeed from a clean tree.
+
+- The last functional change was the designated-overnight-areas feature (2026-07-29).
+- `main` is clean and pushed; the `charity-map-comments-2026-07` branch is **fully merged** into
+  `main` and is safe to delete.
+- **Nothing is in flight.** No half-finished work, no uncommitted changes.
+- What is open is almost entirely **waiting on Charity**, not on engineering — see `BACKLOG.md`.
+  The two engineering items worth knowing before you touch anything: the 5 pre-existing `npm run
+  lint` errors on `main`, and the three lots with empty detail cards caused by upstream `RULETYPE`
+  mislabels. Neither is a regression.
 
 ---
 
@@ -104,13 +122,19 @@ The new maintainer will not have access to most of this. Recorded so it can be r
 
 | Thing | Location |
 |---|---|
+| **This repo, on JK's machine** | **`E:\lagrange-parking`** (moved from `C:\dev\lagrange-parking` on 2026-08-05) |
+| GitHub remote | https://github.com/mgp-inc/lagrange-parking |
 | Running project log (history, GIS decisions) | `X:\GISC\Community\LaGrange\Project\20240829_ParkingDecalMaps\PROJECTDOCUMENTATION.md` |
 | ArcGIS Pro project + source FGDB | `…\20240829_ParkingDecalMaps\APRX\Parking_Permit_Restructure\` |
 | Village policy PDFs, eligibility spreadsheets | `…\20240829_ParkingDecalMaps\Village Policies and Documentation\` |
 | Charity's review PDFs (map comments, exhibits) | delivered by email; extracted assets live in `public/assets/exhibits/` |
 | AGOL org | https://lagrangeil.maps.arcgis.com (named user `LaGrange_IL_ADMIN`) |
-| AGOL publish scripts | `C:\dev\agent1\actions\agol\scripts\` (JK's machine) |
+| AGOL publish scripts | `C:\dev\agent1\actions\agol\scripts\` (JK's machine — **not moved**, still on `C:`) |
 | Azure resources | tenant `Community-Essentials.com`, RG `rg-lagrange-parking` — see `DEPLOY.md` |
+
+The repo is fully self-contained and portable — **nothing in it references its own path.** The move
+to `E:` was a machine-organization change only; everything survives in git, and the only file that
+does not is the gitignored `.env` (see `README.md` → Getting started).
 
 **The apps depend on none of it at runtime.** They are static bundles that query one public AGOL
 feature service. You can develop, build and deploy with nothing but this repo, `npm`, and the `az`

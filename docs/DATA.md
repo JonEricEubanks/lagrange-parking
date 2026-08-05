@@ -192,7 +192,16 @@ X: drive log under §2026-07-27.
 
 ## 3.6 `OvernightResidentSubzones` — designated overnight parking areas
 
-**Digitized by JK 2026-07-28. In the FGDB only — not yet published, not yet used by the apps.**
+**Digitized by JK 2026-07-28. Published and live in the permit app since 2026-07-29.**
+
+| | |
+|---|---|
+| Hosted layer | `LaGrange_Overnight_Resident_Subzones` — [`…/FeatureServer/0`](https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Overnight_Resident_Subzones/FeatureServer/0) |
+| Sharing | **Everyone (public)** — verified anonymously 2026-08-05, returns all 8 rows with `AREAID` populated |
+| Publish script | `scripts/publish_subzones.py` |
+| Wired via | `profile.subzones` in `lagrange-permit.json` → `useSubzoneAreaIds` + `MapPanel` + `LotDetailCard` |
+
+Deliberately its **own** service, not a sublayer of `LaGrange_Parking_Permits` — see "Publishing" below.
 
 ### Why this exists
 
@@ -244,11 +253,12 @@ sent) and **Lot 15** (a 2026 lot; the drawings are from 2016). Both need to be r
 
 ### Schema and the join
 
-As drawn, the only attribute is `Zone` — a bare lot number as text (`"2"`, `"5"`, `"12"`). The apps
+As drawn, the only attribute was `Zone` — a bare lot number as text (`"2"`, `"5"`, `"12"`). The apps
 join on `ParkingArea.AREAID` (`LOT2`, `VILLAGEHALLPARKINGSTRUCTURE`), so
 **`scripts/add_subzone_areaid.py` adds and populates a real `AREAID` field** (dry-run by default,
-`--commit` to write; all 8 rows resolve). Do not string-concatenate `"LOT" + Zone` in the browser —
-it breaks on the Village Hall Garage, which is the next area due.
+`--commit` to write). **It was run 2026-07-29; the published layer carries `AREAID` on all 8 rows.**
+Do not string-concatenate `"LOT" + Zone` in the browser — it breaks on the Village Hall Garage,
+which is the next area due.
 
 No `PERMITTYPE` field: the feature class is overnight-resident by definition, and the name carries
 that. **If employee designated spaces are ever drawn they must go in a separate feature class or
@@ -257,12 +267,33 @@ spaces, and each permit page must show only its own.
 
 No space-count field, per the Village (2026-07-28).
 
-### Publishing
+### Publishing — done 2026-07-29
 
-Publish as its **own hosted feature layer**, not as a new sublayer of `LaGrange_Parking_Permits` —
-overwriting that service resets its public sharing and takes both live apps down (§2), and the
-profiles hardcode sublayer ids `/2` and `/3`. A standalone layer keeps this purely additive. It must
-be **shared publicly** like the main service.
+Published by `scripts/publish_subzones.py` as its **own hosted feature layer**, not as a new sublayer
+of `LaGrange_Parking_Permits` — overwriting that service resets its public sharing and takes both
+live apps down (§2), and the profiles hardcode sublayer ids `/2` and `/3`. A standalone layer keeps
+this purely additive. It is **shared with Everyone**, like the main service.
+
+**If you ever republish it, re-test anonymous access** — the same sharing reset that bites the main
+service applies here. An untokened query of `…/FeatureServer/0/query?where=1=1&outFields=AREAID&f=json`
+must return 8 rows, not `Token Required`. If it fails, the resident pages silently lose their green
+bands *and* the "park only in the highlighted areas" sentence, because `useSubzoneAreaIds` treats an
+errored query the same as "this lot has no subzones" — it fails quiet, not loud.
+
+### How the app uses it
+
+Two gates, both Charity's requirement that the bands appear only when you have clicked into a lot and
+zoomed in:
+
+- **`minScale: 4000`** — the bands never draw when zoomed out, where a few thousand square feet of
+  shading reads as clutter. Selecting a lot that has bands therefore *frames itself*, but only when
+  the current view is too far out to show them.
+- **Selection filter** — only the selected lot's `AREAID` draws.
+
+`useSubzoneAreaIds` asks the service which lots actually have bands, and `LotDetailCard` states the
+rule in words **only for those lots**. This is the YES-only trap from above made concrete: the
+Village Hall Garage and Lot 15 have no bands drawn yet, and telling someone to "park only in the
+highlighted areas" where there are none would read as "you cannot park here at all".
 
 ---
 

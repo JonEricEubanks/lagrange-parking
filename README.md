@@ -49,18 +49,49 @@ Hosted feature service **`LaGrange_Parking_Permits`** on the La Grange AGOL org
 
 The "paths to the maps" live in the **profile JSON** (`layer.url`, `relatedRules.url`, `itemId`), not in `.env`.
 
+## Getting started
+
+```bash
+git clone https://github.com/mgp-inc/lagrange-parking.git
+cd lagrange-parking
+npm install
+npm run dev                 # permit app → http://localhost:5173/
+```
+
+That is the whole setup — **the app runs with no `.env` at all.** `.env.permit` / `.env.public` are
+committed and need no edits.
+
+`.env` (gitignored, holds `VITE_ARCGIS_API_KEY`) is the one file a clone cannot give you, but it is
+**not** required to develop: verified 2026-08-05, the GISC tiled basemaps serve tiles anonymously.
+Comments in `src/main.tsx` and in the committed `.env` claim otherwise — treat those as stale until
+`scripts/verify-basemaps.mjs` says different. Add a key for production builds anyway (insurance
+against an AGOL sharing change, and required if `enableWalkTime` is ever enabled): copy
+`.env.example` → `.env` and get the key from MGP, or mint a referrer-restricted one.
+
+Nothing else is required — no VPN, no `X:` drive, no ArcGIS Pro, no AGOL login. The apps are static
+bundles that read one public feature service. ArcGIS Pro and AGOL credentials only matter if you need
+to change the *underlying data* (`docs/DATA.md`).
+
+Sanity-check the live services before you trust anything you see:
+
+```bash
+node scripts/verify-permit-pages.mjs   # every listed lot resolves + returns rules
+node scripts/verify-basemaps.mjs       # each basemap actually serves a tile
+```
+
 ## Commands
 
 ```bash
-npm install
 npm run dev            # permit app  → http://localhost:5173/
 npm run dev:public     # public app  → http://localhost:5173/ (next free port if permit is up)
 npm run build          # builds both → dist/permit and dist/public
 npm run build:permit
 npm run build:public
+npm run lint           # 5 pre-existing errors on main — not your regression, see docs/BACKLOG.md
 ```
 
 Profile selection, base path and output dir are set per build mode in `.env.permit` / `.env.public`.
+No test framework is configured.
 
 ## Deployment
 
@@ -70,8 +101,13 @@ prerequisites (AGOL public sharing, ArcGIS key referrer restriction).
 
 ## Tech stack
 
-React 19 · TypeScript · Vite 7 · ArcGIS JS SDK (`@arcgis/core` v5). Public/anonymous access via an
-optional API key (`VITE_ARCGIS_API_KEY`, only needed if `enableWalkTime` is turned on). No login.
+React 19 · TypeScript · Vite 7 · ArcGIS JS SDK (`@arcgis/core` v5). No login — the app never prompts
+for an ArcGIS identity (`esriConfig.request.useIdentity = false`).
+
+> **`VITE_ARCGIS_API_KEY` is optional in practice**, despite comments in `src/main.tsx` and `.env`
+> saying the basemap requires it. Verified 2026-08-05: both GISC tiled basemaps serve tiles
+> anonymously. Keep the key in production builds as insurance and for routing
+> (`enableWalkTime`, off today). See [Getting started](#getting-started).
 
 ## Brand
 

@@ -2,6 +2,11 @@
 
 Newest meeting at the top. Anything "blocked" names who it is blocked on.
 
+> **Status 2026-08-05.** Both apps live; nothing in flight; `main` clean and pushed. Every item from
+> the 2026-07-28 meeting is **done**, including the designated overnight areas (shipped 2026-07-29).
+> Everything still open below is **waiting on Charity** except the "Carried over — engineering"
+> table, which is deliberate debt, not breakage.
+
 ---
 
 ## Meeting with Charity Jones — 2026-07-28
@@ -96,7 +101,7 @@ raising with Charity:
 - **The drawings are dated 12/30/2016.** Confirm they still reflect current striping before
   digitizing from them.
 
-### ◐ 3. Designated overnight parking areas as real GIS features — DIGITIZED, not yet published
+### ✅ 3. Designated overnight parking areas as real GIS features — DONE 2026-07-29, LIVE
 
 **What these are and why Charity asked for them is documented in full in [`DATA.md` §3.6](DATA.md).**
 Short version: an overnight resident permit only lets you park in specific designated spaces
@@ -117,17 +122,24 @@ entire remainder of every lot to express what the green areas already imply. Two
 app must handle, both covered below.
 
 **Not drawn:** the **VH Garage** (Heuer sheet 5 of 5 was missing from the set Charity sent) and
-**Lot 15** (a 2026 lot; these drawings are from 2016). Both need requesting.
+**Lot 15** (a 2026 lot; these drawings are from 2016). Both still need requesting — carried over
+below as open item 6.
 
-Remaining:
+**All three remaining steps were completed 2026-07-29** (commit `25d0423`):
 
-1. **Add the join key** — `python scripts/add_subzone_areaid.py --commit`. As drawn the only
-   attribute is `Zone` ("2", "5", "12"); the app joins on `AREAID`. Dry run passes, all 8 resolve.
-   Do not concatenate `"LOT" + Zone` in the browser — it breaks on the VH Garage, which is next up.
-2. **Publish as its own hosted feature layer**, shared publicly. **Not** as a new sublayer of
-   `LaGrange_Parking_Permits` — overwriting that service resets its sharing and takes both live apps
-   down (`DATA.md` §2), and the profiles hardcode sublayer ids `/2` and `/3`.
-3. **Wire up the app** — design below.
+1. ✅ **Join key added** — `scripts/add_subzone_areaid.py --commit` run; all 8 rows carry `AREAID`.
+2. ✅ **Published** as its own hosted layer, `LaGrange_Overnight_Resident_Subzones`, shared with
+   Everyone — deliberately *not* folded into `LaGrange_Parking_Permits`. `scripts/publish_subzones.py`.
+3. ✅ **Wired into both resident pages** — `profile.subzones` + `useSubzoneAreaIds` + `MapPanel` +
+   `LotDetailCard`. Verified against the live service: **5 lots shaded and captioned, 2 correctly
+   withheld**, both non-resident pages unaffected.
+
+The design that was implemented is described below and in `DATA.md` §3.6; it is kept here because the
+reasoning (especially the YES-only trap) still governs any change to this feature.
+
+**Still open on this feature:** the Lot 2 `areaExhibits` diagram is now redundant with the live bands
+and can be retired once Charity confirms; and Lot 13's polygon still implies ~2× the stalls the Heuer
+sheet calls for (see `DATA.md` §3.6) — cosmetic, since counts are not published.
 
 Note there is **no `PERMITTYPE` field**: the feature class is overnight-resident by definition. If
 employee designated spaces are ever drawn they need a separate feature class or a type field — Lots
@@ -146,6 +158,10 @@ across the whole downtown, "so it isn't messy". That is two independent gates, a
 Both belong in the profile — e.g. a `subzones` block with `url`, `keyField`, `minScale`, fill and
 outline. Keep it generic; no hardcoded field names (`CLAUDE.md`).
 
+> **This is what shipped.** `profile.subzones` carries exactly those keys plus `title` and `note`
+> (the sentence shown on the lot card). Tune the bands by editing the profile — no rebuild of
+> component code needed.
+
 ⚠️ **The YES-only decision has a trap.** Because absence of green now carries meaning, the app has
 to state the rule in words ("park only in the highlighted areas") rather than let users infer it —
 **and** absence of green is ambiguous in the data: it can mean "nothing is permitted here" or "not
@@ -154,7 +170,10 @@ having subzones**, and leave those two on the existing generic guidance until th
 Showing "park only in the highlighted areas" on a lot with no highlights would read as "you cannot
 park anywhere here", which is wrong.
 
-Once live, the Lot 2 `areaExhibits` diagram can be retired.
+> **Implemented as specified** — `useSubzoneAreaIds` queries which lots actually have bands and the
+> sentence is withheld for the rest. ⚠️ Note it fails *quiet*: if the subzone service ever stops
+> answering anonymously, every lot looks like "no bands drawn" and the bands and the sentence both
+> vanish with no error. See `DATA.md` §3.6.
 
 ---
 
@@ -184,4 +203,6 @@ Once live, the Lot 2 `areaExhibits` diagram can be retired.
 | 6 | **Bundle is large** (~1.9 MB main chunk, gzip ~566 kB) | Almost entirely `@arcgis/core`. Vite warns on every build. Not a problem in practice for this audience; code-splitting would be the fix if it ever is. |
 | 7 | **`scripts/verify-filters.mjs` is stale** | Predates the four-page model; reports the old three-audience buckets. Either rewrite against `tab.areaIds` or delete it. |
 | 8 | **Explorer / Directory templates are unreferenced** | Reachable at `#/explorer` and `#/directory` for internal comparison; nothing links to them. See `CLAUDE.md` — do not reintroduce a layout chooser. |
-| 9 | **`profile.branding` is dead code for the live app** | The `useEffect` that writes `--lf-*` CSS variables lives in `ParkingApp.tsx` (the Explorer template), which the live app never renders. Harmless today — the defaults in `src/styles/index.css` are hardcoded to the same La Grange values — but **a new profile alone will not re-theme the app**. Lift that effect into `App.tsx` or a shared hook before retargeting another community. Only `branding.logo` is read by `GuidedFinder`. |
+| 9 | **Stale branch `charity-map-comments-2026-07`** | Fully merged into `main` (verified 2026-08-05, zero commits not in `main`). Safe to delete locally and on the remote; left in place only to avoid a surprise. |
+| 10 | **The repo contradicts itself about `VITE_ARCGIS_API_KEY`** | `src/main.tsx` and the committed `.env` say the GISC tiled basemap needs the key; the tile services' metadata says `"access":"SECURE"`. **Measured 2026-08-05: both basemaps serve tiles anonymously** — `verify-basemaps.mjs` passes no key and gets HTTP 200. So a keyless clone works. Either the claim is stale or sharing changed. Worth reconciling the comments; keep shipping a key in prod regardless. |
+| 11 | **`profile.branding` is dead code for the live app** | The `useEffect` that writes `--lf-*` CSS variables lives in `ParkingApp.tsx` (the Explorer template), which the live app never renders. Harmless today — the defaults in `src/styles/index.css` are hardcoded to the same La Grange values — but **a new profile alone will not re-theme the app**. Lift that effect into `App.tsx` or a shared hook before retargeting another community. Only `branding.logo` is read by `GuidedFinder`. |
