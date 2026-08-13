@@ -78,6 +78,12 @@ export interface TabDef {
   audience?: string[];
   /** Guidance shown in the left rail for this audience/section. */
   guide?: AudienceGuideContent;
+  /** When false, the "Parking rules" related-rules block is hidden on the lot detail card. */
+  showRules?: boolean;
+  /** Note shown on every lot card for this tab. */
+  note?: string;
+  /** Per-lot overrides for `note`, keyed by AREAID. Wins over `note` when present. */
+  lotNotes?: Record<string, string>;
 }
 
 export interface ApplyLink {
@@ -181,6 +187,8 @@ export interface RelatedRulesConfig {
   /** Optional field holding a "buy / apply" URL rendered as a button. */
   purchaseUrlField?: string;
   orderByFields?: string[];
+  /** Always-applied filter on rule queries (e.g. USERCLASS = 'VISITOR'). */
+  baseWhere?: string;
 }
 
 /** Field-name mapping so components stay generic across communities. */
@@ -223,6 +231,13 @@ export interface AreaExhibit {
   credit?: string;
 }
 
+/** Per-area availability and time-limit text authored in the profile (e.g. from
+ *  a Village-supplied spreadsheet), shown on the detail card when present. */
+export interface AreaInfo {
+  availability: string;
+  timeLimit: string;
+}
+
 export interface ParkingProfile {
   id: string;
   title: string;
@@ -257,6 +272,8 @@ export interface ParkingProfile {
   nameOverrides?: Record<string, string>;
   /** Designated-space diagrams keyed by area id, shown with that lot's detail. */
   areaExhibits?: Record<string, AreaExhibit>;
+  /** Per-area availability / time-limit overrides keyed by area id. */
+  areaInfo?: Record<string, AreaInfo>;
 
   /** Designated sub-lot areas, shown on pages that opt in via `tab.showSubzones`. */
   subzones?: SubzoneConfig;

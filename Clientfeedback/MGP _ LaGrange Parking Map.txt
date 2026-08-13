@@ -1,0 +1,756 @@
+MGP  LaGrange Parking Map-20260811_140239-Meeting Recording
+August 11, 2026, 7:02PM
+26m 49s
+
+Angie Miller started transcription
+
+Angie Miller   0:06
+Does that work for everybody?
+
+Charity Jones   0:06
+So I think, yeah, I think that sounds great. I think what might work best is if I go ahead and share my screen, because then I can kind of like highlight over the areas I'm talking about. And can you guys hear me okay?
+
+Angie Miller   0:12
+Yeah, great. Let's do it.
+
+JonEric Eubanks   0:13
+Yeah, I was gonna recommend that.
+
+Angie Miller   0:17
+You got it, girl. Yes.
+
+JonEric Eubanks   0:19
+Yeah.
+
+Charity Jones   0:19
+Okay, just checking. You know, I'm always nervous about that, Angie. Okay, so can you see my screen?
+
+Angie Miller   0:20
+Yep.
+I know.
+
+JonEric Eubanks   0:28
+Yep.
+
+Angie Miller   0:28
+Yes, ma'am.
+
+Charity Jones   0:29
+Okay, so John Kenny really accomplished like just about everything we wanted to do with the text and the colours on the buttons and kind of generally how things look here. Like, so all of that looks really good. This is where we're having issues is in this area.
+that it looks like some of the updates maybe haven't gotten made that we talked about. So this is, I think, where the ball needs to get picked up and moved on next. So for example, lot 15, oh, there's lot 15. I guess it was just out of order. So I guess, never mind, that's fine.
+So let me click on lot 2. So this takes you to lot 2. It highlights it.
+And we had talked about trying to show on the map the areas that are allowable for overnight parking. And you see he has that text between 2 AM and 6 AM, park only in the highlighted areas shown on the map. Overnight parking elsewhere in the slot is not permitted. So that's great.
+The text is okay. This is pretty hard to see, I feel like.
+So I don't know if there's a better way that we can visualise this.
+
+JonEric Eubanks   1:49
+So...
+
+Charity Jones   1:49
+And then, oh, go ahead.
+
+JonEric Eubanks   1:50
+When you're saying it's hard to see, you're meaning the parcel, or not the parcels, or I guess it is, the...
+
+Charity Jones   1:57
+It's hard to see these highlighted areas because it's still highlighted in blue. Like, so it's green on blue. And honestly, anybody with any issues with like colour blindness or anything, like it's going to be all kinds of bad.
+
+JonEric Eubanks   2:00
+Okay.
+Polygons, okay.
+Definitely, yeah, yes.
+Okay.
+
+Charity Jones   2:16
+So.
+
+JonEric Eubanks   2:16
+Yeah, we can definitely make that. That's an easy cosmetic change, yeah.
+
+Charity Jones   2:18
+I feel like maybe there's a something that could be easier, like, you know.
+
+JonEric Eubanks   2:23
+Yeah, we can apply accessibility standards to this to ensure that if someone does have some colour or is colorblind, that it caters to them essentially. Yeah, we can definitely incorporate that.
+
+Charity Jones   2:38
+Yeah, so I think, um...
+You know, ideally, I don't know if this is possible or not, but ideally it would be like you click on lot 2, it zooms you kind of to an extent like this where it's real close, right? So you can see it well. Maybe the outline of the lot is still, you know, highlighted and then you just see the
+
+JonEric Eubanks   2:51
+Mhm.
+
+Charity Jones   3:00
+green boxes within. I don't know, but I'm open to ideas, but ideally it would be something like that where we're not having like colour on colour and it's hard to see.
+
+JonEric Eubanks   3:10
+Yeah, I like that idea.
+
+Charity Jones   3:12
+And then parking rules right here. I don't really feel like this adds much to this. So I don't even know that we need it.
+Because we're in the resident day-night 24-hour permit interface.
+We need to have this highlight about, you know, where they can park at night time, but really their permit parking is not 2 A.m. to 6 A.m. Their permit parking is 24 hours a day.
+So I feel like this is just confusing.
+Also, like this designated spaces, if we can get this right, we don't need this.
+
+JonEric Eubanks   3:48
+Okay.
+
+Charity Jones   3:54
+Because during the day they can park anywhere in this lot. So really all we're doing here.
+when they're clicking on it, is it's taking them to the lot, and it's telling them that at nighttime, you have to park in these specific areas.
+
+JonEric Eubanks   4:11
+Yeah, that makes sense.
+
+Charity Jones   4:16
+Sound good?
+
+JonEric Eubanks   4:17
+Yep. And so just to confirm, you essentially just need the green top box, essentially, if that, I mean, in the card that the description, the card description, essentially, that's all you need. You don't simply need the parking rules or the designated spaces. Is that correct?
+
+Charity Jones   4:28
+Oh, up here. Yes. Yeah.
+That's right, yeah, and we...
+
+JonEric Eubanks   4:36
+Okay. And then just change the out, just make the outline of the parking and then just make, just make that different colours as well. Okay. And then what was that? I'm sorry to cut you off.
+
+Charity Jones   4:49
+Yeah, however, we can make that easier to see. Oh, no, that's okay. I was going to say maybe in that tile, we do want to add 1 clarifying sentence. It's like, during daytime hours, you can park anywhere in any available space.
+
+JonEric Eubanks   5:02
+Okay, yeah, we can definitely add a note there somewhere.
+
+Charity Jones   5:06
+Yeah. Okay. So I think that was kind of the thing. Oh, no. And then lot 15, he drew the polygon wrong. I can resend the map, but this is the map that I sent over. So it ends here.
+And he drew it including this, which is not our property.
+
+JonEric Eubanks   5:23
+Okay.
+I see.
+Yeah, we could have an analyst make that update while I'm making the other updates during that, because that's a simple change right there.
+
+Charity Jones   5:36
+Okay.
+
+Angie Miller   5:36
+Yeah, and I have this video recording, John and Eric, so we can kind of take a screenshot. Don't worry about sending anything over to Charity. I think we'll have that covered for you.
+
+Charity Jones   5:45
+Okay, great.
+
+JonEric Eubanks   5:50
+And then I did kind of review this. I did notice on the VH garage, there wasn't anything on that in the employee parking or I'm thinking on a different map here, but I just want to confirm if that was on this one as well here.
+
+Charity Jones   5:50
+Let's see.
+Yeah, let me let me go back.
+
+JonEric Eubanks   6:09
+Sorry if I'm jumping around there. Okay, so it's on here, but it's just not on the other one. Okay.
+
+Charity Jones   6:10
+No, that's okay.
+Yeah.
+So this one should have, like this stuff needs to go away too, and it should similarly have a tile that says where they're allowed to park, which is only in level 1E.
+
+JonEric Eubanks   6:19
+Okay.
+OK.
+
+Charity Jones   6:29
+And that's true during the day and at night for them. Their parking is level 1E.
+
+JonEric Eubanks   6:35
+Okay.
+And just for...
+confirmation here. Just, we're going to remove the parking rules, so just add that tile here. And then on the other map, I know we haven't got to there yet, but is this going to be like similar changes or revisions that you're going to want? Okay, cool.
+
+Charity Jones   6:54
+Yes. Yeah. So I don't know if in the interest of time, it's easier for you to send me like the texts that are in those tiles for the various maps and just have me give you written comments back or go through it individually.
+Now, I mean, I'm open either way.
+
+JonEric Eubanks   7:17
+I would prefer to go now just so we capture everything because I don't want to go back and forth with the e-mail. Essentially, I think if we capture everything now, we can. We can get those changes and get it pushed out to y'all and then ensure that if there are any updates or anything, you can send that and we can make those adjustments as well.
+
+Charity Jones   7:25
+Sure.
+
+JonEric Eubanks   7:35
+But that's dependent on which your schedule as well.
+
+Charity Jones   7:35
+Okay.
+No, that's fine. This works great for me. So for this one, it's eliminating these, adding a tile that says, you know, permit holders must park on level 1E.
+For lot 5, this is just like lot 2, we want to get rid of the parking rules and then this tile just needs one sentence that says, you know, during the day that can park in any space.
+I think that's all of them.
+I need to give you some guidance on where they're supposed to park overnight in lot 15. That's a new lot for us. So let me cheque with my public works department and I'll let you know.
+
+JonEric Eubanks   8:27
+Yeah, and then we'll need to coordinate with our analysts on that aspect, because they'll draw that out, and then they just got to push it to the layer, and then it automatically pops up on the map.
+
+Charity Jones   8:38
+Okay.
+Sounds good. All right, so that's all the resident 24-hour comments I had. We can go to the resident overnight only. So this should be the same, really.
+No.
+because the overnight only is the overnight only location.
+
+JonEric Eubanks   9:00
+Okay, and this is the one I heavily reviewed here just to kind of get more insights and everything. I did kind of a high level on the other map there. So yeah, so I'm more familiar with this one too. Okay.
+
+Charity Jones   9:10
+Yeah.
+So it's, you know, just basically the same. Is there some cleanup we can do on the polygons? Like, that'd be real nice, because they're like, you know.
+I don't know, I'm nitpicky, but...
+
+JonEric Eubanks   9:27
+So when you say clean up, do you want it to be like more uniform?
+
+Charity Jones   9:29
+Like, see how the...
+See how the green edge is extending down and it doesn't really cover the whole parking spaces. Like these were drawn, I think, by Jeff like years ago when we were just like trying to get our hands around our parking regulations internally. And now that it's a public facing document, it'd just be nice.
+
+JonEric Eubanks   9:33
+Okay, I see. Okay.
+Mm.
+
+Charity Jones   9:51
+you know, things are straight and line up like they're supposed to.
+
+JonEric Eubanks   9:54
+Yep, everything's aligned.
+
+Charity Jones   10:04
+Let's see.
+
+JonEric Eubanks   10:05
+High-level overview. Yeah, I can see that as well.
+
+Charity Jones   10:07
+Yeah, like here, that one's sticking out and then it doesn't cover these. It's really kind of like not lined up with where the parking spaces are.
+
+JonEric Eubanks   10:09
+Yeah.
+Yeah, so there, that's you're kind of that right there, because that that vision, that image layer there, that changes every year. So, and it really depends on where the satellite is over the the actual spot it's scanning right there. So, it it that may vary one year. So,
+maybe a few years when Jeff made it, it was like the shadow was perfect. It was probably like at a 45 degree angle or I don't know, but it got like a better angle. So that's why, so that's why some of these may shift a little on that. So they say give it like a 5 to 10 foot variance when it comes to the image layer. So, but yeah, I definitely understand getting those lines aligned though. I do agree with that.
+
+Charity Jones   10:46
+Okay.
+Yeah, because then at least if the whole thing's shifted off, then at least it's shifted off together, right?
+
+JonEric Eubanks   11:04
+Yeah.
+
+Charity Jones   11:05
+Um...
+
+JonEric Eubanks   11:07
+Yeah, when the analysts are making those updates, we can easily make these updates and that's not going to affect being a lab or anything.
+
+Charity Jones   11:08
+Yeah, so...
+Okay.
+So I think really other than that, these are all good.
+I need to tell you again where people should park for Lot Fifteen overnight.
+Um...
+
+Angie Miller   11:30
+Charity, I'm going to make like, sorry, this is kind of an off suggestion, but I do have a couple things for Tim as well that I plan to talk to you about at 3.30. So if we want to do like 1 comprehensive MGP message over to Public Works, that would probably be helpful. I'm not sure if he was the one that you were going to reach out to. So yeah.
+
+Charity Jones   11:46
+Sure.
+
+Angie Miller   11:48
+versus please now. Okay, great.
+
+Charity Jones   11:48
+Yeah, that's fine.
+Yeah, so I think that's it on the resident overnight.
+Can you?
+
+JonEric Eubanks   11:57
+Oh wow, that's, yeah, that's easy. I thought it was going to be a big overhaul.
+
+Angie Miller   12:01
+Yeah.
+
+Charity Jones   12:01
+No, it's just like some of these things are hard to describe in an e-mail, you know, so much easier to just show what we're talking about. Okay, commuters and LT.
+
+Angie Miller   12:03
+What?
+Mhm.
+
+Charity Jones   12:25
+Again, I don't know, but I'm just not sure that the parking rules are really adding anything. I don't know. See, and then that one doesn't have it.
+
+JonEric Eubanks   12:33
+Yeah, lot 13 doesn't have it, yeah.
+
+Charity Jones   12:34
+That one does. And why is that 6 A.m. to 11 A.m.? That doesn't even make any sense. Like.
+So I think it just makes sense to leave the text like where we have it and that's where they understand the rules. And then we don't worry about having all of that on the individual lots.
+
+JonEric Eubanks   12:55
+So, essentially, oh, go ahead, go ahead, Angie.
+
+Angie Miller   12:56
+Oh, sorry, go ahead. No, no, I was going to say, can you scroll down a little bit because I just want to make sure I read, okay, commuter permit holders, LTH, okay. I mean, that's, and let's just make sure so those hours are consistent across every single zone.
+that we have in this particular site.
+
+Charity Jones   13:18
+Yes.
+
+Angie Miller   13:19
+Perfect.
+
+Charity Jones   13:20
+Yeah.
+
+Angie Miller   13:21
+The zone, okay, no specific.
+
+Charity Jones   13:22
+Why you see it differently, though, I'll tell you, like why that one says 6 A.m. to 11 A.m. is because after 11 A.m., that lot is open for public parking. It's no longer reserved only for commuters. So, but commuters with a permit are entitled to park there from 6 A.m. to 6 P.m.
+
+Angie Miller   13:31
+Public.
+
+Charity Jones   13:42
+by their permit. So that's again what I'm talking about, like all those fields and everything. When we built this out in GIS, we weren't building it out with the intention that it was a facing vehicle, you know.
+
+Angie Miller   13:54
+Yeah, yeah, I do. I do.
+
+Charity Jones   13:56
+No.
+So that's it on, that's it on computer and LTHS. It's just like, get rid of all this stuff.
+Um...
+
+Angie Miller   14:07
+So sorry, John Eric, were you going to ask a question? I kind of cut you off a little bit on accident, my friend.
+
+Charity Jones   14:07
+And then employees.
+
+JonEric Eubanks   14:12
+No, I was gonna say, but I don't know if it, if they, if they may need it. Like, essentially, when you click on, like, could you click on lot 15 for me?
+
+Charity Jones   14:24
+Mhm.
+
+JonEric Eubanks   14:25
+When you click on that, essentially we just need like a one-line text there instead of everything there. Okay, that makes sense then.
+
+Charity Jones   14:35
+Okay.
+Um...
+Yeah, and it's the same on these. I don't know that I love the way the labels appear on the employee parking. Like, I don't know, they're just awfully large.
+
+Angie Miller   14:40
+Playlist.
+I believe that part of this was a consideration for mobile.
+If memory serves, but I could be wrong. Maybe that's something, JonEric, that when you're going through your updates, you can test for us. I think that might have been why if memory serves. Yeah.
+
+Charity Jones   14:59
+Okay.
+
+JonEric Eubanks   15:07
+Let me test it now.
+
+Charity Jones   15:10
+Well, I mean, you could at least like on these ones through the on street, the lots are okay. Those don't bother me as much. It's these on street ones that are like super long. I mean, I guess we could just take out the WBD spaces or just have it say WBD in parentheses. Like, do we really need it to say spaces?
+And then it's inconsistent, the labelling, because there are on-street spaces here on Harris for CBD. And see there, it's labelled, but when you zoom out, it disappears.
+
+JonEric Eubanks   15:41
+Yeah, that's a feature they have on, and that's kind of like the ArcGIS web map feature, is whenever you zoom in, they have it, because if you didn't have that feature on, like certain zoom-ins, it would just be overcrowded and you couldn't really see, the labels would be overlapping and everything.
+So that's why they had that. So whenever you zoom in, you can only see certain labels. And that's how they have it on the, they can make adjustments to that. And it looks like there's not that many there. So it may not be an issue to add all the labels. They'll just kind of have to orient them differently.
+
+Charity Jones   16:00
+No.
+Yeah, it's just, it's only that one that's missing. All the rest of them are showing up.
+
+JonEric Eubanks   16:20
+Oh, then yeah, we can, yeah, we'll just have the analysts just add that, because that's just changing a quick setting on the map to have that show on there. Or I think I'll make that adjustment actually, because they're not going to have access to this map. Okay.
+
+Charity Jones   16:28
+Okay.
+Okay.
+
+JonEric Eubanks   16:34
+Then yeah, I'll make that, yeah, that's a simple adjustment then, and is that on all?
+
+Charity Jones   16:35
+Um...
+
+JonEric Eubanks   16:39
+the maps that you've identified or is it just...
+
+Charity Jones   16:44
+It's just this one map where we have that issue. Yeah, I think it's because this is one of the only ones where I think it's only this one. Let me look at the commuters real quick.
+
+JonEric Eubanks   16:45
+Okay, cool.
+
+Charity Jones   16:57
+Yeah, not all of them are showing up for commuter either, I don't think, but...
+
+JonEric Eubanks   17:00
+Okay.
+
+Charity Jones   17:02
+That one bothers me less because it's really obvious that only some of them are showing up with the label.
+On the employee one, everything except that one shows up.
+
+JonEric Eubanks   17:17
+Like you are trying to deter people from parking.
+
+Charity Jones   17:19
+Yeah, it just feels weird, you know.
+
+JonEric Eubanks   17:21
+Okay.
+Yeah, we can definitely adjust that.
+
+Charity Jones   17:24
+Yes.
+Yeah. All right. So back to the employees. I think with these, similarly, we just need to get rid of the parking rules and just add like a basic sentence. Like there are no designated spaces for employees. That's just our overnight parking restrictions.
+So that doesn't even apply.
+
+JonEric Eubanks   17:48
+Okay.
+
+Charity Jones   17:49
+Wow.
+I would say though, the one exception to that is Lot 5.
+Lot 5 does have designated rows that are CBD parking and they have to park in those spaces.
+
+JonEric Eubanks   18:11
+Okay, so that needs to be identified.
+
+Charity Jones   18:12
+Ohh.
+So that does need to be identified and that.
+
+JonEric Eubanks   18:40
+I think my internet's messing up because you are frozen right now.
+
+Angie Miller   18:43
+Yeah, Charity might, she sometimes gets like a little bad internet connexion. Just give her one second to recalibrate. Yeah.
+
+JonEric Eubanks   18:47
+Yeah.
+Okay.
+
+Angie Miller   18:55
+Yeah, I think this all sounds like very doable. And like I said, JonEric, I put on video recording on this. So yeah, I'll just send it all attached to the project card and send it over to you.
+
+JonEric Eubanks   19:01
+Okay, cool.
+Yeah, these are all simple changes, like it up.
+
+Angie Miller   19:10
+I know we were like really at the final throws of having this done, as I'm sure you can imagine. And so I think that this will really just get us over the finish line. Based on your kind of like responses to all the requests, it seems like pretty, yeah, she probably walked off and come back on. Yeah, it seems like pretty good. I like a nice like kind of straightforward update.
+
+JonEric Eubanks   19:27
+Yes.
+
+Angie Miller   19:33
+versus like, oh, we have to recreate the wheel here. Ultimately, Charity did not like story maps and like any of the.
+As we.
+
+JonEric Eubanks   19:43
+I'm gonna ask her why. Like, why did you log the little? Let's...
+
+Angie Miller   19:47
+Don't poke the bear.
+
+JonEric Eubanks   19:48
+Ah.
+
+Angie Miller   19:49
+Don't poke the bear. I'm just gonna make a big rocko. Don't poke the bear today.
+
+JonEric Eubanks   19:50
+Alright, alright, alright, alright, alright.
+
+Angie Miller   19:56
+Yeah.
+
+JonEric Eubanks   19:56
+Only thing I want is just the actual language she wants. I kind of captured it, but I think Copilot may get it. But other than that, I think we're good.
+
+Charity Jones   20:05
+Ohh.
+
+Angie Miller   20:06
+There she is. I said, sometimes you, your Wi-Fi goes down.
+
+Charity Jones   20:11
+Well, it's the weather, like there were a tonne of transformers and things that got taken out today with the storms. Like there were like fires and whatever. So I don't know, my computer just went down for a minute.
+
+Angie Miller   20:14
+Yeah.
+That's alright, that's alright. So let's get back into it.
+
+JonEric Eubanks   20:26
+No worries.
+
+Charity Jones   20:29
+Sorry about that. Okay, so lot 5, there's three rows that are designated as employee parking.
+
+Angie Miller   20:31
+I don't sweat it.
+Charity, hold on one moment. Do you mind bringing your screen up, please?
+
+Charity Jones   20:40
+Yeah, it's going to take me a little while because I have to re-establish all of those links and windows.
+
+Angie Miller   20:48
+Ha ha ha!
+Ohh!
+
+Charity Jones   20:50
+Give me just a second.
+
+Angie Miller   20:52
+I love weather.
+Oh.
+
+Charity Jones   20:55
+Yeah, everything went away. The whole computer just shut itself down.
+
+Angie Miller   20:55
+Actually, my...
+Oh boy, during our, I was on site with Mundelein earlier today and I kind of just got out of Dodge like right before things got like really, really rocky.
+
+Charity Jones   21:01
+Ah.
+
+JonEric Eubanks   21:13
+Yeah, it got pretty dark around here. Looked like it was night time.
+
+Charity Jones   21:13
+Okay, here we go.
+
+Angie Miller   21:16
+Okay. Yeah.
+
+Charity Jones   21:17
+Alright, so back to employees.
+In lot 5, we have.
+just like with the resident overnight, we have specific places where they're allowed to park. And I want to say it's like these two rows and then this one row, but I think if you go into my GIS, it's already drawn.
+
+JonEric Eubanks   21:37
+Okay.
+Yeah, we can definitely, that's good to know. We can reference, just point the analysts to my GIS for that.
+
+Charity Jones   21:43
+Yeah, if you...
+Yeah, if they need help with it, like I can, I can draw it on the map where it is, but it's, I think it's already in there in our parking later.
+
+JonEric Eubanks   21:55
+Okay.
+
+Charity Jones   21:58
+So they have to park in that specific area.
+And then in the garage, similarly, they can only park on levels two and three.
+So there should be a note here saying work on levels 2 and three only.
+
+Angie Miller   22:13
+Two.
+
+JonEric Eubanks   22:15
+It.
+
+Angie Miller   22:15
+Yep.
+
+Charity Jones   22:17
+That's it.
+
+Angie Miller   22:19
+Okay, then John Eric, did you want to clarify something?
+
+JonEric Eubanks   22:20
+Okay.
+Just the language. I know you said you wanted a note on several things. We've captured most of it. Whenever I do add that language on there, we'll just have you kind of review it. And then if there's any changes or anything like that, just send us like a quick note or something like that.
+
+Charity Jones   22:37
+Sure.
+Yeah.
+
+JonEric Eubanks   22:42
+and I can make those adjustments. But I think we captured most of the language in the Copilot. But if I miss anything, feel free to shoot us a message once I make those updates.
+
+Charity Jones   22:44
+Yeah.
+Yeah, and feel free if it, you know, reads better, but says the same thing to make those edits. John Kenny did a good job with that too.
+
+JonEric Eubanks   22:57
+Okay, great. Okay, awesome.
+Yeah, Copilot definitely helps with that, with making it more professional and softening the tone, definitely.
+
+Charity Jones   23:11
+Yeah, yep, for sure. So I really, I'm really happy with how the permit parking stuff looks. It's just those couple little tweaks. We're working on a photo. We're going to have a photographer out Thursday this week so that we can give you the photo to go in here.
+
+Angie Miller   23:17
+Good.
+
+JonEric Eubanks   23:26
+Wow.
+What kind of photo are you going to be taking?
+
+Charity Jones   23:30
+It'll be like of one of our like larger parking signs with the lot in the background. So our social media team is going to be out Thursday doing a bunch of photography and videography anyway. So I'm asking them to grab a couple of pictures that we can use for this. Yeah.
+
+JonEric Eubanks   23:43
+Uncool.
+
+Angie Miller   23:47
+That's awesome. Well, congrats. Are you getting any other photography done, like update the website, like all that?
+
+Charity Jones   23:48
+Yeah.
+
+JonEric Eubanks   23:48
+Yeah.
+
+Charity Jones   23:52
+They're doing some video work.
+Recording, I don't know what they're making a video for this time. Something to do with public works, I think. Maybe leaf pickup.
+
+Angie Miller   23:57
+Despina.
+Oh, oh, timely.
+
+JonEric Eubanks   24:02
+Mm.
+That's real cool. I remember when I used to work for the city of Fort Worth, they would, we would do kind of videos like I worked with like the neighbourhood improvement programme there and we would do videos like that. But yeah, I can't even imagine what kind of videos y'all are doing now. That was like 10 years ago when I was doing that. So I can imagine.
+
+Charity Jones   24:06
+Yes.
+Okay.
+Ha ha.
+
+JonEric Eubanks   24:25
+But how are it looks like now?
+
+Charity Jones   24:27
+Yes, thankfully our board decided to budget to have an actual like social media company do all this stuff for us. There's no way we'd ever get it all done or do it well on our own. So
+
+JonEric Eubanks   24:34
+Oh, oh wow.
+Oh yeah, we had like a department. We had to go through and get all this approval. So yeah, that's great. Y'all have like an actual contract of that out vendor. That's I can't imagine. That's going to look great.
+
+Charity Jones   24:43
+Yeah.
+Yeah.
+It's been really nice. It's been really, really nice. They do a good job.
+
+JonEric Eubanks   24:52
+Awesome, I'll have to cheque it out.
+
+Charity Jones   24:53
+And they only they only work with municipalities.
+
+JonEric Eubanks   24:57
+Oh, cool.
+
+Angie Miller   24:57
+Are you doing A5?
+
+Charity Jones   24:59
+No, no, they're outrageously expensive. Yeah, I think they quoted our project. But they also do more like marketing, social media versus we were looking for like a nuts and bolts, like here's how to engage with the village and know about our services, right?
+
+Angie Miller   25:03
+Are they?
+Yeah.
+Yeah.
+
+JonEric Eubanks   25:16
+So, like, outreach.
+
+Angie Miller   25:19
+Yeah.
+
+JonEric Eubanks   25:19
+Okay.
+
+Charity Jones   25:19
+It's a company called City Social.
+
+Angie Miller   25:23
+I love that. Well, they're expertise, they're experts in the, you know, working with communities, so I love that, yeah.
+
+Charity Jones   25:24
+Yeah.
+
+JonEric Eubanks   25:27
+Yeah.
+
+Charity Jones   25:29
+Yeah, it's great. Thank you. Do we want to visit the public parking map?
+
+JonEric Eubanks   25:31
+That's awesome.
+
+Angie Miller   25:32
+That's awesome.
+
+Charity Jones   25:36
+two while we're at it. That one we haven't worked on really much at all.
+
+Angie Miller   25:39
+Yeah.
+Well, hold on one second. Let me just clarify. JonEric, do you have a little extra time for us or do you...
+
+Charity Jones   25:48
+Oh yeah, it's already 2.3. We could set up a separate time.
+
+JonEric Eubanks   25:49
+I do have a, I do have a 2:30 I gotta jump to, but I can push that, I'm pretty sure.
+
+Angie Miller   25:55
+Okay.
+
+Charity Jones   25:57
+Well, it's, or if you want to set up a separate time to go over the public parking map, because that one needs more work.
+
+JonEric Eubanks   26:05
+Oh, it does. I've been.
+
+Angie Miller   26:06
+It.
+
+Charity Jones   26:06
+Yeah.
+
+JonEric Eubanks   26:07
+Yeah, let's set some time up for that because I feel like in between I'll make these updates and in between that time we can kind of maybe look at the updates together and then see if that works or whatever.
+
+Charity Jones   26:18
+Sure.
+Okay, that sounds great.
+
+JonEric Eubanks   26:23
+Okay, cool.
+
+Angie Miller   26:23
+Okay, I will, also, I'll coordinate with John Eric and Charity. We'll find some time. We can talk about it on our 330. Yikes. I don't even know what day it is anymore. And yeah, all right, cool. Well, we'll talk to everybody soon. Thank you for the time today, John Eric. I'm looking forward to just
+Onward and upwards.
+
+Charity Jones   26:44
+Yeah, great. Thanks so much.
+
+Angie Miller   26:47
+All right, bye bye.
+
+JonEric Eubanks   26:47
+Nice to meet you. Bye.
+
+Charity Jones   26:47
+Alright, bye bye.
+
+JonEric Eubanks stopped transcription

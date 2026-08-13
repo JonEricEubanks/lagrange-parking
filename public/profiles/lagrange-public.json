@@ -1,18 +1,22 @@
 {
   "id": "lagrange-public",
-  "title": "Visitor Parking Map",
+  "title": "Public Parking Map",
   "community": "Village of La Grange",
   "lastUpdated": "2026-07-27",
   "enableWalkTime": false,
 
   "welcome": {
-    "heading": "Visitor Parking in La Grange",
-    "body": "Find public parking downtown and see how long you can stay. Areas are color-coded by time limit — click any area for details.",
-    "hint": "Tip: evenings and weekends are often free. Check each area's rules."
+    "heading": "Public Parking in La Grange",
+    "body": "Find free public parking downtown — lots, garages, and on-street spaces. Click any area for availability and time limits.",
+    "hint": "Tip: many lots are available evenings and weekends. Metered spaces are free on weekends."
   },
-  "legendTitle": "Time Limit",
+  "legendTitle": "Parking Type",
   "nameOverrides": {
-    "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage"
+    "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
+    "WALGREENS": "Walgreens (Private)",
+    "TRADERJOES": "Trader Joe's (Private)",
+    "UPTOWNWEST": "Uptown West (Private)",
+    "HORTONSLOT": "Horton's (Private)"
   },
 
   "layer": {
@@ -22,7 +26,7 @@
     "rendererField": "PRIMARYRULE",
     "idField": "AREAID",
     "spacesField": "MAXSPACES",
-    "baseWhere": "USERCLASS IN ('VISITOR','RESTRICTED')",
+    "baseWhere": "USERCLASS = 'VISITOR' OR AREAID IN ('LOT2','LOT4','LOT5','LOT11','LOT12','LOT13','LOT14','LOT15','VILLAGEHALLPARKINGSTRUCTURE')",
     "opacity": 0.7,
     "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
@@ -41,6 +45,7 @@
     "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/3",
     "keyField": "AREAID",
     "labelField": "RULETYPE",
+    "baseWhere": "USERCLASS = 'VISITOR'",
     "orderByFields": ["ENFORCE_START"],
     "display": [
       { "field": "MAXDURATION", "label": "Time limit" },
@@ -56,8 +61,7 @@
     { "value": "FREE_3HR", "label": "3 Hour", "color": [18, 107, 181, 1] },
     { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
     { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
-    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] },
-    { "value": "NO_PARKING", "label": "No Parking", "color": [120, 120, 120, 1] }
+    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] }
   ],
 
   "symbology": [
@@ -69,7 +73,6 @@
     { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
     { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
     { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] },
-    { "value": "NO_PARKING", "label": "No Parking", "color": [120, 120, 120, 1] },
     { "value": "_default", "label": "Other", "color": [200, 205, 210, 1], "tooltip": "Areas with a rule type not listed above" }
   ],
 
@@ -126,8 +129,39 @@
   },
 
   "tabs": [
-    { "id": "all", "label": "Where can I park?", "enabled": true }
+    {
+      "id": "all",
+      "label": "Where can I park?",
+      "enabled": true,
+      "guide": {
+        "sections": [
+          {
+            "title": "General rules",
+            "bullets": [
+              { "text": "All Village public parking is free (except metered spaces)." },
+              { "text": "No overnight parking (2 am – 6 am) without a permit — whether on-street or in a lot." },
+              { "text": "Metered on-street spaces are free on weekends." }
+            ]
+          }
+        ]
+      }
+    }
   ],
+
+  "areaInfo": {
+    "LOT2": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
+    "LOT3": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
+    "LOT4": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
+    "LOT5": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
+    "LOT8": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
+    "LOT11": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
+    "LOT12": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
+    "LOT13": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
+    "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
+    "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
+    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "4 hr parking 6 am to 6 pm, no time limit after 6 pm" },
+    "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit" }
+  },
 
   "branding": {
     "midnight": "#00306C",

@@ -3,6 +3,7 @@ import type Point from '@arcgis/core/geometry/Point.js';
 import type Polygon from '@arcgis/core/geometry/Polygon.js';
 import type {
   AreaExhibit,
+  AreaInfo,
   FieldDef,
   SymbologyEntry,
   LayerFields,
@@ -29,7 +30,9 @@ export function LotDetailCard({
   ruleConfig,
   ruleSymbology,
   exhibit,
+  areaInfo,
   subzoneNote,
+  cardNote,
   onWalkHere,
   walkMode,
   walkStep,
@@ -47,12 +50,16 @@ export function LotDetailCard({
   ruleSymbology?: SymbologyEntry[];
   /** Diagram of the designated spaces inside this lot, when one exists. */
   exhibit?: AreaExhibit;
+  /** Profile-authored availability and time-limit info for this lot. */
+  areaInfo?: AreaInfo;
   /**
    * The "park only in the highlighted areas" rule. Only passed for lots that
    * actually have designated areas drawn — on a lot without them it would read
    * as "you cannot park here at all".
    */
   subzoneNote?: string;
+  /** Tab-level or lot-specific note (e.g. daytime guidance, level restrictions). */
+  cardNote?: string;
   onWalkHere?: (centroid: Point) => void;
   walkMode?: boolean;
   walkStep?: WalkTimeStep;
@@ -129,6 +136,7 @@ export function LotDetailCard({
           which. Stated in words because "no green here" is not something a
           visitor should have to infer. */}
       {subzoneNote && <p className="lot-card-subzone-note">{subzoneNote}</p>}
+      {cardNote && <p className="lot-card-tab-note">{cardNote}</p>}
 
       {mainFields.length > 0 && (
         <table className="lot-card-table">
@@ -144,7 +152,20 @@ export function LotDetailCard({
       )}
 
       {/* Related parking rules — filtered per audience by the caller */}
-      {ruleConfig && visibleRules.length > 0 && (
+      {areaInfo && (
+        <div className="lot-card-rules">
+          <h4 className="lot-card-details-heading">Public parking</h4>
+          <div className="rule-row">
+            <div className="rule-row-detail">
+              <span className="rule-row-detail-label">Availability:</span> {areaInfo.availability}
+            </div>
+            <div className="rule-row-detail">
+              <span className="rule-row-detail-label">Time limit:</span> {areaInfo.timeLimit}
+            </div>
+          </div>
+        </div>
+      )}
+      {ruleConfig && !areaInfo && visibleRules.length > 0 && (
         <div className="lot-card-rules">
           <h4 className="lot-card-details-heading">Parking rules</h4>
           {visibleRules.map((r, i) => {

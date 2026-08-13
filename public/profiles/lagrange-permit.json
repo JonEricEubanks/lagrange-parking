@@ -26,8 +26,8 @@
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
     "OS115798": "Harris Ave (CBD spaces)",
     "OS115799": "Calendar Ave (CBD spaces)",
-    "OS115797": "Waiola Ave (WBD spaces)",
-    "OS118723": "Hillgrove Ave (WBD spaces)"
+    "OS115797": "Waiola Ave (WBD)",
+    "OS118723": "Hillgrove Ave (WBD)"
   },
 
   "subzones": {
@@ -35,19 +35,13 @@
     "keyField": "AREAID",
     "title": "Designated overnight parking",
     "minScale": 4000,
-    "fill": [67, 183, 73, 0.5],
-    "outline": [30, 115, 36, 1],
-    "outlineWidth": 1.6,
+    "fill": [0, 180, 160, 0.3],
+    "outline": [0, 110, 100, 1],
+    "outlineWidth": 2,
     "note": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
   },
 
-  "areaExhibits": {
-    "LOT2": {
-      "image": "assets/exhibits/lot2-overnight-resident-spaces.png",
-      "caption": "Designated overnight resident spaces in Lot 2 (shaded).",
-      "credit": "Heuer and Associates, Overnight Resident Parking, sheet 1 of 5"
-    }
-  },
+
 
   "layer": {
     "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
@@ -152,6 +146,10 @@
       "id": "resident-overnight",
       "label": "Resident Overnight Only",
       "enabled": true,
+      "showRules": false,
+      "lotNotes": {
+        "VILLAGEHALLPARKINGSTRUCTURE": "Resident permit holders must park on Level 1E."
+      },
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
       "where": "HASRESIDENT = 1",
@@ -212,6 +210,11 @@
       "id": "resident-24hr",
       "label": "Resident Day/Night (24 hr.)",
       "enabled": true,
+      "showRules": false,
+      "note": "During the day, you may park in any available space in your permitted lot.",
+      "lotNotes": {
+        "VILLAGEHALLPARKINGSTRUCTURE": "During the day, you may use any available space. Overflow parking is available on Levels 2 and 3."
+      },
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
       "where": "HASRESIDENT = 1",
@@ -276,6 +279,7 @@
       "id": "commuter",
       "label": "Commuter & LTHS Students",
       "enabled": true,
+      "showRules": false,
       "audience": ["COMMUTER", "STUDENT"],
       "areaIds": [
         "LOT2",
@@ -328,6 +332,12 @@
       "id": "employees",
       "label": "Employees",
       "enabled": true,
+      "showRules": false,
+      "note": "You may park in any available space. No specific spaces are assigned.",
+      "lotNotes": {
+        "LOT5": "You must park in the designated CBD employee rows only.",
+        "VILLAGEHALLPARKINGSTRUCTURE": "Employees must park on Levels 2 and 3 only."
+      },
       "audience": ["EMPLOYEE"],
       "areaIds": [
         "LOT2",

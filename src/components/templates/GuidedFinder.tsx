@@ -60,7 +60,7 @@ export function GuidedFinder({
   profile: ParkingProfile;
   onHome?: () => void;
 }) {
-  const { layer, setDefinitionExpression, setBasemapMode } = useParkingLayer(profile);
+  const { layer, setDefinitionExpression, setBasemapMode, setSubzoneMode } = useParkingLayer(profile);
   const tabs = useMemo(() => profile.tabs.filter((t) => t.id !== 'walk-time'), [profile.tabs]);
   const [chosen, setChosen] = useState<TabDef | null>(tabs.length === 1 ? tabs[0] : null);
   const [mapView, setMapView] = useState<MapView | null>(null);
@@ -142,11 +142,21 @@ export function GuidedFinder({
   const rules = useRelatedRules(profile.relatedRules, selectedAreaId, chosen?.ruleWhere);
   const apply = chosen?.guide?.apply ?? profile.apply;
   const exhibit = selectedAreaId ? profile.areaExhibits?.[String(selectedAreaId)] : undefined;
+  const areaInfo = selectedAreaId ? profile.areaInfo?.[String(selectedAreaId)] : undefined;
+  const cardNote = chosen
+    ? (selectedAreaId
+        ? (chosen.lotNotes?.[String(selectedAreaId)] ?? chosen.note)
+        : chosen.note)
+    : undefined;
 
   // Which lots actually have designated areas drawn. Only permitted areas are
   // mapped, so "no subzones" is ambiguous — see useSubzoneAreaIds.
   const showSubzones = !!chosen?.showSubzones;
   const subzoneIds = useSubzoneAreaIds(profile.subzones, showSubzones);
+
+  useEffect(() => {
+    setSubzoneMode(showSubzones && selectedAreaId != null);
+  }, [showSubzones, selectedAreaId, setSubzoneMode]);
   const lotHasSubzones =
     showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
   const nameOf = (attrs: Record<string, unknown> | undefined) =>
@@ -258,9 +268,11 @@ export function GuidedFinder({
                 symbology={profile.symbology}
                 layerFields={layerFields}
                 rules={rules}
-                ruleConfig={profile.relatedRules}
+                ruleConfig={chosen.showRules === false ? undefined : profile.relatedRules}
                 ruleSymbology={profile.ruleSymbology}
                 exhibit={exhibit}
+                areaInfo={areaInfo}
+                cardNote={cardNote}
                 subzoneNote={lotHasSubzones ? profile.subzones?.note : undefined}
               />
             </>

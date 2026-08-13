@@ -11,7 +11,7 @@ export function useParkingProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(PROFILE_PATH)
+    fetch(PROFILE_PATH, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data: ParkingProfile) => setProfile(data))
       .catch((err) => console.error('Failed to load profile:', err))

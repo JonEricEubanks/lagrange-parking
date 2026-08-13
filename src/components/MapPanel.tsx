@@ -216,8 +216,8 @@ export function MapPanel({
           minScale: sz.minScale ?? 0,
           renderer: new SimpleRenderer({
             symbol: new SimpleFillSymbol({
-              color: rgba(sz.fill),
-              outline: { color: rgba(sz.outline), width: sz.outlineWidth ?? 1.5 },
+              color: [sz.fill[0], sz.fill[1], sz.fill[2], sz.fill[3]],
+              outline: { color: [sz.outline[0], sz.outline[1], sz.outline[2], sz.outline[3]], width: sz.outlineWidth ?? 1.5 },
             }),
           }),
         })
@@ -334,7 +334,10 @@ export function MapPanel({
 
     if (!selectedFeature || !layerViewRef.current || !viewRef.current) return;
 
-    highlightRef.current = layerViewRef.current.highlight(selectedFeature);
+    // Skip the default cyan highlight when subzones are shown — the orange outline is the indicator
+    if (!subzonesEnabled || !selectedHasSubzones) {
+      highlightRef.current = layerViewRef.current.highlight(selectedFeature);
+    }
 
     if (selectedFeature.geometry) {
       const view = viewRef.current;

@@ -16,11 +16,14 @@ export interface ParkingLayerResult {
    * light-on-dark, or neither the imagery nor the labels read.
    */
   setBasemapMode: (aerial: boolean) => void;
+  /** When true, swaps lot polygons to outline-only so subzone bands read clearly. */
+  setSubzoneMode: (active: boolean) => void;
 }
 
 export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerResult {
   const [layer, setLayer] = useState<FeatureLayer | null>(null);
   const layerRef = useRef<FeatureLayer | null>(null);
+  const rendererRef = useRef<UniqueValueRenderer | null>(null);
 
   useEffect(() => {
     if (!profile) return;
@@ -100,10 +103,12 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
     });
 
     layerRef.current = newLayer;
+    rendererRef.current = renderer;
     setLayer(newLayer);
 
     return () => {
       layerRef.current = null;
+      rendererRef.current = null;
       setLayer(null);
     };
   }, [profile]);
@@ -141,5 +146,38 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
     [profile]
   );
 
-  return { layer, setDefinitionExpression, setBasemapMode };
+  const setSubzoneMode = useCallback(
+    (active: boolean) => {
+      const target = layerRef.current;
+      if (!target || !profile) return;
+      if (active) {
+        // White outline stands out over any aerial background
+        const makeOutlineOnly = () =>
+          new SimpleFillSymbol({
+            color: [0, 0, 0, 0],
+            outline: {
+              color: [255, 255, 255, 1],
+              width: 3,
+            },
+          });
+        const categories = profile.symbology.filter((s) => s.value !== '_default');
+        const defaultEntry = profile.symbology.find((s) => s.value === '_default');
+        target.renderer = new UniqueValueRenderer({
+          field: profile.layer.rendererField,
+          uniqueValueInfos: categories.map((s) => ({
+            value: s.value,
+            label: s.label,
+            symbol: makeOutlineOnly(),
+          })),
+          defaultSymbol: defaultEntry ? makeOutlineOnly() : undefined,
+          defaultLabel: defaultEntry?.label ?? 'Other',
+        });
+      } else if (rendererRef.current) {
+        target.renderer = rendererRef.current;
+      }
+    },
+    [profile]
+  );
+
+  return { layer, setDefinitionExpression, setBasemapMode, setSubzoneMode };
 }

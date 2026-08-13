@@ -1742,6 +1742,18 @@ body,
   font-weight: 600;
 }
 
+.lot-card-tab-note {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-left: 3px solid var(--lf-primary, #126bb5);
+  border-radius: 4px;
+  background: #e8f3fc;
+  color: #0d3a60;
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
 /* ─── Designated-space exhibit ─── */
 .lot-card-exhibit {
   margin-top: 12px;

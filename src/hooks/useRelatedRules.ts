@@ -39,6 +39,7 @@ export function useRelatedRules(
 
     const idValue = typeof areaId === 'number' ? areaId : `'${String(areaId).replace(/'/g, "''")}'`;
     const clauses = [`${config.keyField} = ${idValue}`];
+    if (config.baseWhere?.trim()) clauses.push(`(${config.baseWhere})`);
     if (ruleWhere && ruleWhere.trim()) clauses.push(`(${ruleWhere})`);
 
     // Chain queryFeatures off load() with native .then so the FeatureSet is

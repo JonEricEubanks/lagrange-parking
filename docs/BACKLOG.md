@@ -2,10 +2,68 @@
 
 Newest meeting at the top. Anything "blocked" names who it is blocked on.
 
-> **Status 2026-08-05.** Both apps live; nothing in flight; `main` clean and pushed. Every item from
-> the 2026-07-28 meeting is **done**, including the designated overnight areas (shipped 2026-07-29).
-> Everything still open below is **waiting on Charity** except the "Carried over — engineering"
-> table, which is deliberate debt, not breakage.
+> **Status 2026-08-13.** Both apps live; `main` clean. Meeting with Charity on 2026-08-11 generated
+> a full round of permit-app card changes and a public-map redesign. **Hard deadline: all maps and
+> communications finalized before end of August 2026** for October 1 Passport permit platform go-live.
+> Full meeting notes: [`docs/MEETING-2026-08-11.md`](MEETING-2026-08-11.md).
+
+---
+
+## Meeting with Charity Jones — 2026-08-11
+
+### Permit app — all tabs
+
+| # | Item | Status |
+|---|------|--------|
+| P-1 | **Remove "Parking rules" section from all permit lot cards** — suppress the `relatedRules` block. One code change to `LotDetailCard` + a `showRules: false` flag on each tab config covers all four tabs at once. | ⬜ To do |
+| P-2 | **Retire Lot 2 scanned exhibit** (`areaExhibits.LOT2`) — superseded by live subzone polygons. | 🚫 Confirm with Charity first |
+
+### Permit app — Resident Overnight Only
+
+| # | Item | Status |
+|---|------|--------|
+| R1-1 | **Subzone color contrast / accessibility** — green fill on blue lot background is hard to see and fails colorblind users. Fix `subzones.fill` / `subzones.outline` in the profile for WCAG contrast. Consider auto-zooming on lot click so subzones are visible. | ⬜ To do |
+| R1-2 | **VH Garage card** — remove Parking Rules; add note: "Resident permit holders must park on Level 1E." | ⬜ To do |
+| R1-3 | **Lot 15 overnight subzones** — blocked: Charity coordinates with Tim (Public Works via Angie). Analysts draw + publish once areas confirmed. | 🚫 Blocked — Charity/Tim |
+| R1-4 | **Lot 15 polygon boundary (GIS)** — currently includes non-MGP property. Angie has screenshot from recording. Analyst redraw. | ⬜ To do (GIS) |
+| R1-5 | **Lot 13 subzone polygon** — ~2× expected stall count; cosmetic, does not block anything. | ⬜ Low priority |
+
+### Permit app — Resident Day/Night (24 hr.)
+
+| # | Item | Status |
+|---|------|--------|
+| R2-1 | **Add daytime sentence to lot card** — "During the day, you may park in any available space in your permitted lot." Add a `note` field to the tab config and surface it in `LotDetailCard`. | ⬜ To do |
+| R2-2 | **VH Garage card** — add overflow note: "Overflow parking is available on Levels 2 and 3." | ⬜ To do |
+
+### Permit app — Commuter & LTHS Students
+
+| # | Item | Status |
+|---|------|--------|
+| C-1 | **Standardize enforcement hours** — verify data is consistent (some lots 6am–11am, others 6am–6pm; 6am–11am is correct for lots that open to public after 11am). | ⬜ To do (data check) |
+| C-2 | **Missing Harris St. CBD on-street label** — label disappears when zoomed out while all others stay. JonEric to fix `minScale` on the map service label class directly. | ⬜ To do (JonEric — map service) |
+
+### Permit app — Employees
+
+| # | Item | Status |
+|---|------|--------|
+| E-1 | **Add "no designated spaces" note** to most employee lot cards: "You may park in any available space." | ⬜ To do |
+| E-2 | **Lot 5 employee designated rows (GIS)** — specific CBD rows must be published as a separate hosted layer (cannot reuse overnight-resident subzones — Lots 2 and 5 each have both types). Already drawn in MyGIS; analysts publish + wire into app. | ⬜ To do (GIS + code) |
+| E-3 | **VH Garage card** — add note: "Employees must park on Levels 2 and 3 only." | ⬜ To do |
+| E-4 | **Shorten on-street label text** — `nameOverrides`: `"Waiola Ave (WBD spaces)"` → `"Waiola Ave (WBD)"`, `"Hillgrove Ave (WBD spaces)"` → `"Hillgrove Ave (WBD)"`. | ⬜ To do (config) |
+
+### Public parking map
+
+> A separate meeting is being scheduled. The items below are the agreed redesign direction from
+> Charity's written notes (2026-08-11). See [`docs/MEETING-2026-08-11.md`](MEETING-2026-08-11.md)
+> for full context.
+
+| # | Item | Status |
+|---|------|--------|
+| PUB-1 | **Redesign organizing principle** — current time-limit color ramp doesn't communicate availability windows. Discuss in follow-up meeting: left rail = general notes + parking type; right = lot detail. Availability-restricted lots (evenings-only, after-11am) need visual distinction (hatching or color). | 🚫 Blocked — follow-up meeting |
+| PUB-2 | **Simplify legend** — remove 15min / 30min / 1hr granularity; consolidate. Depends on PUB-1 direction. | ⬜ After PUB-1 |
+| PUB-3 | **Remove "no parking" areas** — exclude RESTRICTED USERCLASS features from `baseWhere`. | ⬜ To do (config) |
+| PUB-4 | **Private lot cards** — Horton's, Trader Joe's, Uptown West, Walgreens: add explicit card note "Private lot — for customers of [business] only. Not public Village parking." | ⬜ To do |
+| PUB-5 | **Cover photo** — Village shooting Thursday 2026-08-14. Once received: add to `public/assets/`, set `picker.image.src` in `lagrange-permit.json`. | 🚫 Blocked — waiting on Village |
 
 ---
 
