@@ -16,8 +16,8 @@
     "heading": "What type of permit are you looking for?",
     "sub": "Pick the permit that fits you to see where you can park and the rules that apply.",
     "image": {
-      "placeholder": "Village photo goes here",
-      "alt": "Village of La Grange"
+      "src": "assets/parking-sign.jpg",
+      "alt": "Village of La Grange parking sign"
     }
   },
   "apply": { "label": "Apply for a Permit Now →", "url": "https://www.villageoflagrange.com/" },
@@ -54,7 +54,8 @@
     "opacity": 0.7,
     "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
-    "outlineWidth": 1.2
+    "outlineWidth": 1.2,
+    "labelDeconfliction": "none"
   },
 
   "fields": {

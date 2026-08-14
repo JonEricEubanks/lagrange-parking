@@ -86,11 +86,12 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
         font: { size: 11, family: 'Arial', weight: 'bold' },
       });
 
+    const deconfliction = profile.layer.labelDeconfliction ?? 'none';
     const baseLabelClass = (where?: string, xoffset = 0, yoffset = 0) =>
       new LabelClass({
         labelExpressionInfo: { expression: nameExpression },
         labelPlacement: 'always-horizontal',
-        deconflictionStrategy: 'none',
+        deconflictionStrategy: deconfliction,
         where,
         symbol: makeLabelSymbol(xoffset, yoffset),
       });

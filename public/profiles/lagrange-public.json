@@ -10,7 +10,13 @@
     "body": "Find free public parking downtown — lots, garages, and on-street spaces. Click any area for availability and time limits.",
     "hint": "Tip: many lots are available evenings and weekends. Metered spaces are free on weekends."
   },
-  "legendTitle": "Parking Type",
+  "picker": {
+    "brandTitle": "Public Parking in La Grange",
+    "image": {
+      "src": "assets/parking-sign.jpg",
+      "alt": "Village of La Grange parking sign — Harris Ave Lot"
+    }
+  },
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
     "WALGREENS": "Walgreens (Private)",
@@ -30,7 +36,8 @@
     "opacity": 0.7,
     "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
-    "outlineWidth": 1.2
+    "outlineWidth": 1.2,
+    "labelDeconfliction": "static"
   },
 
   "fields": {
@@ -133,6 +140,13 @@
       "id": "all",
       "label": "Where can I park?",
       "enabled": true,
+      "showRules": false,
+      "lotNotes": {
+        "WALGREENS": "Private lot — for Walgreens customers only. Not public Village parking.",
+        "TRADERJOES": "Private lot — for Trader Joe's customers only. Not public Village parking.",
+        "UPTOWNWEST": "Private lot — for Uptown West customers only. Not public Village parking.",
+        "HORTONSLOT": "Private lot — for Horton's customers only. Not public Village parking."
+      },
       "guide": {
         "sections": [
           {

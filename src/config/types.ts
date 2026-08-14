@@ -297,6 +297,8 @@ export interface ParkingProfile {
     imageryOpacity?: number;
     outlineColor: [number, number, number, number];
     outlineWidth: number;
+    /** ArcGIS label deconfliction strategy. 'none' forces all labels visible; 'static' lets ArcGIS drop collisions. */
+    labelDeconfliction?: 'none' | 'static' | 'dynamic';
   };
 
   fields: {
