@@ -24,8 +24,8 @@
 
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
-    "OS115798": "Harris Ave (CBD spaces)",
-    "OS115799": "Calendar Ave (CBD spaces)",
+    "OS115798": "Harris Ave (CBD)",
+    "OS115799": "Calendar Ave (CBD)",
     "OS115797": "Waiola Ave (WBD)",
     "OS118723": "Hillgrove Ave (WBD)"
   },

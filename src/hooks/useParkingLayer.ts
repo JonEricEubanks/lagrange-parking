@@ -73,20 +73,34 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
             .join(', ')}, $feature.${profile.layer.nameField})`
         : `$feature.${profile.layer.nameField}`;
 
-    const labelClass = new LabelClass({
-      labelExpressionInfo: { expression: nameExpression },
-      labelPlacement: 'always-horizontal',
-      deconflictionStrategy: 'static',
-      // Map labels render from Esri's hosted font service — web fonts (Nunito
-      // Sans) 404 there, so use Arial Bold (confirmed hosted) for a strong,
-      // legible lot label over the light-canvas basemap.
-      symbol: new TextSymbol({
+    // Map labels render from Esri's hosted font service — web fonts (Nunito
+    // Sans) 404 there, so use Arial Bold (confirmed hosted) for a strong,
+    // legible lot label over the light-canvas basemap.
+    const makeLabelSymbol = (xoffset = 0, yoffset = 0) =>
+      new TextSymbol({
         color: [0, 48, 108, 1],
         haloColor: [255, 255, 255, 0.95],
         haloSize: 1.8,
+        xoffset,
+        yoffset,
         font: { size: 11, family: 'Arial', weight: 'bold' },
-      }),
-    });
+      });
+
+    const baseLabelClass = (where?: string, xoffset = 0, yoffset = 0) =>
+      new LabelClass({
+        labelExpressionInfo: { expression: nameExpression },
+        labelPlacement: 'always-horizontal',
+        deconflictionStrategy: 'none',
+        where,
+        symbol: makeLabelSymbol(xoffset, yoffset),
+      });
+
+    // Lot 2 label offset — nudges it above the adjacent Harris Ave label
+    const lot2Field = idField ?? 'AREAID';
+    const labelClasses = [
+      baseLabelClass(`${lot2Field} = 'LOT2'`, 0, 14),
+      baseLabelClass(`${lot2Field} <> 'LOT2'`),
+    ];
 
     const newLayer = new FeatureLayer({
       url: profile.layer.url,
@@ -95,7 +109,7 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
       opacity: profile.layer.opacity,
       popupEnabled: false,
       effect: featureEffect,
-      labelingInfo: [labelClass],
+      labelingInfo: labelClasses,
       labelsVisible: true,
       // Apply the experience-wide filter (e.g. USERCLASS = 'PERMIT') up front so
       // the layer never flashes the full inventory before the tab filter lands.
@@ -131,17 +145,20 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
         ? profile.layer.imageryOpacity ?? profile.layer.opacity
         : profile.layer.opacity;
 
-      const existing = target.labelingInfo?.[0];
-      if (existing) {
-        const relabelled = existing.clone();
+      const updated = (target.labelingInfo ?? []).map((lc) => {
+        const relabelled = lc.clone();
+        const prev = lc.symbol as TextSymbol;
         relabelled.symbol = new TextSymbol({
           color: aerial ? [255, 255, 255, 1] : [0, 48, 108, 1],
           haloColor: aerial ? [0, 0, 0, 0.85] : [255, 255, 255, 0.95],
           haloSize: aerial ? 2 : 1.8,
+          xoffset: prev?.xoffset,
+          yoffset: prev?.yoffset,
           font: { size: 11, family: 'Arial', weight: 'bold' },
         });
-        target.labelingInfo = [relabelled];
-      }
+        return relabelled;
+      });
+      if (updated.length) target.labelingInfo = updated;
     },
     [profile]
   );
@@ -151,12 +168,12 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
       const target = layerRef.current;
       if (!target || !profile) return;
       if (active) {
-        // White outline stands out over any aerial background
+        // Bright green outline frames the lot boundary against the aerial subzone bands
         const makeOutlineOnly = () =>
           new SimpleFillSymbol({
             color: [0, 0, 0, 0],
             outline: {
-              color: [255, 255, 255, 1],
+              color: [34, 193, 203, 1],
               width: 3,
             },
           });
