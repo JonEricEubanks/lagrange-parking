@@ -341,17 +341,7 @@ export function MapPanel({
 
     if (selectedFeature.geometry) {
       const view = viewRef.current;
-      // Normally keep the visitor's zoom and just recentre. The exception is a
-      // lot with designated areas: those are gated on `minScale`, so at an
-      // overview zoom selecting the lot would highlight nothing. Frame the lot
-      // instead, which puts the view well inside the threshold.
-      const min = profile.subzones?.minScale ?? 0;
-      const needsCloserLook =
-        subzonesEnabled && selectedHasSubzones && min > 0 && view.scale > min;
-      const target = needsCloserLook
-        ? { target: selectedFeature.geometry }
-        : { target: selectedFeature.geometry, zoom: view.zoom };
-      view.goTo(target, { duration: 400 }).catch(() => {
+      view.goTo({ target: selectedFeature.geometry }, { duration: 400 }).catch(() => {
         /* goTo interrupted by another navigation — ignore */
       });
     }
