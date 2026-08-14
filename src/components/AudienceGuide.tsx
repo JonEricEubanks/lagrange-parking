@@ -1,4 +1,5 @@
 import type { SymbologyEntry, AudienceGuideContent, ApplyLink } from '../config/types';
+import { swatchStyle } from '../config/lots';
 import { PermitInfo } from './PermitInfo';
 
 interface AudienceGuideProps {
@@ -102,12 +103,7 @@ export function AudienceGuide({
                   className={`legend-item ${onFilterToggle ? 'legend-item-clickable' : ''} ${isActive ? 'legend-item-active' : ''} ${isDimmed ? 'legend-item-dimmed' : ''}`}
                   onClick={() => onFilterToggle?.(s.value)}
                 >
-                  <span
-                    className="legend-swatch"
-                    style={{
-                      backgroundColor: `rgba(${s.color[0]}, ${s.color[1]}, ${s.color[2]}, ${s.color[3]})`,
-                    }}
-                  />
+                  <span className="legend-swatch" style={swatchStyle(s)} />
                   <span className="legend-label" title={s.tooltip}>
                     {s.label}
                   </span>

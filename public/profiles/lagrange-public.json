@@ -4,6 +4,15 @@
   "community": "Village of La Grange",
   "lastUpdated": "2026-07-27",
   "enableWalkTime": false,
+  "legendTitle": "What the colors mean",
+  "showLegend": true,
+  "showDirections": true,
+  "consolidateList": {
+    "field": "FACILITYTYPE",
+    "values": ["On-Street"],
+    "label": "On-street spaces",
+    "note": "Throughout downtown — click any space on the map for its time limit."
+  },
 
   "welcome": {
     "heading": "Public Parking in La Grange",
@@ -72,15 +81,13 @@
   ],
 
   "symbology": [
-    { "value": "FREE_15MIN", "label": "15 Minute", "color": [67, 183, 73, 1] },
-    { "value": "FREE_30MIN", "label": "30 Minute", "color": [127, 194, 65, 1] },
-    { "value": "FREE_1HR", "label": "1 Hour", "color": [19, 172, 225, 1] },
-    { "value": "FREE_2HR", "label": "2 Hour", "color": [30, 144, 200, 1] },
-    { "value": "FREE_3HR", "label": "3 Hour", "color": [18, 107, 181, 1] },
-    { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
-    { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
-    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] },
-    { "value": "_default", "label": "Other", "color": [200, 205, 210, 1], "tooltip": "Areas with a rule type not listed above" }
+    { "value": "PRIVATE", "label": "Private lot — customers only", "color": [130, 130, 130, 0.9], "match": { "AREAID": ["WALGREENS", "TRADERJOES", "UPTOWNWEST", "HORTONSLOT"] }, "tooltip": "Owned by the business — not public Village parking" },
+    { "value": "EVENINGS", "label": "Evenings & weekends only", "color": [222, 110, 30, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT2", "LOT4", "LOT12", "COSSITTOFFSITE"] } },
+    { "value": "AFTER11", "label": "After 11 am daily", "color": [0, 150, 166, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT13", "LOT14", "LOT15"] } },
+    { "value": "METERED", "label": "Metered — free on weekends", "color": [107, 91, 166, 1], "match": { "PRIMARYRULE": ["METERED"] } },
+    { "value": "STREET", "label": "On-street — time limit on sign", "color": [110, 190, 230, 1], "match": { "FACILITYTYPE": ["On-Street"] } },
+    { "value": "OPEN", "label": "Public lot / garage — open every day", "color": [18, 107, 181, 1], "match": { "FACILITYTYPE": ["Lot", "Garage"] } },
+    { "value": "_default", "label": "Other public parking", "color": [150, 170, 185, 1] }
   ],
 
   "effects": [
@@ -128,10 +135,10 @@
   ],
 
   "extent": {
-    "xmin": -87.8845,
-    "ymin": 41.811,
-    "xmax": -87.8645,
-    "ymax": 41.8201,
+    "xmin": -87.88,
+    "ymin": 41.8131,
+    "xmax": -87.869,
+    "ymax": 41.8181,
     "spatialReference": { "wkid": 4326 }
   },
 
@@ -163,18 +170,18 @@
   ],
 
   "areaInfo": {
-    "LOT2": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
-    "LOT3": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
-    "LOT4": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
-    "LOT5": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
-    "LOT8": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
-    "LOT11": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm" },
-    "LOT12": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit" },
-    "LOT13": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
-    "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
-    "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit" },
-    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "4 hr parking 6 am to 6 pm, no time limit after 6 pm" },
-    "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit" }
+    "LOT2": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT3": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT4": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT5": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT8": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT11": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT12": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT13": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "4 hr parking 6 am to 6 pm, no time limit after 6 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 17, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] }
   },
 
   "branding": {

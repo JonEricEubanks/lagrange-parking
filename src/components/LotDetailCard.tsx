@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import type Graphic from '@arcgis/core/Graphic.js';
 import type Point from '@arcgis/core/geometry/Point.js';
 import type Polygon from '@arcgis/core/geometry/Polygon.js';
+import SpatialReference from '@arcgis/core/geometry/SpatialReference.js';
+import * as projectOperator from '@arcgis/core/geometry/operators/projectOperator.js';
 import type {
   AreaExhibit,
   AreaInfo,
@@ -11,7 +14,7 @@ import type {
   WalkTimeStep,
   WalkTimeRouteInfo,
 } from '../config/types';
-import { areaDisplayName } from '../config/lots';
+import { areaDisplayName, classifySymbology, swatchStyle } from '../config/lots';
 import type { RuleRow } from '../hooks/useRelatedRules';
 
 function formatValue(value: unknown, format?: string): string {
@@ -19,6 +22,29 @@ function formatValue(value: unknown, format?: string): string {
   if (format === 'boolean') return Number(value) === 1 ? 'Yes' : 'No';
   if (format === 'integer') return String(Math.round(Number(value)));
   return String(value);
+}
+
+function formatHour(x: number): string {
+  const h = Math.floor(x);
+  const m = Math.round((x - h) * 60);
+  const h12 = ((h + 11) % 12) + 1;
+  const ampm = h >= 12 ? 'pm' : 'am';
+  return m ? `${h12}:${String(m).padStart(2, '0')} ${ampm}` : `${h12} ${ampm}`;
+}
+
+/** Live open/closed state from the profile-authored windows and the clock. */
+function openStatus(
+  hours: NonNullable<AreaInfo['hours']>,
+  now = new Date()
+): { open: boolean; text: string } {
+  const h = now.getHours() + now.getMinutes() / 60;
+  // Village-wide overnight ban trumps any lot's own window.
+  if (h >= 2 && h < 6) return { open: false, text: 'No parking 2–6 am' };
+  const today = hours.filter((w) => w.days.includes(now.getDay()));
+  if (today.some((w) => h >= w.from && h < w.to)) return { open: true, text: 'Open now' };
+  const next = today.filter((w) => w.from > h).sort((a, b) => a.from - b.from)[0];
+  if (next) return { open: false, text: `Opens at ${formatHour(next.from)}` };
+  return { open: false, text: 'Closed today' };
 }
 
 export function LotDetailCard({
@@ -33,6 +59,7 @@ export function LotDetailCard({
   areaInfo,
   subzoneNote,
   cardNote,
+  showDirections,
   onWalkHere,
   walkMode,
   walkStep,
@@ -60,6 +87,8 @@ export function LotDetailCard({
   subzoneNote?: string;
   /** Tab-level or lot-specific note (e.g. daytime guidance, level restrictions). */
   cardNote?: string;
+  /** Show a "Get directions" link to the lot in the user's maps app. */
+  showDirections?: boolean;
   onWalkHere?: (centroid: Point) => void;
   walkMode?: boolean;
   walkStep?: WalkTimeStep;
@@ -78,9 +107,10 @@ export function LotDetailCard({
   const restriction = attrs[layerFields.rendererField] || '';
 
   const symMatch =
+    classifySymbology(attrs, symbology) ||
     symbology.find((s) => s.value === restriction) ||
     symbology.find((s) => s.value === '_default');
-  const friendlyLabel = restriction ? (symMatch?.label ?? restriction) : '--';
+  const friendlyLabel = symMatch?.label ?? (restriction || '--');
   const symColor = symMatch?.color ?? [0, 0, 0, 0];
   const borderColor = `rgba(${symColor[0]}, ${symColor[1]}, ${symColor[2]}, ${symColor[3]})`;
 
@@ -116,6 +146,29 @@ export function LotDetailCard({
   });
 
   const centroid = (feature.geometry as Polygon)?.centroid ?? null;
+  const status = areaInfo?.hours ? openStatus(areaInfo.hours) : null;
+
+  // The hosted layer is in a state-plane projection, so lat/lng for the
+  // directions link has to be projected out of it.
+  const [destination, setDestination] = useState<string | null>(null);
+  useEffect(() => {
+    setDestination(null);
+    if (!showDirections || !centroid) return;
+    if (centroid.latitude != null && centroid.longitude != null) {
+      setDestination(`${centroid.latitude.toFixed(6)},${centroid.longitude.toFixed(6)}`);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      if (!projectOperator.isLoaded()) await projectOperator.load();
+      const pt = projectOperator.execute(centroid, SpatialReference.WGS84) as Point | null;
+      if (!cancelled && pt) setDestination(`${pt.y.toFixed(6)},${pt.x.toFixed(6)}`);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feature, showDirections]);
 
   return (
     <div className="lot-detail-card" style={{ borderLeft: `5px solid ${borderColor}` }}>
@@ -124,13 +177,17 @@ export function LotDetailCard({
         <span className="lot-card-restriction">
           <span
             className="lot-card-restriction-swatch"
-            style={{
-              backgroundColor: `rgba(${symColor[0]}, ${symColor[1]}, ${symColor[2]}, ${symColor[3]})`,
-            }}
+            style={symMatch ? swatchStyle(symMatch) : { backgroundColor: borderColor }}
           />
           {friendlyLabel}
         </span>
       </div>
+
+      {status && (
+        <span className={`lot-card-open-badge ${status.open ? 'is-open' : 'is-closed'}`}>
+          {status.text}
+        </span>
+      )}
 
       {/* Only the marked areas inside this lot are permitted, and the map shows
           which. Stated in words because "no green here" is not something a
@@ -227,6 +284,17 @@ export function LotDetailCard({
             </div>
           ))}
         </>
+      )}
+
+      {showDirections && destination && (
+        <a
+          className="lot-card-directions"
+          href={`https://www.google.com/maps/dir/?api=1&destination=${destination}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Get directions ↗
+        </a>
       )}
 
       {/* Walk Here button (only when walk-time is enabled and not already active) */}

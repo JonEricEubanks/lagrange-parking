@@ -4,6 +4,7 @@
   "community": "Village of La Grange",
   "lastUpdated": "2026-07-27",
   "enableWalkTime": false,
+  "showDirections": true,
 
   "welcome": {
     "heading": "La Grange Parking Permits",

@@ -7,7 +7,7 @@ import { useSelectedLot } from '../../hooks/useSelectedLot';
 import { useAudienceAreaIds } from '../../hooks/useAudienceAreaIds';
 import { useSubzoneAreaIds } from '../../hooks/useSubzoneAreaIds';
 import { useRelatedRules } from '../../hooks/useRelatedRules';
-import { areaDisplayName, explicitAreaWhere } from '../../config/lots';
+import { areaDisplayName, explicitAreaWhere, swatchStyle, symbologyFilterWhere } from '../../config/lots';
 import { MapPanel } from '../MapPanel';
 import { LotDetailCard } from '../LotDetailCard';
 import { PermitInfo } from '../PermitInfo';
@@ -68,6 +68,8 @@ export function GuidedFinder({
   // the map (nearly) the full screen. Starts collapsed so the map leads; tapping
   // a lot (or the handle) expands it. Ignored by the desktop layout.
   const [sheetCollapsed, setSheetCollapsed] = useState(true);
+  // Legend entry acting as an interactive filter ("only show evening parking").
+  const [legendFilter, setLegendFilter] = useState<string | null>(null);
 
   const idField = profile.layer.idField ?? 'AREAID';
   // Only fall back to the rules-derived lookup for tabs without an explicit list.
@@ -90,14 +92,17 @@ export function GuidedFinder({
     return chosen.where ?? '';
   }, [chosen, explicitWhere, audienceIds, idField]);
 
-  const listWhere = useMemo(
-    () =>
-      [profile.layer.baseWhere, memberFilter]
+  const listWhere = useMemo(() => {
+    const legendWhere = legendFilter
+      ? symbologyFilterWhere(profile.symbology, legendFilter, profile.layer.rendererField)
+      : null;
+    return (
+      [profile.layer.baseWhere, memberFilter, legendWhere]
         .filter((p) => p && p.trim())
         .map((p) => `(${p})`)
-        .join(' AND ') || '1=1',
-    [profile.layer.baseWhere, memberFilter]
-  );
+        .join(' AND ') || '1=1'
+    );
+  }, [profile.layer.baseWhere, profile.layer.rendererField, profile.symbology, memberFilter, legendFilter]);
 
   const lot = useSelectedLot(layer, listWhere, profile.layer.nameField);
 
@@ -162,12 +167,29 @@ export function GuidedFinder({
   const nameOf = (attrs: Record<string, unknown> | undefined) =>
     areaDisplayName(attrs, profile.layer.nameField, profile.layer.idField, profile.nameOverrides);
 
+  // Collapse e.g. 100+ on-street segments into one summary row, keeping named
+  // lots individually listed (indices stay tied to lot.allFeatures for selection).
+  const consolidate = profile.consolidateList;
+  const indexed = lot.allFeatures.map((f, i) => ({ f, i }));
+  const listedFeatures = consolidate
+    ? indexed.filter(
+        ({ f }) => !consolidate.values.includes(String(f.attributes[consolidate.field] ?? ''))
+      )
+    : indexed;
+  const consolidatedCount = indexed.length - listedFeatures.length;
+
+  const toggleLegendFilter = (value: string) => {
+    lot.clear();
+    setLegendFilter((cur) => (cur === value ? null : value));
+  };
+
   // "Between 2 a.m. and 6 a.m. park in the designated overnight areas" is only
   // useful if you can get to that page from here.
   const goToTab = (tabId: string) => {
     const next = tabs.find((t) => t.id === tabId);
     if (!next) return;
     lot.clear();
+    setLegendFilter(null);
     setSheetCollapsed(true);
     setChosen(next);
   };
@@ -274,22 +296,79 @@ export function GuidedFinder({
                 areaInfo={areaInfo}
                 cardNote={cardNote}
                 subzoneNote={lotHasSubzones ? profile.subzones?.note : undefined}
+                showDirections={profile.showDirections}
               />
             </>
           ) : (
             <>
+              {profile.showLegend && profile.symbology.length > 0 && (
+                <div className="finder-legend">
+                  <div className="finder-legend-head">
+                    <h3 className="finder-results-h">{profile.legendTitle ?? 'What the colors mean'}</h3>
+                    {legendFilter !== null && (
+                      <button className="finder-legend-showall" onClick={() => toggleLegendFilter(legendFilter)}>
+                        Show all
+                      </button>
+                    )}
+                  </div>
+                  <ul className="finder-legend-list">
+                    {profile.symbology
+                      .filter((s) => s.value !== '_default')
+                      .map((s) => {
+                        const isActive = legendFilter === s.value;
+                        const isDimmed = legendFilter !== null && !isActive;
+                        return (
+                          <li key={s.value}>
+                            <button
+                              className={`finder-legend-item${isActive ? ' finder-legend-item--active' : ''}${isDimmed ? ' finder-legend-item--dimmed' : ''}`}
+                              title={s.tooltip}
+                              aria-pressed={isActive}
+                              onClick={() => toggleLegendFilter(s.value)}
+                            >
+                              <span className="finder-legend-swatch" style={swatchStyle(s)} />
+                              <span>{s.label}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                  {legendFilter === null && (
+                    <p className="finder-legend-hint">Tap a color to show only that parking.</p>
+                  )}
+                </div>
+              )}
               <h3 className="finder-results-h">
-                {lot.totalCount} place{lot.totalCount === 1 ? '' : 's'} to park
+                {listedFeatures.length > 0 && consolidatedCount > 0
+                  ? `${listedFeatures.length} lots & garages`
+                  : `${lot.totalCount} place${lot.totalCount === 1 ? '' : 's'} to park`}
               </h3>
               <ul className="finder-list">
-                {lot.allFeatures.map((f, i) => (
-                  <li key={f.attributes.OBJECTID}>
-                    <button className="finder-list-item" onClick={() => selectByIndex(i)}>
-                      <span className="finder-list-name">{nameOf(f.attributes)}</span>
-                      <span className="finder-list-go">›</span>
-                    </button>
+                {listedFeatures.map(({ f, i }) => {
+                  const info = idField
+                    ? profile.areaInfo?.[String(f.attributes[idField] ?? '')]
+                    : undefined;
+                  return (
+                    <li key={f.attributes.OBJECTID}>
+                      <button className="finder-list-item" onClick={() => selectByIndex(i)}>
+                        <span className="finder-list-text">
+                          <span className="finder-list-name">{nameOf(f.attributes)}</span>
+                          {info && <span className="finder-list-sub">{info.availability}</span>}
+                        </span>
+                        <span className="finder-list-go">›</span>
+                      </button>
+                    </li>
+                  );
+                })}
+                {consolidatedCount > 0 && profile.consolidateList && (
+                  <li className="finder-consolidated">
+                    <span className="finder-list-name">
+                      {profile.consolidateList.label} ({consolidatedCount})
+                    </span>
+                    {profile.consolidateList.note && (
+                      <span className="finder-list-sub">{profile.consolidateList.note}</span>
+                    )}
                   </li>
-                ))}
+                )}
               </ul>
               <PermitInfo guide={chosen.guide} onGoToTab={goToTab} />
             </>

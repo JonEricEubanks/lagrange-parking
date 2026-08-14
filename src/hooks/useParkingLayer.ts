@@ -5,7 +5,30 @@ import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol.js';
 import TextSymbol from '@arcgis/core/symbols/TextSymbol.js';
 import LabelClass from '@arcgis/core/layers/support/LabelClass.js';
 import type { EffectScaleStop } from '@arcgis/core/layers/support/FeatureEffect.js';
-import type { ParkingProfile } from '../config/types';
+import type { ParkingProfile, SymbologyEntry } from '../config/types';
+
+/**
+ * Compile symbology `match` criteria into an Arcade expression so the renderer
+ * classifies features the same way classifySymbology does in JS (first matching
+ * entry wins). Returns undefined when no entry has match rules.
+ */
+function matchValueExpression(symbology: SymbologyEntry[]): string | undefined {
+  const matched = symbology.filter((s) => s.match && s.value !== '_default');
+  if (!matched.length) return undefined;
+  const q = (v: string) => `'${v.replace(/'/g, "\\'")}'`;
+  const branches = matched
+    .map((s) => {
+      const cond = Object.entries(s.match!)
+        .map(([field, values]) => {
+          const ors = values.map((v) => `$feature.${field} == ${q(v)}`).join(' || ');
+          return values.length === 1 ? ors : `(${ors})`;
+        })
+        .join(' && ');
+      return `${cond}, ${q(s.value)}`;
+    })
+    .join(', ');
+  return `When(${branches}, '_default')`;
+}
 
 export interface ParkingLayerResult {
   layer: FeatureLayer | null;
@@ -31,8 +54,9 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
     const outlineColor = profile.layer.outlineColor;
     const outlineWidth = profile.layer.outlineWidth;
 
-    const makeSymbol = (color: [number, number, number, number]) =>
+    const makeSymbol = (color: [number, number, number, number], style?: SymbologyEntry['style']) =>
       new SimpleFillSymbol({
+        style: style ?? 'solid',
         color: [color[0], color[1], color[2], color[3] * 255],
         outline: {
           color: [outlineColor[0], outlineColor[1], outlineColor[2], outlineColor[3] * 255],
@@ -42,15 +66,17 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
 
     const categories = profile.symbology.filter((s) => s.value !== '_default');
     const defaultEntry = profile.symbology.find((s) => s.value === '_default');
+    const valueExpression = matchValueExpression(profile.symbology);
 
     const renderer = new UniqueValueRenderer({
-      field: profile.layer.rendererField,
+      field: valueExpression ? undefined : profile.layer.rendererField,
+      valueExpression,
       uniqueValueInfos: categories.map((s) => ({
         value: s.value,
         label: s.label,
-        symbol: makeSymbol(s.color),
+        symbol: makeSymbol(s.color, s.style),
       })),
-      defaultSymbol: defaultEntry ? makeSymbol(defaultEntry.color) : undefined,
+      defaultSymbol: defaultEntry ? makeSymbol(defaultEntry.color, defaultEntry.style) : undefined,
       defaultLabel: defaultEntry?.label ?? 'Other',
     });
 
@@ -180,8 +206,10 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
           });
         const categories = profile.symbology.filter((s) => s.value !== '_default');
         const defaultEntry = profile.symbology.find((s) => s.value === '_default');
+        const valueExpression = matchValueExpression(profile.symbology);
         target.renderer = new UniqueValueRenderer({
-          field: profile.layer.rendererField,
+          field: valueExpression ? undefined : profile.layer.rendererField,
+          valueExpression,
           uniqueValueInfos: categories.map((s) => ({
             value: s.value,
             label: s.label,

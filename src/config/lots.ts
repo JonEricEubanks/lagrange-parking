@@ -1,4 +1,5 @@
-import type { ParkingProfile, TabDef } from './types';
+import type { CSSProperties } from 'react';
+import type { ParkingProfile, SymbologyEntry, TabDef } from './types';
 
 const quote = (v: string) => `'${String(v).replace(/'/g, "''")}'`;
 
@@ -25,4 +26,66 @@ export function areaDisplayName(
   if (!attrs) return 'Parking area';
   const override = idField ? nameOverrides?.[String(attrs[idField] ?? '')] : undefined;
   return override ?? String(attrs[nameField] ?? 'Parking area');
+}
+
+/**
+ * Resolve a feature's symbology class when entries carry `match` criteria
+ * (first matching entry wins, mirroring the renderer's Arcade expression).
+ * Returns undefined when no entry has match rules, so callers can fall back to
+ * plain rendererField-value equality.
+ */
+export function classifySymbology(
+  attrs: Record<string, unknown> | undefined,
+  symbology: SymbologyEntry[]
+): SymbologyEntry | undefined {
+  if (!symbology.some((s) => s.match)) return undefined;
+  if (attrs) {
+    for (const s of symbology) {
+      if (!s.match) continue;
+      const ok = Object.entries(s.match).every(([field, values]) =>
+        values.includes(String(attrs[field] ?? ''))
+      );
+      if (ok) return s;
+    }
+  }
+  return symbology.find((s) => s.value === '_default');
+}
+
+/** CSS for a legend swatch, rendering hatched entries the same way the map does. */
+export function swatchStyle(s: SymbologyEntry): CSSProperties {
+  const rgba = `rgba(${s.color[0]}, ${s.color[1]}, ${s.color[2]}, ${s.color[3]})`;
+  if (s.style && s.style !== 'solid') {
+    const angle = s.style === 'backward-diagonal' ? '-45deg' : '45deg';
+    return {
+      background: `repeating-linear-gradient(${angle}, ${rgba} 0 2px, rgba(255, 255, 255, 0.85) 2px 5px)`,
+    };
+  }
+  return { backgroundColor: rgba };
+}
+
+const matchClause = (m: Record<string, string[]>) =>
+  Object.entries(m)
+    .map(([field, values]) => `${field} IN (${values.map(quote).join(', ')})`)
+    .join(' AND ');
+
+/**
+ * SQL filter selecting exactly the features a legend entry paints. Mirrors the
+ * renderer's first-match-wins ordering, so an entry excludes anything an
+ * earlier entry already claimed (e.g. "open every day" lots must exclude the
+ * evenings-only lots, which are also FACILITYTYPE = 'Lot').
+ */
+export function symbologyFilterWhere(
+  symbology: SymbologyEntry[],
+  value: string,
+  rendererField: string
+): string | null {
+  const idx = symbology.findIndex((s) => s.value === value);
+  if (idx < 0) return null;
+  const entry = symbology[idx];
+  const own = entry.match ? matchClause(entry.match) : `${rendererField} = ${quote(entry.value)}`;
+  const earlier = symbology
+    .slice(0, idx)
+    .filter((s) => s.match)
+    .map((s) => `NOT (${matchClause(s.match!)})`);
+  return [`(${own})`, ...earlier].join(' AND ');
 }

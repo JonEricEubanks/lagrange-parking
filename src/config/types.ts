@@ -17,6 +17,16 @@ export interface SymbologyEntry {
   label: string;
   color: [number, number, number, number];
   tooltip?: string;
+  /** Fill style — hatches mark restricted-availability areas. Defaults to solid. */
+  style?: 'solid' | 'forward-diagonal' | 'backward-diagonal' | 'cross' | 'diagonal-cross';
+  /**
+   * Attribute criteria for this class: matches when every listed field's value
+   * is in its list. Entries are checked in order; first match wins. When any
+   * entry has `match`, the renderer classifies by these rules (via an Arcade
+   * expression) instead of raw `rendererField` values — this is how the public
+   * map groups lots by *when you can park* rather than by rule code.
+   */
+  match?: Record<string, string[]>;
 }
 
 export interface EffectEntry {
@@ -236,6 +246,9 @@ export interface AreaExhibit {
 export interface AreaInfo {
   availability: string;
   timeLimit: string;
+  /** Open windows driving the live "Open now" badge. Days: 0=Sun … 6=Sat;
+   *  from/to are 24-hour decimals (17.5 = 5:30 pm). Omit for no badge. */
+  hours?: { days: number[]; from: number; to: number }[];
 }
 
 export interface ParkingProfile {
@@ -249,6 +262,16 @@ export interface ParkingProfile {
   welcome?: { heading: string; body: string; hint?: string };
   /** Title shown above the legend. */
   legendTitle?: string;
+  /** Show the color legend in the guided-finder results rail. */
+  showLegend?: boolean;
+  /** Show a "Get directions" link on lot detail cards. */
+  showDirections?: boolean;
+  /**
+   * Collapse features matching this filter into one summary row in the finder
+   * list (e.g. 100+ on-street segments), keeping named lots individually
+   * listed. Without it a public map lists every street segment separately.
+   */
+  consolidateList?: { field: string; values: string[]; label: string; note?: string };
   /** Profile-level "how to apply" link (a tab guide may override it). */
   apply?: ApplyLink;
   /** Heading + sub-heading for the guided-finder audience picker. */
@@ -298,7 +321,7 @@ export interface ParkingProfile {
     outlineColor: [number, number, number, number];
     outlineWidth: number;
     /** ArcGIS label deconfliction strategy. 'none' forces all labels visible; 'static' lets ArcGIS drop collisions. */
-    labelDeconfliction?: 'none' | 'static' | 'dynamic';
+    labelDeconfliction?: 'none' | 'static';
   };
 
   fields: {
