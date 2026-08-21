@@ -1,4 +1,43 @@
-import type { AudienceGuideContent } from '../config/types';
+import React from 'react';
+import type { AudienceGuideContent, GuideBullet } from '../config/types';
+
+function renderBulletText(
+  bullet: GuideBullet,
+  onGoToTab?: (tabId: string) => void
+): React.ReactNode {
+  const { text, links } = bullet;
+  if (!links || links.length === 0) return text;
+
+  const parts: React.ReactNode[] = [];
+  let remaining = text;
+
+  for (const link of links) {
+    const idx = remaining.indexOf(link.text);
+    if (idx === -1) continue;
+    if (idx > 0) parts.push(remaining.slice(0, idx));
+    if (link.tabId && onGoToTab) {
+      parts.push(
+        <button
+          key={link.text}
+          type="button"
+          className="permit-info-inline-link"
+          onClick={() => onGoToTab(link.tabId!)}
+        >
+          {link.text}
+        </button>
+      );
+    } else if (link.url) {
+      parts.push(
+        <a key={link.text} href={link.url} target="_blank" rel="noopener noreferrer">
+          {link.text}
+        </a>
+      );
+    }
+    remaining = remaining.slice(idx + link.text.length);
+  }
+  if (remaining) parts.push(remaining);
+  return <>{parts}</>;
+}
 
 /**
  * The permit-wide information panel: everything that applies to *every* lot on
@@ -30,7 +69,7 @@ export function PermitInfo({
               <ul className="permit-info-list">
                 {section.bullets.map((bullet, i) => (
                   <li key={i}>
-                    {bullet.text}
+                    {renderBulletText(bullet, onGoToTab)}
                     {bullet.items && bullet.items.length > 0 && (
                       <ul className="permit-info-sublist">
                         {bullet.items.map((item, k) => (

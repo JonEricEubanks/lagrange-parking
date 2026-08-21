@@ -164,6 +164,10 @@ export function GuidedFinder({
   }, [showSubzones, selectedAreaId, setSubzoneMode]);
   const lotHasSubzones =
     showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
+  const subzoneNote = selectedAreaId
+    ? (chosen?.lotSubzoneNotes?.[String(selectedAreaId)] ??
+        (lotHasSubzones ? profile.subzones?.note : undefined))
+    : undefined;
   const nameOf = (attrs: Record<string, unknown> | undefined) =>
     areaDisplayName(attrs, profile.layer.nameField, profile.layer.idField, profile.nameOverrides);
 
@@ -295,7 +299,7 @@ export function GuidedFinder({
                 exhibit={exhibit}
                 areaInfo={areaInfo}
                 cardNote={cardNote}
-                subzoneNote={lotHasSubzones ? profile.subzones?.note : undefined}
+                subzoneNote={subzoneNote}
                 showDirections={profile.showDirections}
               />
             </>

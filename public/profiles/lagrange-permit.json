@@ -28,7 +28,8 @@
     "OS115798": "Harris Ave (CBD)",
     "OS115799": "Calendar Ave (CBD)",
     "OS115797": "Waiola Ave (WBD)",
-    "OS118723": "Hillgrove Ave (WBD)"
+    "OS115718723": "Hillgrove Ave (WBD)",
+    "OS115800": "Permit Zone H (High School)"
   },
 
   "subzones": {
@@ -149,8 +150,9 @@
       "label": "Resident Overnight Only",
       "enabled": true,
       "showRules": false,
-      "lotNotes": {
-        "VILLAGEHALLPARKINGSTRUCTURE": "Resident permit holders must park on Level 1E."
+      "lotSubzoneNotes": {
+        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted.",
+        "LOT15": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
       },
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
@@ -193,8 +195,7 @@
                 "text": "You must meet all of the following:",
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
-                  "Live in a building built prior to 1993.",
-                  "Residents of single family detached homes are only eligible if their property has no on-site parking."
+                  "Live in a building built prior to 1993."
                 ]
               }
             ]
@@ -215,7 +216,11 @@
       "showRules": false,
       "note": "During the day, you may park in any available space in your permitted lot.",
       "lotNotes": {
-        "VILLAGEHALLPARKINGSTRUCTURE": "During the day, you may use any available space. Overflow parking is available on Levels 2 and 3."
+        "VILLAGEHALLPARKINGSTRUCTURE": "Resident permit holders must park on Level 1E. During the day, if you cannot find parking on Level 1E, overflow parking is available on Levels 2 and 3."
+      },
+      "lotSubzoneNotes": {
+        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted.",
+        "LOT15": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
       },
       "audience": ["RESIDENT"],
       "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
@@ -236,7 +241,7 @@
           {
             "title": "Where you can park",
             "bullets": [
-              { "text": "Permits are issued for a specific lot. Permit holders may park anywhere within their lot during the day; between 2 a.m. and 6 a.m. they must park within the designated overnight parking areas. No specific parking spaces are assigned." },
+              { "text": "Permits are issued for a specific lot. Permit holders may park anywhere within their lot during the day; between 2 a.m. and 6 a.m. they must park within the designated overnight parking areas. No specific parking spaces are assigned.", "links": [{ "text": "designated overnight parking areas", "tabId": "resident-overnight" }] },
               { "text": "If you cannot find parking in your lot, overflow parking is available on Levels 2 and 3 of the Village Hall Garage." }
             ]
           },
@@ -255,8 +260,7 @@
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
                   "Live in a building built prior to 1993.",
-                  "Live in a residential building with no on-site parking, or in a mixed use (commercial & residential) building.",
-                  "Residents of single family detached homes are only eligible if their property has no on-site parking."
+                  "Live in a residential building with no on-site parking, or in a mixed use (commercial & residential) building."
                 ]
               }
             ]
@@ -305,7 +309,7 @@
             "title": "Hours",
             "bullets": [
               { "text": "Commuter permit holders are entitled to park 6 a.m. to 6 p.m., Monday–Friday." },
-              { "text": "LTHS student permit holders are entitled to park 6 a.m. to 6 p.m., Monday–Friday, during the school year only." }
+              { "text": "LTHS student permit holders are entitled to park in Zone H, 6 a.m. to 6 p.m., Monday–Friday, during the school year only." }
             ]
           },
           {

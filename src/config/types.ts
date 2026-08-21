@@ -94,6 +94,12 @@ export interface TabDef {
   note?: string;
   /** Per-lot overrides for `note`, keyed by AREAID. Wins over `note` when present. */
   lotNotes?: Record<string, string>;
+  /**
+   * Per-lot notes shown with the green subzone callout style, for lots whose
+   * overnight areas exist but the GIS query hasn't returned them yet.
+   * Wins over the live GIS-derived subzone note when present.
+   */
+  lotSubzoneNotes?: Record<string, string>;
 }
 
 export interface ApplyLink {
@@ -101,10 +107,17 @@ export interface ApplyLink {
   url: string;
 }
 
+export interface GuideBulletLink {
+  text: string;
+  tabId?: string;
+  url?: string;
+}
+
 /** One bullet of permit-wide guidance, optionally with nested sub-bullets. */
 export interface GuideBullet {
   text: string;
   items?: string[];
+  links?: GuideBulletLink[];
 }
 
 /** A labelled group of bullets ("Where you can park", "Who's eligible", …). */
