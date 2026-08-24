@@ -1735,6 +1735,10 @@ body,
   border-top: 1px solid #e3eaf0;
 }
 
+.finder-results .permit-info {
+  padding-left: 4px;
+}
+
 .permit-info-h {
   font-family: var(--font-header);
   font-size: 16px;

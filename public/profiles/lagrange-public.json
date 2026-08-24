@@ -28,10 +28,7 @@
   },
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
-    "WALGREENS": "Walgreens (Private)",
-    "TRADERJOES": "Trader Joe's (Private)",
-    "UPTOWNWEST": "Uptown West (Private)",
-    "HORTONSLOT": "Horton's (Private)"
+    "COSSITTOFFSITE": "Cossitt School Lot"
   },
 
   "layer": {
@@ -41,7 +38,7 @@
     "rendererField": "PRIMARYRULE",
     "idField": "AREAID",
     "spacesField": "MAXSPACES",
-    "baseWhere": "(USERCLASS = 'VISITOR' OR AREAID IN ('LOT2','LOT4','LOT5','LOT11','LOT12','LOT13','LOT14','LOT15','VILLAGEHALLPARKINGSTRUCTURE')) AND USERCLASS <> 'RESTRICTED'",
+    "baseWhere": "(USERCLASS = 'VISITOR' OR AREAID IN ('LOT2','LOT4','LOT5','LOT11','LOT12','LOT13','LOT14','VILLAGEHALLPARKINGSTRUCTURE')) AND USERCLASS <> 'RESTRICTED' AND AREAID NOT IN ('WALGREENS','TRADERJOES','UPTOWNWEST','HORTONSLOT','UPTOWNPARKINGDECK','COSSITTWEST','LOT15','LOT6')",
     "opacity": 0.7,
     "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],
@@ -53,7 +50,7 @@
     "display": [
       { "field": "FACILITYTYPE", "label": "Facility" },
       { "field": "MAXSPACES", "label": "Spaces", "format": "integer", "hideZero": true },
-      { "field": "NUMHANDICAP", "label": "Accessible Spaces", "format": "integer", "section": "detail", "hideZero": true }
+      { "field": "NUMHANDICAP", "label": "Accessible (ADA) Spaces", "format": "integer", "section": "detail", "hideZero": true }
     ]
   },
 
@@ -81,7 +78,6 @@
   ],
 
   "symbology": [
-    { "value": "PRIVATE", "label": "Private lot — customers only", "color": [130, 130, 130, 0.9], "match": { "AREAID": ["WALGREENS", "TRADERJOES", "UPTOWNWEST", "HORTONSLOT"] }, "tooltip": "Owned by the business — not public Village parking" },
     { "value": "EVENINGS", "label": "Evenings & weekends only", "color": [222, 110, 30, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT2", "LOT4", "LOT12", "COSSITTOFFSITE"] } },
     { "value": "AFTER11", "label": "After 11 am daily", "color": [0, 150, 166, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT13", "LOT14", "LOT15"] } },
     { "value": "METERED", "label": "Metered — free on weekends", "color": [107, 91, 166, 1], "match": { "PRIMARYRULE": ["METERED"] } },
@@ -119,8 +115,6 @@
       "opacity": 1,
       "categoryField": "category",
       "categories": [
-        { "value": "Metra Station", "fill": [126, 78, 156, 0.5], "outline": [126, 78, 156, 1] },
-        { "value": "Civic / Public", "fill": [156, 146, 132, 0.4], "outline": [120, 110, 96, 1] },
         { "value": "Park / Open Space", "fill": [120, 165, 95, 0.45], "outline": [120, 165, 95, 1] },
         { "value": "Landmark", "fill": [190, 150, 80, 0.45], "outline": [190, 150, 80, 1] }
       ],
@@ -148,12 +142,7 @@
       "label": "Where can I park?",
       "enabled": true,
       "showRules": false,
-      "lotNotes": {
-        "WALGREENS": "Private lot — for Walgreens customers only. Not public Village parking.",
-        "TRADERJOES": "Private lot — for Trader Joe's customers only. Not public Village parking.",
-        "UPTOWNWEST": "Private lot — for Uptown West customers only. Not public Village parking.",
-        "HORTONSLOT": "Private lot — for Horton's customers only. Not public Village parking."
-      },
+
       "guide": {
         "sections": [
           {
@@ -163,8 +152,18 @@
               { "text": "No overnight parking (2 am – 6 am) without a permit — whether on-street or in a lot." },
               { "text": "Metered on-street spaces are free on weekends." }
             ]
+          },
+          {
+            "title": "Garage",
+            "bullets": [
+              { "text": "Garage is 4 hr parking, 6 am to 6 pm." }
+            ]
           }
         ]
+      },
+
+      "lotNotes": {
+        "LIBRARYLOT": "For library customers only during Library operating hours."
       }
     }
   ],
@@ -180,7 +179,7 @@
     "LOT13": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
-    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "4 hr parking 6 am to 6 pm, no time limit after 6 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "Garage is 4 hr parking, 6 am to 6 pm.", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
     "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 17, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] }
   },
 
