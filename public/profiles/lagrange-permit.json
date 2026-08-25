@@ -72,7 +72,7 @@
     "purchaseUrlField": "PURCHASEURL",
     "display": [
       { "field": "ENFORCE_TEXT", "label": "When" },
-      { "field": "MAXDURATION", "label": "Time limit" }
+      { "field": "MAXDURATION", "label": "Time limit", "format": "duration" }
     ]
   },
 

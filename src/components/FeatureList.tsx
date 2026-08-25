@@ -119,7 +119,13 @@ export function FeatureList({
 
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      entries = entries.filter(({ feature }) => nameOf(feature).toLowerCase().includes(q));
+      entries = entries.filter(({ feature }) => {
+        if (nameOf(feature).toLowerCase().includes(q)) return true;
+        const desc = consolidate?.descField
+          ? String(feature.attributes[consolidate.descField] ?? '')
+          : '';
+        return desc.toLowerCase().includes(q);
+      });
     }
 
     entries.sort((a, b) => {
@@ -146,6 +152,11 @@ export function FeatureList({
   }, [features, legendFilter, search, sortKey, symbology, rendererField, spacesField, nameField, consolidate, ruleSymbology, ruleFilter]);
 
   if (features.length === 0) return <div className="feature-list-empty">Loading...</div>;
+
+  // Legend-filtering to on-street leaves only the consolidated group — the
+  // breakdown chips ARE the results then, so open them instead of "No matches".
+  const onlyConsolidated =
+    filteredEntries.length === 0 && consolidatedCount > 0 && !search.trim() && ruleFilter == null;
 
   const activeChip =
     ruleFilter != null ? consolidatedBreakdown.find((b) => b.value === ruleFilter) : undefined;
@@ -180,7 +191,7 @@ export function FeatureList({
       </div>
       {consolidate && consolidatedCount > 0 && (() => {
         // Stays expanded while a spotlight filter is active.
-        const expanded = onStreetOpen || ruleFilter != null;
+        const expanded = onStreetOpen || ruleFilter != null || onlyConsolidated;
         return (
           <div className="feature-list-consolidated">
             <button
@@ -252,7 +263,7 @@ export function FeatureList({
         </button>
       )}
       {filteredEntries.length === 0 ? (
-        <div className="feature-list-empty">No matches</div>
+        !onlyConsolidated && <div className="feature-list-empty">No matches</div>
       ) : (
         <ul className="feature-list-items">
           {filteredEntries.map(({ feature, originalIndex }) => {
@@ -262,6 +273,11 @@ export function FeatureList({
             const sym = symOf(attrs);
             const spaces = spacesField ? attrs[spacesField] : null;
             const info = idField ? areaInfo?.[String(attrs[idField] ?? '')] : undefined;
+            // Same-named on-street segments are told apart by their location text.
+            const locDesc =
+              consolidate?.descField && ruleFilter != null
+                ? String(attrs[consolidate.descField] ?? '').trim()
+                : '';
 
             return (
               <li
@@ -274,7 +290,7 @@ export function FeatureList({
                   <span className="feature-list-item-name">{name}</span>
                 </div>
                 <div className="feature-list-item-meta">
-                  {info?.availability ?? sym?.label ?? restriction}
+                  {locDesc || info?.availability || sym?.label || restriction}
                   {/* 0/null capacity means "never inventoried" (all on-street
                       permit zones), not "no spaces" — say nothing instead. */}
                   {Number(spaces) > 0 && ` · ${Math.round(Number(spaces))} spaces`}

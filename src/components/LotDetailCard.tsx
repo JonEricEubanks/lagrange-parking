@@ -21,6 +21,17 @@ function formatValue(value: unknown, format?: string): string {
   if (value == null || value === '') return '--';
   if (format === 'boolean') return Number(value) === 1 ? 'Yes' : 'No';
   if (format === 'integer') return String(Math.round(Number(value)));
+  if (format === 'duration') {
+    // GIS codes like "2HOURS" / "15MIN" / "ANYTIME" → friendly text.
+    const raw = String(value).trim().toUpperCase();
+    if (raw === 'ANYTIME') return 'No time limit';
+    const m = raw.match(/^(\d+)\s*(MIN|HOURS?)$/);
+    if (m) {
+      const n = Number(m[1]);
+      const unit = m[2].startsWith('MIN') ? 'minute' : 'hour';
+      return `${n} ${unit}${n === 1 ? '' : 's'}`;
+    }
+  }
   return String(value);
 }
 

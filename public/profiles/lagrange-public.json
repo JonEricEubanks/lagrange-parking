@@ -12,7 +12,8 @@
     "values": ["On-Street"],
     "label": "On-street spaces",
     "note": "Throughout downtown — click any space on the map for its time limit.",
-    "subdivide": { "value": "METERED", "byField": "AREANAME" }
+    "subdivide": { "value": "METERED", "byField": "AREANAME" },
+    "descField": "LOCDESC"
   },
 
   "welcome": {
@@ -62,7 +63,7 @@
     "baseWhere": "USERCLASS = 'VISITOR'",
     "orderByFields": ["ENFORCE_START"],
     "display": [
-      { "field": "MAXDURATION", "label": "Time limit" },
+      { "field": "MAXDURATION", "label": "Time limit", "format": "duration" },
       { "field": "ENFORCE_TEXT", "label": "When enforced" }
     ]
   },

@@ -292,6 +292,9 @@ export interface ParkingProfile {
     /** Split one rule category into finer chips by another field's value
         (e.g. METERED → "Metered 6/8/12 Hour" via AREANAME). */
     subdivide?: { value: string; byField: string };
+    /** Field with a human-readable location (e.g. LOCDESC "south side of
+        Hillgrove, east of Dover Ave") shown to tell same-named segments apart. */
+    descField?: string;
   };
   /** Profile-level "how to apply" link (a tab guide may override it). */
   apply?: ApplyLink;
