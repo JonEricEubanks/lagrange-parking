@@ -9,8 +9,13 @@ Publishing separately keeps this purely additive.
 
 The layer MUST end up shared with EVERYONE — the web apps query it anonymously.
 
-Run with the arcpy conda env:
-    C:\\Users\\jkenny\\AppData\\Local\\ESRI\\conda\\envs\\mgp-agol-mcp\\python.exe scripts/publish_subzones.py
+Run with any ArcGIS Pro conda env that has arcpy + the arcgis API (e.g. mgp-agol-mcp).
+
+Configuration (env vars, or a .env file in the repo root, or CLI flags):
+    ARCGIS_USERNAME / ARCGIS_PASSWORD  AGOL credentials (required for --commit)
+    ARCGIS_ORG_URL                     e.g. https://<org>.maps.arcgis.com
+    LAGRANGE_GDB                       path to ParkingPermits.gdb (default: X: drive path)
+    PUBLISH_WORK_DIR                   scratch dir (default: %TEMP%\\lagrange_publish)
 
 Dry-run by default; --commit actually publishes.
 """
@@ -19,23 +24,9 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 
 import arcpy
-
-GDB = r"X:\GISC\Community\LaGrange\Project\20240829_ParkingDecalMaps\APRX\Parking_Permit_Restructure\ParkingPermits.gdb"
-FC = os.path.join(GDB, "OvernightResidentSubzones")
-
-PROFILE_DIR = r"C:\dev\agent1\actions\agol\profiles\lagrange"
-BLANK = r"C:\Program Files\ArcGIS\Pro\Resources\ArcToolBox\Services\routingservices\data\Blank.aprx"
-WORK = r"C:\dev\agent1\working\publish"
-APRX_PATH = os.path.join(WORK, "lagrange_subzones_publish.aprx")
-
-SERVICE_NAME = "LaGrange_Overnight_Resident_Subzones"
-PORTAL_FOLDER = "La Grange Parking"
-SDDRAFT = os.path.join(WORK, SERVICE_NAME + ".sddraft")
-SD = os.path.join(WORK, SERVICE_NAME + ".sd")
-
-arcpy.env.overwriteOutput = True
 
 
 def load_env(path):
@@ -47,6 +38,56 @@ def load_env(path):
                 k, v = line.split("=", 1)
                 out[k.strip()] = v.strip()
     return out
+
+
+# repo-root .env (gitignored) is loaded into os.environ without overriding real env vars
+_REPO_ENV = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+if os.path.exists(_REPO_ENV):
+    for _k, _v in load_env(_REPO_ENV).items():
+        os.environ.setdefault(_k, _v)
+
+GDB = os.environ.get(
+    "LAGRANGE_GDB",
+    r"X:\GISC\Community\LaGrange\Project\20240829_ParkingDecalMaps\APRX\Parking_Permit_Restructure\ParkingPermits.gdb",
+)
+FC = os.path.join(GDB, "OvernightResidentSubzones")
+
+# legacy profile dir (jkenny's machine) — only used as a fallback if env vars are absent
+PROFILE_DIR = os.environ.get("AGOL_PROFILE_DIR", r"C:\dev\agent1\actions\agol\profiles\lagrange")
+BLANK = r"C:\Program Files\ArcGIS\Pro\Resources\ArcToolBox\Services\routingservices\data\Blank.aprx"
+WORK = os.environ.get("PUBLISH_WORK_DIR", os.path.join(tempfile.gettempdir(), "lagrange_publish"))
+APRX_PATH = os.path.join(WORK, "lagrange_subzones_publish.aprx")
+
+SERVICE_NAME = "LaGrange_Overnight_Resident_Subzones"
+PORTAL_FOLDER = "La Grange Parking"
+SDDRAFT = os.path.join(WORK, SERVICE_NAME + ".sddraft")
+SD = os.path.join(WORK, SERVICE_NAME + ".sd")
+
+arcpy.env.overwriteOutput = True
+
+
+def resolve_credentials():
+    """env vars / repo .env first, then the legacy profile dir."""
+    user = os.environ.get("ARCGIS_USERNAME")
+    pw = os.environ.get("ARCGIS_PASSWORD")
+    org_url = os.environ.get("ARCGIS_ORG_URL")
+
+    if not (user and pw) and os.path.isdir(PROFILE_DIR):
+        creds_path = os.path.join(PROFILE_DIR, "credentials.env")
+        if os.path.exists(creds_path):
+            creds = load_env(creds_path)
+            user = user or creds.get("ARCGIS_USERNAME")
+            pw = pw or creds.get("ARCGIS_PASSWORD")
+        profile_path = os.path.join(PROFILE_DIR, "profile.json")
+        if not org_url and os.path.exists(profile_path):
+            org_url = json.load(open(profile_path)).get("agol_org_url")
+
+    missing = [n for n, v in (("ARCGIS_USERNAME", user), ("ARCGIS_PASSWORD", pw),
+                              ("ARCGIS_ORG_URL", org_url)) if not v]
+    if missing:
+        sys.exit("missing credentials: set " + ", ".join(missing)
+                 + " as env vars or in the repo-root .env file")
+    return org_url, user, pw
 
 
 def main():
@@ -74,10 +115,7 @@ def main():
         print("\nDRY RUN — re-run with --commit to publish.")
         return
 
-    profile = json.load(open(os.path.join(PROFILE_DIR, "profile.json")))
-    creds = load_env(os.path.join(PROFILE_DIR, "credentials.env"))
-    org_url = profile["agol_org_url"]
-    user, pw = creds["ARCGIS_USERNAME"], creds["ARCGIS_PASSWORD"]
+    org_url, user, pw = resolve_credentials()
 
     os.makedirs(WORK, exist_ok=True)
     for p in (SDDRAFT, SD):
