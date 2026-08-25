@@ -264,7 +264,7 @@ export function MapPanel({
     home.goToOverride = (v, params) => {
       if (onHomeResetRef.current) {
         onHomeResetRef.current();
-        return;
+        return Promise.resolve();
       }
       return v.goTo(params.target, params.options);
     };
