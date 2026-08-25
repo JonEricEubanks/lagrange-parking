@@ -125,12 +125,14 @@ export function DetailPanel({
 
   return (
     <aside className="detail-panel">
-      <FeatureNavigator
-        currentIndex={navPos}
-        totalCount={navIndices.length}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
+      {selectedFeature && (
+        <FeatureNavigator
+          currentIndex={navPos}
+          totalCount={navIndices.length}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
+      )}
 
       {selectedFeature ? (
         <>
@@ -170,11 +172,11 @@ export function DetailPanel({
           <p>Loading…</p>
         </div>
       ) : (
-        <div className="detail-welcome">
-          {welcome?.heading && <p className="detail-welcome-heading">{welcome.heading}</p>}
-          {welcome?.body && <p>{welcome.body}</p>}
-          {welcome?.hint && <p className="detail-welcome-hint">{welcome.hint}</p>}
-        </div>
+        welcome?.hint && (
+          <div className="detail-welcome">
+            <p className="detail-welcome-hint">{welcome.hint}</p>
+          </div>
+        )
       )}
 
       <FeatureList
