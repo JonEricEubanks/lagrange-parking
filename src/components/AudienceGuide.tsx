@@ -1,6 +1,6 @@
 import type { SymbologyEntry, AudienceGuideContent, ApplyLink } from '../config/types';
-import { swatchStyle } from '../config/lots';
 import { PermitInfo } from './PermitInfo';
+import { Legend } from './Legend';
 
 interface AudienceGuideProps {
   /** Audience/section name shown as the rail heading (e.g. "Residents"). */
@@ -17,6 +17,8 @@ interface AudienceGuideProps {
   activeFilter?: string | null;
   onFilterToggle?: (value: string) => void;
   isOpen?: boolean;
+  /** Closes the mobile bottom sheet (grip tap); unused on desktop. */
+  onClose?: () => void;
   /** Lets a guide's "see also" pointer switch to another permit tab. */
   onGoToTab?: (tabId: string) => void;
 }
@@ -32,22 +34,17 @@ export function AudienceGuide({
   activeFilter = null,
   onFilterToggle,
   isOpen,
+  onClose,
   onGoToTab,
 }: AudienceGuideProps) {
-  const knownValues = new Set(symbology.filter((s) => s.value !== '_default').map((s) => s.value));
-  const hasUnknown = [...presentValues].some((v) => !knownValues.has(v));
-  // Only show legend entries that actually occur in the current lots.
-  const entries = symbology.filter((s) => {
-    if (s.value === '_default') return hasUnknown;
-    if (s.match) return true; // match-based entries always represent real map colors
-    return presentValues.has(s.value);
-  });
-
   const applyLink = guide?.apply ?? apply;
   const showGuide = !!guide?.who;
 
   return (
     <aside className={`legend-sidebar audience-guide ${isOpen ? 'legend-sidebar-open' : ''}`}>
+      <button className="guide-sheet-handle" onClick={onClose} aria-label="Close guide">
+        <span className="guide-sheet-grip" />
+      </button>
       {showGuide ? (
         <div className="guide-section">
           {heading && <h2 className="guide-heading">{heading}</h2>}
@@ -85,36 +82,15 @@ export function AudienceGuide({
 
       <PermitInfo guide={guide} onGoToTab={onGoToTab} />
 
-      <div className="guide-legend">
-        <h3 className="legend-title">{legendTitle}</h3>
-        {activeFilter !== null && onFilterToggle && (
-          <button className="legend-show-all" onClick={() => onFilterToggle(activeFilter)}>
-            Show All
-          </button>
-        )}
-        {entries.length === 0 ? (
-          <p className="legend-empty-note">No areas to show for this group yet.</p>
-        ) : (
-          <ul className="legend-list">
-            {entries.map((s) => {
-              const isActive = activeFilter === s.value;
-              const isDimmed = activeFilter !== null && !isActive;
-              return (
-                <li
-                  key={s.value}
-                  className={`legend-item ${onFilterToggle ? 'legend-item-clickable' : ''} ${isActive ? 'legend-item-active' : ''} ${isDimmed ? 'legend-item-dimmed' : ''}`}
-                  onClick={() => onFilterToggle?.(s.value)}
-                >
-                  <span className="legend-swatch" style={swatchStyle(s)} />
-                  <span className="legend-label" title={s.tooltip}>
-                    {s.label}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+      {/* Drawer copy of the legend — shown on mobile/tablet only; desktop uses the right rail. */}
+      <Legend
+        className="guide-legend-drawer"
+        title={legendTitle}
+        symbology={symbology}
+        presentValues={presentValues}
+        activeFilter={activeFilter}
+        onFilterToggle={onFilterToggle}
+      />
     </aside>
   );
 }

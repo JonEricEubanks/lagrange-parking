@@ -113,20 +113,30 @@ export function useParkingLayer(profile: ParkingProfile | null): ParkingLayerRes
       });
 
     const deconfliction = profile.layer.labelDeconfliction ?? 'none';
-    const baseLabelClass = (where?: string, xoffset = 0, yoffset = 0) =>
+    const baseLabelClass = (where?: string, xoffset = 0, yoffset = 0, minScale?: number) =>
       new LabelClass({
         labelExpressionInfo: { expression: nameExpression },
         labelPlacement: 'always-horizontal',
         deconflictionStrategy: deconfliction,
         where,
+        ...(minScale != null ? { minScale } : {}),
         symbol: makeLabelSymbol(xoffset, yoffset),
       });
 
     // Lot 2 label offset — nudges it above the adjacent Harris Ave label
     const lot2Field = idField ?? 'AREAID';
+    // On-street/metered segments are small and dense — hold their labels until
+    // the user is zoomed close, so they don't crowd out the lot labels.
+    const cl = profile.consolidateList;
+    const onStreetWhere = cl
+      ? `${cl.field} IN (${cl.values.map((v) => `'${v.replace(/'/g, "''")}'`).join(', ')})`
+      : undefined;
     const labelClasses = [
       baseLabelClass(`${lot2Field} = 'LOT2'`, 0, 14),
-      baseLabelClass(`${lot2Field} <> 'LOT2'`),
+      baseLabelClass(
+        `${lot2Field} <> 'LOT2'${onStreetWhere ? ` AND NOT (${onStreetWhere})` : ''}`
+      ),
+      ...(onStreetWhere ? [baseLabelClass(onStreetWhere, 0, 0, 2400)] : []),
     ];
 
     const newLayer = new FeatureLayer({

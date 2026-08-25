@@ -26,6 +26,8 @@ interface MapPanelProps {
   walkTimeMode?: boolean;
   onMapClick?: (mapPoint: Point) => void;
   onViewReady?: (view: MapView) => void;
+  /** Overrides the map Home button — e.g. zoom to the current audience's lots. */
+  onHomeReset?: () => void;
   overlayVisibility?: Record<string, boolean>;
   /** Reports the active basemap so the parking layer's owner can restyle it. */
   onBasemapChange?: (aerial: boolean) => void;
@@ -45,6 +47,7 @@ export function MapPanel({
   walkTimeMode = false,
   onMapClick,
   onViewReady,
+  onHomeReset,
   overlayVisibility,
   onBasemapChange,
   subzonesEnabled = false,
@@ -72,10 +75,12 @@ export function MapPanel({
   const walkTimeModeRef = useRef(walkTimeMode);
   const onMapClickRef = useRef(onMapClick);
   const onFeatureClickRef = useRef(onFeatureClick);
+  const onHomeResetRef = useRef(onHomeReset);
 
   walkTimeModeRef.current = walkTimeMode;
   onMapClickRef.current = onMapClick;
   onFeatureClickRef.current = onFeatureClick;
+  onHomeResetRef.current = onHomeReset;
 
   // Set cursor on the ArcGIS view surface — never toggle classes on the container div itself
   useEffect(() => {
@@ -254,6 +259,15 @@ export function MapPanel({
 
 
     const home = new Home({ view });
+    // Home should return to the app's current fitted view (the visible lots),
+    // not the load-time profile extent, which goes stale as tabs/filters change.
+    home.goToOverride = (v, params) => {
+      if (onHomeResetRef.current) {
+        onHomeResetRef.current();
+        return;
+      }
+      return v.goTo(params.target, params.options);
+    };
     view.ui.add(home, 'top-left');
 
     // "Locate me" — geolocates the visitor and zooms to their spot. Sits with the

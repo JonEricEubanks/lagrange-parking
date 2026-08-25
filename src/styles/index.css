@@ -277,27 +277,33 @@ body,
   flex-shrink: 0;
 }
 
+.legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .legend-title {
   font-family: var(--font-header);
   font-size: 15px;
   color: var(--lf-primary);
-  margin-bottom: 14px;
   font-weight: 400;
 }
 
 .legend-show-all {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 5px 10px;
-  font-size: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--lf-secondary);
   background: none;
   border: 1px solid var(--lf-secondary);
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-family: var(--font-body);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .legend-show-all:hover {
@@ -357,6 +363,11 @@ body,
   padding: 0;
 }
 
+/* Bottom-sheet grip — mobile only. */
+.guide-sheet-handle {
+  display: none;
+}
+
 .guide-section {
   padding: 16px 14px;
   background: var(--lf-card-bg);
@@ -410,6 +421,24 @@ body,
   padding: 14px 12px;
 }
 
+/* Legend card at the top of the right rail (desktop). */
+.detail-rail-legend {
+  padding: 14px 16px 10px;
+  background: var(--lf-white);
+  border-bottom: 1px solid var(--lf-border);
+  flex-shrink: 0;
+}
+
+.detail-rail-legend .legend-item {
+  margin-bottom: 7px;
+}
+
+.legend-filter-hint {
+  font-size: 11px;
+  color: #98a3ad;
+  margin-top: 2px;
+}
+
 .legend-empty-note {
   font-size: 12px;
   color: #999;
@@ -457,9 +486,15 @@ body,
   }
 }
 
-/* ─── Detail Panel Container (mobile collapse wrapper) ─── */
+/* ─── Detail Panel Container (right rail: legend on top, details below) ─── */
 .detail-panel-container {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  width: var(--detail-width);
+  min-height: 0;
+  flex-shrink: 0;
+  background: #fafafa;
+  border-left: 1px solid #ddd;
 }
 
 .detail-panel-toggle {
@@ -468,13 +503,13 @@ body,
 
 /* ─── Detail Panel ─── */
 .detail-panel {
-  width: var(--detail-width);
+  width: 100%;
+  flex: 1;
+  min-height: 0;
   background: #fafafa;
-  border-left: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  flex-shrink: 0;
 }
 
 .detail-welcome {
@@ -2223,21 +2258,48 @@ body,
     --detail-width: 100%;
   }
 
+  /* Guide + legend becomes a bottom sheet on mobile/tablet. */
   .legend-sidebar {
     position: fixed;
-    top: 0;
+    top: auto;
     left: 0;
+    right: 0;
     bottom: 0;
-    width: 220px;
+    width: 100%;
+    max-height: 70vh;
     z-index: 950;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    border-right: 1px solid #ddd;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    transition: transform 0.28s ease;
+    border-right: none;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.25);
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   .legend-sidebar.legend-sidebar-open {
-    transform: translateX(0);
+    transform: translateY(0);
+  }
+
+  .guide-sheet-handle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 12px 0 10px;
+    background: var(--lf-white);
+    border: none;
+    border-radius: 16px 16px 0 0;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .guide-sheet-grip {
+    width: 38px;
+    height: 4px;
+    border-radius: 999px;
+    background: #c3d2e0;
   }
 
   .legend-mobile-toggle {
@@ -2270,6 +2332,12 @@ body,
     transition: max-height 0.3s ease;
     overflow: hidden;
     border-top: 1px solid #ddd;
+    border-left: none;
+  }
+
+  /* Mobile/tablet keeps the legend in the slide-out drawer instead. */
+  .detail-rail-legend {
+    display: none;
   }
 
   .detail-panel-container:not(.detail-panel-container-open) {
@@ -2333,6 +2401,11 @@ body,
 
   .legend-mobile-backdrop {
     display: none !important;
+  }
+
+  /* Desktop shows the legend in the right rail; hide the drawer copy. */
+  .guide-legend-drawer {
+    display: none;
   }
 }
 

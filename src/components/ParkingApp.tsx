@@ -14,6 +14,7 @@ import { TabBar } from './TabBar';
 import { AudienceGuide } from './AudienceGuide';
 import { MapPanel } from './MapPanel';
 import { DetailPanel } from './DetailPanel';
+import { Legend } from './Legend';
 
 const and = (...parts: (string | undefined | null)[]) =>
   parts.filter((p) => p && p.trim()).map((p) => `(${p})`).join(' AND ');
@@ -190,7 +191,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
       .queryExtent({ where: listWhere })
       .then((result) => {
         if (!cancelled && result.extent) {
-          mapView.goTo(result.extent.expand(1.4), { duration: 600 }).catch(() => {});
+          mapView.goTo(result.extent.expand(1.1), { duration: 600 }).catch(() => {});
         }
       })
       .catch(() => {
@@ -290,6 +291,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
           activeFilter={legendFilter}
           onFilterToggle={handleFilterToggle}
           isOpen={legendOpen}
+          onClose={() => setLegendOpen(false)}
           onGoToTab={handleTabClick}
         />
         <div className="map-panel-wrapper">
@@ -301,6 +303,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             walkTimeMode={walkMode}
             onMapClick={walkRoute.handleMapClick}
             onViewReady={setMapView}
+            onHomeReset={zoomToAll}
             onBasemapChange={setBasemapMode}
             subzonesEnabled={showSubzones}
             selectedAreaId={selectedAreaId}
@@ -320,6 +323,15 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
           >
             <span className="detail-panel-toggle-bar" />
           </button>
+          {/* Desktop-only legend at the top of the right rail; mobile keeps the drawer copy. */}
+          <Legend
+            className="detail-rail-legend"
+            title={profile.legendTitle}
+            symbology={profile.symbology}
+            presentValues={presentValues}
+            activeFilter={legendFilter}
+            onFilterToggle={handleFilterToggle}
+          />
           <DetailPanel
             allFeatures={lot.allFeatures}
             selectedFeature={lot.selectedFeature}
