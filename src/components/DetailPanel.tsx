@@ -179,19 +179,21 @@ export function DetailPanel({
         )
       )}
 
-      <FeatureList
-        features={allFeatures}
-        selectedIndex={currentIndex}
-        onSelect={onSelectIndex}
-        symbology={symbology}
-        legendFilter={legendFilter}
-        layerFields={layerFields}
-        areaInfo={areaInfo}
-        consolidate={consolidateList}
-        ruleSymbology={ruleSymbology}
-        ruleFilter={ruleFilter}
-        onRuleFilterToggle={onRuleFilterToggle}
-      />
+      {!selectedFeature && (
+        <FeatureList
+          features={allFeatures}
+          selectedIndex={currentIndex}
+          onSelect={onSelectIndex}
+          symbology={symbology}
+          legendFilter={legendFilter}
+          layerFields={layerFields}
+          areaInfo={areaInfo}
+          consolidate={consolidateList}
+          ruleSymbology={ruleSymbology}
+          ruleFilter={ruleFilter}
+          onRuleFilterToggle={onRuleFilterToggle}
+        />
+      )}
 
       {lastUpdated && (
         <div className="detail-last-updated">
