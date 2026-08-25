@@ -6,8 +6,9 @@ import { useParkingLayer } from '../hooks/useParkingLayer';
 import { useSelectedLot } from '../hooks/useSelectedLot';
 import { useRelatedRules } from '../hooks/useRelatedRules';
 import { useAudienceAreaIds } from '../hooks/useAudienceAreaIds';
+import { useSubzoneAreaIds } from '../hooks/useSubzoneAreaIds';
 import { useWalkRoute } from '../hooks/useWalkRoute';
-import { explicitAreaWhere } from '../config/lots';
+import { explicitAreaWhere, symbologyFilterWhere } from '../config/lots';
 import { Header } from './Header';
 import { TabBar } from './TabBar';
 import { AudienceGuide } from './AudienceGuide';
@@ -18,7 +19,7 @@ const and = (...parts: (string | undefined | null)[]) =>
   parts.filter((p) => p && p.trim()).map((p) => `(${p})`).join(' AND ');
 
 export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHome?: () => void }) {
-  const { layer: featureLayer, setDefinitionExpression, setBasemapMode } = useParkingLayer(profile);
+  const { layer: featureLayer, setDefinitionExpression, setBasemapMode, setSubzoneMode } = useParkingLayer(profile);
 
   const layerFields: LayerFields = useMemo(
     () => ({
@@ -40,6 +41,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   const [activeTab, setActiveTab] = useState(() => visibleTabs[0]?.id ?? '');
   const [mapView, setMapView] = useState<MapView | null>(null);
   const [legendFilter, setLegendFilter] = useState<string | null>(null);
+  const [ruleFilter, setRuleFilter] = useState<string | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(true);
   const [walkMode, setWalkMode] = useState(false);
@@ -76,7 +78,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
     [profile.layer.baseWhere, memberFilter]
   );
 
-  // Legend filter clause built off the renderer field.
+  // Legend filter clause — uses match conditions when present (e.g. AREAID-based entries).
   const legendWhere = useMemo(() => {
     if (!legendFilter) return '';
     if (legendFilter === '_default') {
@@ -86,11 +88,28 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
         .join(', ');
       return `${rField} NOT IN (${known}) OR ${rField} IS NULL`;
     }
-    return `${rField} = '${legendFilter}'`;
+    return symbologyFilterWhere(profile.symbology, legendFilter, rField) ?? `${rField} = '${legendFilter}'`;
   }, [legendFilter, profile.symbology, rField]);
 
-  // What the map actually draws: base AND tab AND legend.
-  const mapWhere = useMemo(() => and(listWhere, legendWhere) || '1=1', [listWhere, legendWhere]);
+  // Spotlight filter from the on-street breakdown chips (e.g. only 2 Hour spaces).
+  // Subdivided chips (e.g. "Metered 12 Hour") carry a `sub:` prefix and match on
+  // the subdivide byField instead of the renderer field.
+  const ruleFilterWhere = useMemo(() => {
+    if (!ruleFilter || !profile.consolidateList) return '';
+    const { field, values, subdivide } = profile.consolidateList;
+    const list = values.map((v) => `'${v.replace(/'/g, "''")}'`).join(', ');
+    const esc = (s: string) => s.replace(/'/g, "''");
+    if (subdivide && ruleFilter.startsWith('sub:')) {
+      return `${field} IN (${list}) AND ${subdivide.byField} = '${esc(ruleFilter.slice(4))}'`;
+    }
+    return `${field} IN (${list}) AND ${rField} = '${esc(ruleFilter)}'`;
+  }, [ruleFilter, profile.consolidateList, rField]);
+
+  // What the map actually draws: base AND tab AND legend AND spotlight.
+  const mapWhere = useMemo(
+    () => and(listWhere, legendWhere, ruleFilterWhere) || '1=1',
+    [listWhere, legendWhere, ruleFilterWhere]
+  );
 
   const lot = useSelectedLot(featureLayer, listWhere, layerFields.nameField);
 
@@ -132,17 +151,40 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   const rules = useRelatedRules(profile.relatedRules, selectedAreaId, activeTabDef?.ruleWhere);
   const exhibit = selectedAreaId ? profile.areaExhibits?.[String(selectedAreaId)] : undefined;
 
+  // Subzones (designated areas within a lot) — drawn when the active tab opts in
+  // and a lot is selected; the lot polygons swap to outline-only so the bands read.
+  const showSubzones = !!activeTabDef?.showSubzones;
+  const subzoneIds = useSubzoneAreaIds(profile.subzones, showSubzones);
+  useEffect(() => {
+    setSubzoneMode(showSubzones && selectedAreaId != null);
+  }, [showSubzones, selectedAreaId, setSubzoneMode]);
+  const lotHasSubzones =
+    showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
+  const subzoneNote = selectedAreaId
+    ? (activeTabDef?.lotSubzoneNotes?.[String(selectedAreaId)] ??
+        (lotHasSubzones ? profile.subzones?.note : undefined))
+    : undefined;
+  const cardNote = selectedAreaId
+    ? (activeTabDef?.lotNotes?.[String(selectedAreaId)] ?? activeTabDef?.note)
+    : activeTabDef?.note;
+
   const walkRoute = useWalkRoute(mapView, walkMode);
   const walkEnabled = !!profile.enableWalkTime;
 
-  const handleTabClick = useCallback((tabId: string) => {
-    setActiveTab(tabId);
-    setLegendFilter(null);
-  }, []);
+  const handleTabClick = useCallback(
+    (tabId: string) => {
+      setActiveTab(tabId);
+      setLegendFilter(null);
+      setRuleFilter(null);
+      // Switching views resets any lot selection so the full list is shown.
+      lot.clear();
+    },
+    [lot]
+  );
 
   // Zoom to the current audience's lots whenever the (non-legend) filter changes.
-  useEffect(() => {
-    if (!mapView || !featureLayer || listWhere === '1=0') return;
+  const zoomToAll = useCallback(() => {
+    if (!mapView || !featureLayer || listWhere === '1=0') return () => {};
     let cancelled = false;
     featureLayer
       .queryExtent({ where: listWhere })
@@ -159,6 +201,14 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
     };
   }, [listWhere, mapView, featureLayer]);
 
+  useEffect(() => zoomToAll(), [zoomToAll]);
+
+  // Back to all locations: drop the selection and return the map to the full view.
+  const handleClearSelection = useCallback(() => {
+    lot.clear();
+    zoomToAll();
+  }, [lot, zoomToAll]);
+
   const handleFeatureClick = useCallback(
     (graphic: Parameters<typeof lot.selectByClick>[0]) => {
       lot.selectByClick(graphic);
@@ -169,6 +219,8 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
 
   const handleSelectIndex = useCallback(
     (index: number) => {
+      // Selecting a lot ends any on-street spotlight so the lot is visible on the map.
+      setRuleFilter(null);
       lot.selectByIndex(index);
       setDetailOpen(true);
     },
@@ -179,10 +231,14 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
     (value: string) => {
       const newFilter = legendFilter === value ? null : value;
       setLegendFilter(newFilter);
+      setRuleFilter(null);
       setLegendOpen(false);
 
-      // Clear selection if it no longer matches the filter
-      if (newFilter !== null && lot.selectedFeature) {
+      // Clear selection if it no longer matches the filter; "Show All" (toggle
+      // off) resets the selection too so the full list comes back.
+      if (newFilter === null) {
+        lot.clear();
+      } else if (lot.selectedFeature) {
         const sel = lot.selectedFeature.attributes[rField] ?? '';
         const known = profile.symbology.filter((s) => s.value !== '_default').map((s) => s.value);
         const matches = newFilter === '_default' ? !known.includes(sel) : sel === newFilter;
@@ -190,6 +246,16 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
       }
     },
     [legendFilter, profile.symbology, rField, lot]
+  );
+
+  const handleRuleFilterToggle = useCallback(
+    (value: string) => {
+      const next = ruleFilter === value ? null : value;
+      setRuleFilter(next);
+      // Lots are hidden while spotlighting on-street spaces, so drop any selection.
+      if (next !== null && lot.selectedFeature) lot.clear();
+    },
+    [ruleFilter, lot]
   );
 
   const handleWalkHere = useCallback(
@@ -236,6 +302,9 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             onMapClick={walkRoute.handleMapClick}
             onViewReady={setMapView}
             onBasemapChange={setBasemapMode}
+            subzonesEnabled={showSubzones}
+            selectedAreaId={selectedAreaId}
+            selectedHasSubzones={lotHasSubzones}
           />
           {walkMode && walkRoute.step === 'set-start' && (
             <div className="walk-map-toast">
@@ -255,7 +324,6 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             allFeatures={lot.allFeatures}
             selectedFeature={lot.selectedFeature}
             currentIndex={lot.currentIndex}
-            totalCount={lot.totalCount}
             fields={profile.fields.display}
             symbology={profile.symbology}
             layerFields={layerFields}
@@ -265,9 +333,15 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             exhibit={exhibit}
             welcome={profile.welcome}
             legendFilter={legendFilter}
-            onPrev={lot.prev}
-            onNext={lot.next}
+            areaInfo={profile.areaInfo}
+            cardNote={cardNote}
+            subzoneNote={subzoneNote}
+            showDirections={profile.showDirections}
+            consolidateList={profile.consolidateList}
+            ruleFilter={ruleFilter}
+            onRuleFilterToggle={handleRuleFilterToggle}
             onSelectIndex={handleSelectIndex}
+            onClearSelection={handleClearSelection}
             onWalkHere={walkEnabled ? handleWalkHere : undefined}
             walkMode={walkMode}
             walkStep={walkRoute.step}

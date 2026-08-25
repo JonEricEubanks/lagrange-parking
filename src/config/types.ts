@@ -284,7 +284,15 @@ export interface ParkingProfile {
    * list (e.g. 100+ on-street segments), keeping named lots individually
    * listed. Without it a public map lists every street segment separately.
    */
-  consolidateList?: { field: string; values: string[]; label: string; note?: string };
+  consolidateList?: {
+    field: string;
+    values: string[];
+    label: string;
+    note?: string;
+    /** Split one rule category into finer chips by another field's value
+        (e.g. METERED → "Metered 6/8/12 Hour" via AREANAME). */
+    subdivide?: { value: string; byField: string };
+  };
   /** Profile-level "how to apply" link (a tab guide may override it). */
   apply?: ApplyLink;
   /** Heading + sub-heading for the guided-finder audience picker. */

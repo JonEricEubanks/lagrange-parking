@@ -496,9 +496,8 @@ body,
 }
 
 .detail-welcome-hint {
-  font-size: 12px;
-  color: #888;
-  font-style: italic;
+  font-size: 13px;
+  color: #555;
 }
 
 .detail-last-updated {
@@ -920,6 +919,162 @@ body,
 
 .feature-list-item-name {
   font-size: 13px;
+}
+
+/* On-street rule breakdown, styled like the map legend sections. Sits above
+   the location list so it stays visible even when the list is long. */
+.feature-list-consolidated {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e4e4e4;
+  font-size: 13px;
+}
+
+/* "Back to all locations" — shown while an on-street chip filter is active. */
+.feature-list-back {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lf-secondary);
+  background: none;
+  border: 1px solid var(--lf-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.feature-list-back:hover {
+  background: var(--lf-secondary);
+  color: var(--lf-white);
+}
+
+/* "Back to all locations" above the lot detail card — deselects the lot. */
+.detail-back {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lf-secondary);
+  background: none;
+  border: 1px solid var(--lf-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.detail-back:hover {
+  background: var(--lf-secondary);
+  color: var(--lf-white);
+}
+
+.feature-list-consolidated-note {
+  font-size: 12px;
+  color: #5a6b7a;
+  line-height: 1.3;
+}
+
+.feature-list-consolidated-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  padding: 2px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+}
+
+.feature-list-consolidated-header:hover .feature-list-item-name {
+  text-decoration: underline;
+}
+
+.feature-list-consolidated-caret {
+  font-size: 11px;
+  color: #5a6b7a;
+  flex-shrink: 0;
+}
+
+.feature-list-consolidated-total {
+  font-size: 12px;
+  color: #5a6b7a;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.feature-list-breakdown {
+  list-style: none;
+  margin: 6px 0 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Chips mirror the map legend rows (swatch + label) for a consistent look. */
+.feature-list-breakdown-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 3px 4px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #333;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.feature-list-breakdown-chip:hover {
+  background: #f0f0f0;
+}
+
+.feature-list-breakdown-chip-active {
+  background: var(--lf-card-bg);
+  font-weight: 600;
+}
+
+.feature-list-breakdown-chip-dimmed {
+  opacity: 0.4;
+}
+
+.feature-list-breakdown-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid #aaa;
+  flex-shrink: 0;
+}
+
+.feature-list-breakdown-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feature-list-breakdown-count {
+  font-variant-numeric: tabular-nums;
+  color: #5a6b7a;
+  text-align: right;
 }
 
 .feature-list-item-meta {
@@ -1737,6 +1892,10 @@ body,
 
 .finder-results .permit-info {
   padding-left: 4px;
+}
+
+.audience-guide .permit-info {
+  padding: 0 12px;
 }
 
 .permit-info-h {

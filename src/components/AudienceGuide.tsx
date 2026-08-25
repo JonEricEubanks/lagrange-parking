@@ -37,9 +37,11 @@ export function AudienceGuide({
   const knownValues = new Set(symbology.filter((s) => s.value !== '_default').map((s) => s.value));
   const hasUnknown = [...presentValues].some((v) => !knownValues.has(v));
   // Only show legend entries that actually occur in the current lots.
-  const entries = symbology.filter((s) =>
-    s.value === '_default' ? hasUnknown : presentValues.has(s.value)
-  );
+  const entries = symbology.filter((s) => {
+    if (s.value === '_default') return hasUnknown;
+    if (s.match) return true; // match-based entries always represent real map colors
+    return presentValues.has(s.value);
+  });
 
   const applyLink = guide?.apply ?? apply;
   const showGuide = !!guide?.who;

@@ -51,6 +51,27 @@ export function classifySymbology(
   return symbology.find((s) => s.value === '_default');
 }
 
+/**
+ * Whether a feature belongs to the legend entry `legendFilter`. Uses
+ * match-based classification when the profile defines it, otherwise plain
+ * rendererField-value equality (with `_default` catching unknown values).
+ */
+export function matchesLegendFilter(
+  attrs: Record<string, unknown>,
+  symbology: SymbologyEntry[] | undefined,
+  rendererField: string,
+  legendFilter: string
+): boolean {
+  const matched = classifySymbology(attrs, symbology ?? []);
+  if (matched) return matched.value === legendFilter;
+  const knownValues = symbology
+    ? symbology.filter((s) => s.value !== '_default').map((s) => s.value)
+    : [];
+  const val = String(attrs[rendererField] ?? '');
+  if (legendFilter === '_default') return !knownValues.includes(val);
+  return val === legendFilter;
+}
+
 /** CSS for a legend swatch, rendering hatched entries the same way the map does. */
 export function swatchStyle(s: SymbologyEntry): CSSProperties {
   const rgba = `rgba(${s.color[0]}, ${s.color[1]}, ${s.color[2]}, ${s.color[3]})`;

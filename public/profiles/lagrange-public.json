@@ -11,13 +11,14 @@
     "field": "FACILITYTYPE",
     "values": ["On-Street"],
     "label": "On-street spaces",
-    "note": "Throughout downtown — click any space on the map for its time limit."
+    "note": "Throughout downtown — click any space on the map for its time limit.",
+    "subdivide": { "value": "METERED", "byField": "AREANAME" }
   },
 
   "welcome": {
     "heading": "Public Parking in La Grange",
-    "body": "Find free public parking downtown — lots, garages, and on-street spaces. Click any area for availability and time limits.",
-    "hint": "Tip: many lots are available evenings and weekends. Metered spaces are free on weekends."
+    "body": "Find free public parking downtown — lots, garages, and on-street spaces.",
+    "hint": "Click any area for availability and time limits."
   },
   "picker": {
     "brandTitle": "Public Parking in La Grange",
@@ -82,8 +83,7 @@
     { "value": "AFTER11", "label": "After 11 am daily", "color": [0, 150, 166, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT13", "LOT14", "LOT15"] } },
     { "value": "METERED", "label": "Metered — free on weekends", "color": [107, 91, 166, 1], "match": { "PRIMARYRULE": ["METERED"] } },
     { "value": "STREET", "label": "On-street — time limit on sign", "color": [110, 190, 230, 1], "match": { "FACILITYTYPE": ["On-Street"] } },
-    { "value": "OPEN", "label": "Public lot / garage — open every day", "color": [18, 107, 181, 1], "match": { "FACILITYTYPE": ["Lot", "Garage"] } },
-    { "value": "_default", "label": "Other public parking", "color": [150, 170, 185, 1] }
+    { "value": "OPEN", "label": "Public lot / garage — open every day", "color": [18, 107, 181, 1], "match": { "FACILITYTYPE": ["Lot", "Garage"] } }
   ],
 
   "effects": [
@@ -163,7 +163,8 @@
       },
 
       "lotNotes": {
-        "LIBRARYLOT": "For library customers only during Library operating hours."
+        "LIBRARYLOT": "For library customers only during Library operating hours.",
+        "VILLAGEHALLSURFACELOT": "This lot also includes three 15-minute spaces for Village Hall business."
       }
     }
   ],
@@ -180,6 +181,7 @@
     "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "Garage is 4 hr parking, 6 am to 6 pm.", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "VILLAGEHALLSURFACELOT": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
     "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 17, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] }
   },
 
