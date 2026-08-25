@@ -365,7 +365,8 @@ body,
 
 .guide-heading {
   font-family: var(--font-header);
-  font-size: 18px;
+  /* 16px keeps both app headings on a single line in the 240px sidebar. */
+  font-size: 16px;
   font-weight: 600;
   color: var(--lf-primary);
   letter-spacing: 0.4px;
