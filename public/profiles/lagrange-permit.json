@@ -151,11 +151,10 @@
       "enabled": true,
       "showRules": false,
       "lotSubzoneNotes": {
-        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted.",
-        "LOT15": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
+        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted."
       },
       "audience": ["RESIDENT"],
-      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13", "LOT15"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT11", "LOT12", "LOT13"],
       "where": "HASRESIDENT = 1",
       "showSubzones": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT')",
