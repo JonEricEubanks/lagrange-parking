@@ -43,6 +43,20 @@
     "note": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
   },
 
+  "overlayLayers": [
+    {
+      "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
+      "title": "Lot 5 CBD designated spaces",
+      "where": "AREANAME = 'Lot 5 CBD'",
+      "minScale": 4000,
+      "abovePolygons": true,
+      "showForAreaId": "LOT5",
+      "fillColor": [0, 180, 160, 0.3],
+      "color": [0, 110, 100, 1],
+      "outlineWidth": 2
+    }
+  ],
+
 
 
   "layer": {
@@ -52,7 +66,7 @@
     "rendererField": "FACILITYTYPE",
     "idField": "AREAID",
     "spacesField": "MAXSPACES",
-    "baseWhere": "USERCLASS = 'PERMIT'",
+    "baseWhere": "USERCLASS = 'PERMIT' AND AREANAME <> 'Lot 5 CBD'",
     "opacity": 0.7,
     "imageryOpacity": 0.5,
     "outlineColor": [40, 40, 40, 1],

@@ -161,6 +161,14 @@ export interface OverlayLayer {
   color: [number, number, number, number];
   outlineWidth: number;
   fillColor?: [number, number, number, number];
+  /** Server-side filter for this overlay (e.g. draw only one named feature). */
+  where?: string;
+  /** Hide when zoomed out beyond this scale. */
+  minScale?: number;
+  /** Draw above the parking polygons (like the subzone bands) instead of under them. */
+  abovePolygons?: boolean;
+  /** Only show while this area id is the selected lot (selection-gated, like subzones). */
+  showForAreaId?: string;
 }
 
 /** One category of a reference layer's polygon renderer (alpha 0–1). */

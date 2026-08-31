@@ -70,6 +70,7 @@ export function MapPanel({
   const imageryTileRef = useRef<TileLayer | null>(null);
   const referenceLayersRef = useRef<FeatureLayer[]>([]);
   const subzoneLayerRef = useRef<FeatureLayer | null>(null);
+  const gatedOverlaysRef = useRef<{ layer: FeatureLayer; areaId: string }[]>([]);
 
   // Refs to avoid stale closures in the click handler
   const walkTimeModeRef = useRef(walkTimeMode);
@@ -127,24 +128,37 @@ export function MapPanel({
 
     // Build overlay layers (e.g., CBD boundary)
     const overlayMap = new globalThis.Map<string, FeatureLayer>();
-    const overlays = (profile.overlayLayers ?? []).map((ol) => {
+    const overlaysAbove: FeatureLayer[] = [];
+    const overlays = (profile.overlayLayers ?? []).flatMap((ol) => {
       const fillColor = ol.fillColor ?? [0, 0, 0, 0];
       const layer = new FeatureLayerModule({
         url: ol.url,
         title: ol.title,
         renderer: new SimpleRenderer({
+          // Alpha is 0–1, same as the subzone layer — do not scale it.
           symbol: new SimpleFillSymbol({
-            color: [fillColor[0], fillColor[1], fillColor[2], fillColor[3] * 255],
+            color: [fillColor[0], fillColor[1], fillColor[2], fillColor[3]],
             outline: {
-              color: [ol.color[0], ol.color[1], ol.color[2], ol.color[3] * 255],
+              color: [ol.color[0], ol.color[1], ol.color[2], ol.color[3]],
               width: ol.outlineWidth,
             },
           }),
         }),
         popupEnabled: false,
+        ...(ol.where ? { definitionExpression: ol.where } : {}),
+        ...(ol.minScale != null ? { minScale: ol.minScale } : {}),
+        ...(ol.showForAreaId ? { visible: false } : {}),
       });
-      overlayMap.set(ol.url, layer);
-      return layer;
+      if (ol.showForAreaId) {
+        gatedOverlaysRef.current.push({ layer, areaId: ol.showForAreaId });
+      } else {
+        overlayMap.set(ol.url, layer);
+      }
+      if (ol.abovePolygons) {
+        overlaysAbove.push(layer);
+        return [];
+      }
+      return [layer];
     });
     overlayLayersRef.current = overlayMap;
 
@@ -237,7 +251,8 @@ export function MapPanel({
         ...overlays,
         ...referenceLayers,
         featureLayer,
-        // Above the parking polygons — it marks a part of one.
+        // Above the parking polygons — they mark parts of one.
+        ...overlaysAbove,
         ...(subzoneLayer ? [subzoneLayer] : []),
       ],
     });
@@ -317,6 +332,7 @@ export function MapPanel({
       canvasTileRef.current = null;
       imageryTileRef.current = null;
       referenceLayersRef.current = [];
+      gatedOverlaysRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [featureLayer]);
@@ -376,6 +392,15 @@ export function MapPanel({
     layer.definitionExpression = `${keyField} = '${id}'`;
     layer.visible = true;
   }, [subzonesEnabled, selectedAreaId, profile.subzones?.keyField]);
+
+  // Selection-gated overlays (e.g. Lot 5 CBD rows) show only while their lot is
+  // selected, and only on pages that use designated spaces (like the subzone bands).
+  useEffect(() => {
+    gatedOverlaysRef.current.forEach((g) => {
+      g.layer.visible =
+        subzonesEnabled && selectedAreaId != null && String(selectedAreaId) === g.areaId;
+    });
+  }, [subzonesEnabled, selectedAreaId, featureLayer]);
 
   return (
     <>
