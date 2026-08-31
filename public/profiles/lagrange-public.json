@@ -1,0 +1,205 @@
+{
+  "id": "lagrange-public",
+  "title": "Public Parking Map",
+  "community": "Village of La Grange",
+  "lastUpdated": "2026-07-27",
+  "enableWalkTime": false,
+  "legendTitle": "What the colors mean",
+  "showLegend": true,
+  "showDirections": true,
+  "consolidateList": {
+    "field": "FACILITYTYPE",
+    "values": ["On-Street"],
+    "label": "On-street spaces",
+    "note": "Throughout downtown — click any space on the map for its time limit.",
+    "subdivide": { "value": "METERED", "byField": "AREANAME" },
+    "descField": "LOCDESC"
+  },
+
+  "welcome": {
+    "heading": "Public Parking in La Grange",
+    "body": "Find free public parking downtown — lots, garages, and on-street spaces.",
+    "hint": "Click any area for availability and time limits."
+  },
+  "picker": {
+    "brandTitle": "Public Parking in La Grange",
+    "image": {
+      "src": "assets/parking-sign.jpg",
+      "alt": "Village of La Grange parking sign — Harris Ave Lot"
+    }
+  },
+  "nameOverrides": {
+    "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
+    "COSSITTOFFSITE": "Cossitt School Lot"
+  },
+
+  "layer": {
+    "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/2",
+    "itemId": "f13e7fa3199141a2be6c2eea816de8d4",
+    "nameField": "AREANAME",
+    "rendererField": "PRIMARYRULE",
+    "idField": "AREAID",
+    "spacesField": "MAXSPACES",
+    "baseWhere": "(USERCLASS = 'VISITOR' OR AREAID IN ('LOT2','LOT4','LOT5','LOT11','LOT12','LOT13','LOT14','VILLAGEHALLPARKINGSTRUCTURE')) AND USERCLASS <> 'RESTRICTED' AND AREAID NOT IN ('WALGREENS','TRADERJOES','UPTOWNWEST','HORTONSLOT','UPTOWNPARKINGDECK','COSSITTWEST','LOT15','LOT6')",
+    "opacity": 0.7,
+    "imageryOpacity": 0.5,
+    "outlineColor": [40, 40, 40, 1],
+    "outlineWidth": 1.2,
+    "labelDeconfliction": "static"
+  },
+
+  "fields": {
+    "display": [
+      { "field": "FACILITYTYPE", "label": "Facility" },
+      { "field": "MAXSPACES", "label": "Spaces", "format": "integer", "hideZero": true },
+      { "field": "NUMHANDICAP", "label": "Accessible (ADA) Spaces", "format": "integer", "section": "detail", "hideZero": true }
+    ]
+  },
+
+  "relatedRules": {
+    "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrange_Parking_Permits/FeatureServer/3",
+    "keyField": "AREAID",
+    "labelField": "RULETYPE",
+    "baseWhere": "USERCLASS = 'VISITOR'",
+    "orderByFields": ["ENFORCE_START"],
+    "display": [
+      { "field": "MAXDURATION", "label": "Time limit", "format": "duration" },
+      { "field": "ENFORCE_TEXT", "label": "When enforced" }
+    ]
+  },
+
+  "ruleSymbology": [
+    { "value": "FREE_15MIN", "label": "15 Minute", "color": [67, 183, 73, 1] },
+    { "value": "FREE_30MIN", "label": "30 Minute", "color": [127, 194, 65, 1] },
+    { "value": "FREE_1HR", "label": "1 Hour", "color": [19, 172, 225, 1] },
+    { "value": "FREE_2HR", "label": "2 Hour", "color": [30, 144, 200, 1] },
+    { "value": "FREE_3HR", "label": "3 Hour", "color": [18, 107, 181, 1] },
+    { "value": "FREE_4HR", "label": "4 Hour", "color": [14, 79, 140, 1] },
+    { "value": "METERED", "label": "Metered", "color": [107, 91, 166, 1] },
+    { "value": "UNRESTRICTED", "label": "No Time Limit", "color": [0, 48, 108, 1] }
+  ],
+
+  "symbology": [
+    { "value": "EVENINGS", "label": "Evenings & weekends only", "color": [222, 110, 30, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT2", "LOT4", "LOT12", "COSSITTOFFSITE"] } },
+    { "value": "AFTER11", "label": "After 11 am daily", "color": [0, 150, 166, 1], "style": "forward-diagonal", "match": { "AREAID": ["LOT13", "LOT14", "LOT15"] } },
+    { "value": "METERED", "label": "Metered — free on weekends", "color": [107, 91, 166, 1], "match": { "PRIMARYRULE": ["METERED"] } },
+    { "value": "STREET", "label": "On-street — time limit on sign", "color": [110, 190, 230, 1], "match": { "FACILITYTYPE": ["On-Street"] } },
+    { "value": "OPEN", "label": "Public lot / garage — open every day", "color": [18, 107, 181, 1], "match": { "FACILITYTYPE": ["Lot", "Garage"] } }
+  ],
+
+  "effects": [
+    { "scale": 16000, "value": "drop-shadow(0.75px, 0.75px, 1.125px, rgba(0,0,0,0.5))" },
+    { "scale": 4000, "value": "drop-shadow(1.5px, 1.5px, 2.25px, rgba(0,0,0,0.5))" },
+    { "scale": 1000, "value": "drop-shadow(3px, 3px, 4.5px, rgba(0,0,0,0.5))" }
+  ],
+
+  "basemap": {
+    "tileUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/GISC_BASEMAP_LIGHTCANVAS/MapServer",
+    "imageryUrl": "https://tiles.arcgis.com/tiles/uRp89l90TnovtJpf/arcgis/rest/services/COUNTY_IMAGERY_COOK_2025_Project/MapServer",
+    "imageryLabel": "Aerial",
+    "default": "canvas",
+    "dynamicUrl": "https://ags.gisconsortium.org/arcgis/rest/services/GISC/AGOL_GISC_BASEMAP_DYNAMIC/MapServer",
+    "sublayers": [
+      { "id": 14, "title": "Municipal Boundary", "visible": true, "definitionExpression": "COMMUNITYNAME = 'LA GRANGE'" },
+      { "id": 16, "title": "Municipal Boundary Mask", "visible": true, "definitionExpression": "GEODBID = '024'" },
+      { "id": 17, "title": "Interstate Highway Labels", "visible": true },
+      { "id": 18, "title": "Major Road Labels", "visible": true },
+      { "id": 191, "mapLayerId": 19, "title": "Collector Street Labels", "visible": true, "definitionExpression": "CLASS = 3", "minScale": 16000 },
+      { "id": 192, "mapLayerId": 19, "title": "Local Street Labels", "visible": true, "definitionExpression": "CLASS IN (0, 4, 6)", "minScale": 8000 }
+    ]
+  },
+
+  "referenceLayers": [
+    {
+      "url": "https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/LaGrangeImportantPlaces_ParkingContext_/FeatureServer/0",
+      "title": "Important Places",
+      "opacity": 1,
+      "categoryField": "category",
+      "categories": [
+        { "value": "Park / Open Space", "fill": [120, 165, 95, 0.45], "outline": [120, 165, 95, 1] },
+        { "value": "Landmark", "fill": [190, 150, 80, 0.45], "outline": [190, 150, 80, 1] }
+      ],
+      "labelField": "name",
+      "labelColor": [110, 110, 110, 1],
+      "labelHaloColor": [255, 255, 255, 0.85],
+      "labelSize": 7.5,
+      "labelItalic": true,
+      "labelMinScale": 6000,
+      "labelMaxLength": 22
+    }
+  ],
+
+  "extent": {
+    "xmin": -87.88,
+    "ymin": 41.8131,
+    "xmax": -87.869,
+    "ymax": 41.8181,
+    "spatialReference": { "wkid": 4326 }
+  },
+
+  "tabs": [
+    {
+      "id": "all",
+      "label": "Where can I park?",
+      "enabled": true,
+      "showRules": false,
+
+      "guide": {
+        "sections": [
+          {
+            "title": "General rules",
+            "bullets": [
+              { "text": "All Village public parking is free (except metered spaces)." },
+              { "text": "No overnight parking (2 am – 6 am) without a permit — whether on-street or in a lot." },
+              { "text": "Metered on-street spaces are free on weekends." }
+            ]
+          },
+          {
+            "title": "Garage",
+            "bullets": [
+              { "text": "Garage is 4 hr parking, 6 am to 6 pm." }
+            ]
+          }
+        ]
+      },
+
+      "lotNotes": {
+        "LIBRARYLOT": "For library customers only during Library operating hours.",
+        "VILLAGEHALLSURFACELOT": "This lot also includes three 15-minute spaces for Village Hall business."
+      }
+    }
+  ],
+
+  "areaInfo": {
+    "LOT2": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT3": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT4": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT5": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT8": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT11": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "LOT12": { "availability": "Evenings (after 6 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 18, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT13": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
+    "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "Garage is 4 hr parking, 6 am to 6 pm.", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "VILLAGEHALLSURFACELOT": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 17, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] }
+  },
+
+  "branding": {
+    "midnight": "#00306C",
+    "primary": "#126BB5",
+    "secondary": "#126BB5",
+    "greenGray": "#A8E0F8",
+    "lightGray": "#dfeaf2",
+    "white": "#ffffff",
+    "fontHeader": "'Oswald', 'Nunito Sans', 'Segoe UI', sans-serif",
+    "fontBody": "'Nunito Sans', 'Segoe UI', Calibri, sans-serif",
+    "logo": "assets/lagrange-mark.png",
+    "mgpLogo": "assets/mgp-logo.png"
+  },
+
+  "portal": {
+    "url": "https://lagrangeil.maps.arcgis.com"
+  }
+}
