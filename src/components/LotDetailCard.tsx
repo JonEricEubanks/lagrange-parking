@@ -35,29 +35,6 @@ function formatValue(value: unknown, format?: string): string {
   return String(value);
 }
 
-function formatHour(x: number): string {
-  const h = Math.floor(x);
-  const m = Math.round((x - h) * 60);
-  const h12 = ((h + 11) % 12) + 1;
-  const ampm = h >= 12 ? 'pm' : 'am';
-  return m ? `${h12}:${String(m).padStart(2, '0')} ${ampm}` : `${h12} ${ampm}`;
-}
-
-/** Live open/closed state from the profile-authored windows and the clock. */
-function openStatus(
-  hours: NonNullable<AreaInfo['hours']>,
-  now = new Date()
-): { open: boolean; text: string } {
-  const h = now.getHours() + now.getMinutes() / 60;
-  // Village-wide overnight ban trumps any lot's own window.
-  if (h >= 2 && h < 6) return { open: false, text: 'No parking 2–6 am' };
-  const today = hours.filter((w) => w.days.includes(now.getDay()));
-  if (today.some((w) => h >= w.from && h < w.to)) return { open: true, text: 'Open now' };
-  const next = today.filter((w) => w.from > h).sort((a, b) => a.from - b.from)[0];
-  if (next) return { open: false, text: `Opens at ${formatHour(next.from)}` };
-  return { open: false, text: 'Closed today' };
-}
-
 export function LotDetailCard({
   feature,
   fields,
@@ -157,7 +134,6 @@ export function LotDetailCard({
   });
 
   const centroid = (feature.geometry as Polygon)?.centroid ?? null;
-  const status = areaInfo?.hours ? openStatus(areaInfo.hours) : null;
 
   // The hosted layer is in a state-plane projection, so lat/lng for the
   // directions link has to be projected out of it.
@@ -193,12 +169,6 @@ export function LotDetailCard({
           {friendlyLabel}
         </span>
       </div>
-
-      {status && (
-        <span className={`lot-card-open-badge ${status.open ? 'is-open' : 'is-closed'}`}>
-          {status.text}
-        </span>
-      )}
 
       {/* Only the marked areas inside this lot are permitted, and the map shows
           which. Stated in words because "no green here" is not something a

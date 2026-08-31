@@ -161,7 +161,7 @@ export function FeatureList({
   const activeChip =
     ruleFilter != null ? consolidatedBreakdown.find((b) => b.value === ruleFilter) : undefined;
   const heading = activeChip
-    ? `${filteredEntries.length} ${activeChip.label} space${filteredEntries.length === 1 ? '' : 's'}`
+    ? `${activeChip.label} spaces`
     : consolidate && consolidatedCount > 0
       ? filteredEntries.length === 0
         ? consolidate.label
@@ -202,11 +202,10 @@ export function FeatureList({
             >
               <span className="feature-list-consolidated-caret">{expanded ? '▾' : '▸'}</span>
               <span className="feature-list-item-name">{consolidate.label}</span>
-              <span className="feature-list-consolidated-total">{consolidatedCount} spaces</span>
             </button>
             {expanded && consolidatedBreakdown.length > 0 && (
               <ul className="feature-list-breakdown">
-                {consolidatedBreakdown.map(({ value, label, count }) => {
+                {consolidatedBreakdown.map(({ value, label }) => {
                   // Subdivided chips ("sub:...") inherit the parent rule's color.
                   const symValue = value.startsWith('sub:')
                     ? consolidate.subdivide?.value ?? value
@@ -234,7 +233,6 @@ export function FeatureList({
                           style={{ background: swatch }}
                         />
                         <span className="feature-list-breakdown-label">{label}</span>
-                        <span className="feature-list-breakdown-count">{count}</span>
                       </button>
                     </li>
                   );

@@ -73,7 +73,7 @@ export function PermitInfo({
                     {bullet.items && bullet.items.length > 0 && (
                       <ul className="permit-info-sublist">
                         {bullet.items.map((item, k) => (
-                          <li key={k}>{item}</li>
+                          <li key={k}>{renderBulletText({ text: item, links: bullet.links }, onGoToTab)}</li>
                         ))}
                       </ul>
                     )}

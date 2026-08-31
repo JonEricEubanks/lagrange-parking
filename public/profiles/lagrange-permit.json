@@ -21,14 +21,14 @@
       "alt": "Village of La Grange parking sign"
     }
   },
-  "apply": { "label": "Apply for a Permit Now →", "url": "https://www.villageoflagrange.com/" },
+  "apply": { "label": "Apply for a Permit Now →", "url": "https://lagrangepermits.rmcpay.com/#account_start" },
 
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
     "OS115798": "Harris Ave (CBD)",
     "OS115799": "Calendar Ave (CBD)",
     "OS115797": "Waiola Ave (WBD)",
-    "OS115718723": "Hillgrove Ave (WBD)",
+    "OS118723": "Hillgrove Ave (WBD)",
     "OS115800": "Permit Zone H (High School)"
   },
 
@@ -174,7 +174,7 @@
               {
                 "text": "There are two types of resident overnight parking permits:",
                 "items": [
-                  "West End permits are valid in Lots 13 and 15 only.",
+                  "West End permits are valid in Lot 13 only.",
                   "Central Business District (CBD) permits are valid in Lots 2, 5, 11 and 12 and the Village Hall Garage."
                 ]
               }
@@ -192,6 +192,7 @@
             "bullets": [
               {
                 "text": "You must meet all of the following:",
+                "links": [{ "text": "eligible areas", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3768/2026-Eligible-Areas-Maps" }],
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
                   "Live in a building built prior to 1993."
@@ -218,17 +219,16 @@
         "VILLAGEHALLPARKINGSTRUCTURE": "Resident permit holders must park on Level 1E. During the day, if you cannot find parking on Level 1E, overflow parking is available on Levels 2 and 3."
       },
       "lotSubzoneNotes": {
-        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted.",
-        "LOT15": "Between 2 a.m. and 6 a.m., park only in the highlighted areas shown on the map. Overnight parking elsewhere in this lot is not permitted."
+        "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted."
       },
       "audience": ["RESIDENT"],
-      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE"],
       "where": "HASRESIDENT = 1",
       "showSubzones": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
         "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",
-        "apply": { "label": "Purchase a Permit →", "url": "https://www.villageoflagrange.com/" },
+        "apply": { "label": "Purchase a Permit →", "url": "https://lagrangepermits.rmcpay.com/#account_start" },
         "sections": [
           {
             "title": "How it works",
@@ -240,8 +240,8 @@
           {
             "title": "Where you can park",
             "bullets": [
-              { "text": "Permits are issued for a specific lot. Permit holders may park anywhere within their lot during the day; between 2 a.m. and 6 a.m. they must park within the designated overnight parking areas. No specific parking spaces are assigned.", "links": [{ "text": "designated overnight parking areas", "tabId": "resident-overnight" }] },
-              { "text": "If you cannot find parking in your lot, overflow parking is available on Levels 2 and 3 of the Village Hall Garage." }
+              { "text": "Permits are issued for a specific lot. Permit holders may park anywhere within their lot during the day; between 2 a.m. and 6 a.m. they must park within the designated overnight parking areas. No specific parking spaces are assigned." },
+              { "text": "If you cannot find parking in your lot, overflow parking for CBD permits is available on Levels 2 and 3 of the Village Hall Garage. For West End permits, overflow parking is available in Lot 13." }
             ]
           },
           {
@@ -256,6 +256,7 @@
             "bullets": [
               {
                 "text": "You must meet all of the following:",
+                "links": [{ "text": "eligible areas", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3768/2026-Eligible-Areas-Maps" }],
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
                   "Live in a building built prior to 1993.",
@@ -272,12 +273,7 @@
               { "text": "No commercial vehicles, or vehicles with logos in excess of one square foot." }
             ]
           }
-        ],
-        "seeAlso": {
-          "tabId": "resident-overnight",
-          "label": "See the overnight parking areas",
-          "text": "Between 2 a.m. and 6 a.m. you must park in the designated overnight areas."
-        }
+        ]
       }
     },
     {
@@ -348,7 +344,6 @@
         "LOT2",
         "LOT5",
         "VILLAGEHALLPARKINGSTRUCTURE",
-        "LOT15",
         "OS115798",
         "OS115799",
         "OS115797",
@@ -387,7 +382,7 @@
           {
             "title": "Who is eligible",
             "bullets": [
-              { "text": "You must be an employee of a business within the eligible CBD or WBD area. Proof of employment is required at application and renewal." }
+              { "text": "You must be an employee of a business within the eligible CBD or WBD area. Proof of employment is required at application and renewal.", "links": [{ "text": "eligible CBD or WBD area", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3768/2026-Eligible-Areas-Maps" }] }
             ]
           },
           {
