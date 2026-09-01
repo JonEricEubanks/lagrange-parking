@@ -156,9 +156,18 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   // and a lot is selected; the lot polygons swap to outline-only so the bands read.
   const showSubzones = !!activeTabDef?.showSubzones;
   const subzoneIds = useSubzoneAreaIds(profile.subzones, showSubzones);
+  // Tab-gated designated-space overlays (e.g. Lot 5 CBD employee rows) get the
+  // same outline-only lot treatment as the subzone bands.
+  const lotHasGatedOverlay =
+    selectedAreaId != null &&
+    (profile.overlayLayers ?? []).some(
+      (ol) =>
+        ol.showForAreaId === String(selectedAreaId) &&
+        (ol.showForTabIds ? ol.showForTabIds.includes(activeTab) : showSubzones)
+    );
   useEffect(() => {
-    setSubzoneMode(showSubzones && selectedAreaId != null);
-  }, [showSubzones, selectedAreaId, setSubzoneMode]);
+    setSubzoneMode((showSubzones || lotHasGatedOverlay) && selectedAreaId != null);
+  }, [showSubzones, lotHasGatedOverlay, selectedAreaId, setSubzoneMode]);
   const lotHasSubzones =
     showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
   const subzoneNote = selectedAreaId
@@ -308,6 +317,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             subzonesEnabled={showSubzones}
             selectedAreaId={selectedAreaId}
             selectedHasSubzones={lotHasSubzones}
+            activeTabId={activeTab}
           />
           {walkMode && walkRoute.step === 'set-start' && (
             <div className="walk-map-toast">

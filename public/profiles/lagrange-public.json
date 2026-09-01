@@ -182,7 +182,7 @@
     "LOT14": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "LOT15": { "availability": "After 11 am daily", "timeLimit": "No time limit", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 11, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] },
     "VILLAGEHALLPARKINGSTRUCTURE": { "availability": "Every day", "timeLimit": "Garage is 4 hr parking, 6 am to 6 pm.", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
-    "VILLAGEHALLSURFACELOT": { "availability": "Every day", "timeLimit": "3 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
+    "VILLAGEHALLSURFACELOT": { "availability": "Every day", "timeLimit": "4 hr parking 6 am to 8 pm, no time limit after 8 pm", "hours": [{ "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 24 }] },
     "COSSITTOFFSITE": { "availability": "Evenings (after 5 pm) and weekends only", "timeLimit": "No time limit", "hours": [{ "days": [1, 2, 3, 4, 5], "from": 17, "to": 24 }, { "days": [0, 6], "from": 6, "to": 24 }, { "days": [0, 1, 2, 3, 4, 5, 6], "from": 0, "to": 2 }] }
   },
 

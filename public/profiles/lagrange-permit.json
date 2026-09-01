@@ -51,6 +51,7 @@
       "minScale": 4000,
       "abovePolygons": true,
       "showForAreaId": "LOT5",
+      "showForTabIds": ["employees"],
       "fillColor": [0, 180, 160, 0.3],
       "color": [0, 110, 100, 1],
       "outlineWidth": 2
@@ -186,7 +187,7 @@
             "title": "Where you can park",
             "bullets": [
               {
-                "text": "There are two types of resident overnight parking permits:",
+                "text": "Effective October 1st, there are two types of resident overnight parking permits:",
                 "items": [
                   "West End permits are valid in Lot 13 only.",
                   "Central Business District (CBD) permits are valid in Lots 2, 5, 11 and 12 and the Village Hall Garage."
@@ -248,7 +249,7 @@
             "title": "How it works",
             "bullets": [
               { "text": "The Village makes a limited number of public parking spaces available to residents of older buildings near the downtown that have no parking on their private properties." },
-              { "text": "There are two types of resident 24 hr. permits: Central Business District (CBD) and West End." }
+              { "text": "Effective October 1st, there are two types of resident 24 hr. permits: Central Business District (CBD) and West End." }
             ]
           },
           {
@@ -356,6 +357,7 @@
       "audience": ["EMPLOYEE"],
       "areaIds": [
         "LOT2",
+        "LOT4",
         "LOT5",
         "VILLAGEHALLPARKINGSTRUCTURE",
         "OS115798",
@@ -380,7 +382,7 @@
               {
                 "text": "There are two types of employee parking permits:",
                 "items": [
-                  "CBD permits are valid anywhere within Lot 2, in designated spaces only in Lot 5 and on-street on Calendar Ave. and Harris Ave., and on Levels 2 and 3 of the Village Hall Garage.",
+                  "CBD permits are valid anywhere within Lot 2 and Lot 4, in designated spaces only in Lot 5 and on-street on Calendar Ave. and Harris Ave., and on Levels 2 and 3 of the Village Hall Garage.",
                   "WBD permits are valid anywhere in Lot 15, as well as designated on-street spaces on Waiola Ave. and Hillgrove Ave."
                 ]
               }

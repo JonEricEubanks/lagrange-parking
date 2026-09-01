@@ -159,9 +159,19 @@ export function GuidedFinder({
   const showSubzones = !!chosen?.showSubzones;
   const subzoneIds = useSubzoneAreaIds(profile.subzones, showSubzones);
 
+  // Tab-gated designated-space overlays (e.g. Lot 5 CBD employee rows) get the
+  // same outline-only lot treatment as the subzone bands.
+  const lotHasGatedOverlay =
+    selectedAreaId != null &&
+    (profile.overlayLayers ?? []).some(
+      (ol) =>
+        ol.showForAreaId === String(selectedAreaId) &&
+        (ol.showForTabIds ? ol.showForTabIds.includes(chosen?.id ?? '') : showSubzones)
+    );
+
   useEffect(() => {
-    setSubzoneMode(showSubzones && selectedAreaId != null);
-  }, [showSubzones, selectedAreaId, setSubzoneMode]);
+    setSubzoneMode((showSubzones || lotHasGatedOverlay) && selectedAreaId != null);
+  }, [showSubzones, lotHasGatedOverlay, selectedAreaId, setSubzoneMode]);
   const lotHasSubzones =
     showSubzones && selectedAreaId != null && !!subzoneIds?.includes(String(selectedAreaId));
   const subzoneNote = selectedAreaId
@@ -254,6 +264,7 @@ export function GuidedFinder({
             subzonesEnabled={showSubzones}
             selectedAreaId={selectedAreaId}
             selectedHasSubzones={lotHasSubzones}
+            activeTabId={chosen.id}
           />
         </div>
         <aside

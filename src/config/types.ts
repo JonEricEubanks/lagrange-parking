@@ -169,6 +169,8 @@ export interface OverlayLayer {
   abovePolygons?: boolean;
   /** Only show while this area id is the selected lot (selection-gated, like subzones). */
   showForAreaId?: string;
+  /** Only show on these tab ids. Omit = any tab with `showSubzones`. */
+  showForTabIds?: string[];
 }
 
 /** One category of a reference layer's polygon renderer (alpha 0–1). */

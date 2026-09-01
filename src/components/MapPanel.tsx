@@ -37,6 +37,8 @@ interface MapPanelProps {
   selectedAreaId?: string | number | null;
   /** Whether that lot actually has designated areas drawn. */
   selectedHasSubzones?: boolean;
+  /** Id of the active audience tab — gates overlays with `showForTabIds`. */
+  activeTabId?: string;
 }
 
 export function MapPanel({
@@ -53,6 +55,7 @@ export function MapPanel({
   subzonesEnabled = false,
   selectedAreaId = null,
   selectedHasSubzones = false,
+  activeTabId,
 }: MapPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<MapView | null>(null);
@@ -70,7 +73,7 @@ export function MapPanel({
   const imageryTileRef = useRef<TileLayer | null>(null);
   const referenceLayersRef = useRef<FeatureLayer[]>([]);
   const subzoneLayerRef = useRef<FeatureLayer | null>(null);
-  const gatedOverlaysRef = useRef<{ layer: FeatureLayer; areaId: string }[]>([]);
+  const gatedOverlaysRef = useRef<{ layer: FeatureLayer; areaId: string; tabIds?: string[] }[]>([]);
 
   // Refs to avoid stale closures in the click handler
   const walkTimeModeRef = useRef(walkTimeMode);
@@ -150,7 +153,7 @@ export function MapPanel({
         ...(ol.showForAreaId ? { visible: false } : {}),
       });
       if (ol.showForAreaId) {
-        gatedOverlaysRef.current.push({ layer, areaId: ol.showForAreaId });
+        gatedOverlaysRef.current.push({ layer, areaId: ol.showForAreaId, tabIds: ol.showForTabIds });
       } else {
         overlayMap.set(ol.url, layer);
       }
@@ -364,8 +367,18 @@ export function MapPanel({
 
     if (!selectedFeature || !layerViewRef.current || !viewRef.current) return;
 
-    // Skip the default cyan highlight when subzones are shown — the orange outline is the indicator
-    if (!subzonesEnabled || !selectedHasSubzones) {
+    // Skip the default cyan highlight when subzones or a gated overlay are shown —
+    // the designated-area bands are the indicator
+    const gatedOverlayShown = (profile.overlayLayers ?? []).some(
+      (ol) =>
+        !!ol.showForAreaId &&
+        selectedAreaId != null &&
+        String(selectedAreaId) === ol.showForAreaId &&
+        (ol.showForTabIds
+          ? !!activeTabId && ol.showForTabIds.includes(activeTabId)
+          : subzonesEnabled)
+    );
+    if (!(subzonesEnabled && selectedHasSubzones) && !gatedOverlayShown) {
       highlightRef.current = layerViewRef.current.highlight(selectedFeature);
     }
 
@@ -375,7 +388,7 @@ export function MapPanel({
         /* goTo interrupted by another navigation — ignore */
       });
     }
-  }, [selectedFeature, subzonesEnabled, selectedHasSubzones, profile.subzones?.minScale]);
+  }, [selectedFeature, subzonesEnabled, selectedHasSubzones, selectedAreaId, activeTabId, profile.subzones?.minScale, profile.overlayLayers]);
 
   // Filter the subzone layer to the selected lot. Hidden whenever the page does
   // not use subzones or nothing is selected — these are "here specifically",
@@ -394,13 +407,14 @@ export function MapPanel({
   }, [subzonesEnabled, selectedAreaId, profile.subzones?.keyField]);
 
   // Selection-gated overlays (e.g. Lot 5 CBD rows) show only while their lot is
-  // selected, and only on pages that use designated spaces (like the subzone bands).
+  // selected — on the tabs listed in `showForTabIds`, or (when omitted) on any
+  // page that uses designated spaces (like the subzone bands).
   useEffect(() => {
     gatedOverlaysRef.current.forEach((g) => {
-      g.layer.visible =
-        subzonesEnabled && selectedAreaId != null && String(selectedAreaId) === g.areaId;
+      const tabOk = g.tabIds ? !!activeTabId && g.tabIds.includes(activeTabId) : subzonesEnabled;
+      g.layer.visible = tabOk && selectedAreaId != null && String(selectedAreaId) === g.areaId;
     });
-  }, [subzonesEnabled, selectedAreaId, featureLayer]);
+  }, [subzonesEnabled, activeTabId, selectedAreaId, featureLayer]);
 
   return (
     <>
