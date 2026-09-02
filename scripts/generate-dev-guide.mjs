@@ -1,7 +1,6 @@
-// Generates docs/LaGrange-Parking-Developer-Guide.docx — a visual, scannable
-// Word developer guide styled after the MGP "Standard Intranet" document.
-// Run: node scripts/generate-dev-guide.mjs   (regenerates the doc + keep
-// screenshots in docs/guide-assets/ fresh with Playwright when the apps change)
+// Generates docs/LaGrange-Parking-Developer-Guide.docx — a visual, color-coded
+// Word developer guide styled after (and elevating) the MGP "Standard Intranet" doc.
+// Run: node scripts/generate-dev-guide.mjs
 import {
   AlignmentType, BorderStyle, Document, ExternalHyperlink, Footer, HeadingLevel, ImageRun,
   LevelFormat, Packer, PageBreak, PageNumber, Paragraph, ShadingType, Table, TableCell,
@@ -9,27 +8,39 @@ import {
 } from 'docx';
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// ---- palette (matched to the reference document) ---------------------------
-const BANNER_BLUE = '1F5C8B';
-const HEADING_BLUE = '2E74B5';
-const TITLE_BLUE = '1F4E79';
-const CALLOUT_FILL = 'EAF3FA';
-const CALLOUT_BORDER = '7FB2D9';
-const CARD_HEADER = '2E74B5';
-const CODE_FILL = 'F2F2F2';
-const GRAY = '808080';
-const GOOD_FILL = 'E2EFDA';
-const GOOD_DARK = '538135';
-const BAD_FILL = 'FBE4E4';
-const BAD_DARK = 'C00000';
-
+// ---- design system ----------------------------------------------------------
 const BODY_FONT = 'Arial';
 const CODE_FONT = 'Consolas';
 
-// ---- run/paragraph helpers -------------------------------------------------
-const plain = (text) => new TextRun({ text, font: BODY_FONT, size: 21 });
-const bold = (text) => new TextRun({ text, font: BODY_FONT, size: 21, bold: true });
-const mono = (text) => new TextRun({ text, font: CODE_FONT, size: 19 });
+const INK = '2B2B2B';
+const GRAY = '808080';
+const TITLE_BLUE = '1F4E79';
+const HEADING_BLUE = '2E74B5';
+const CODE_FILL = 'F4F4F4';
+const ZEBRA = 'F2F7FB';
+const FRAME = 'C9C9C9';
+
+const GOOD_FILL = 'E2EFDA', GOOD_DARK = '538135';
+const BAD_FILL = 'FBE4E4', BAD_DARK = 'C00000';
+const WARN_FILL = 'FFF3DC', WARN_DARK = 'B45309';
+const INFO_FILL = 'EAF3FA', INFO_BORDER = '7FB2D9';
+
+// One accent per chapter — banner tab, heading color, and table headers follow it.
+const CH = {
+  qr:    { num: '★', title: 'Quick Reference — 90% of the job on one page', accent: '1F5C8B', dark: '143E5E' },
+  apps:  { num: '1', title: 'The Two Apps',                                 accent: '0B7285', dark: '074E5B' },
+  rules: { num: '2', title: 'Content Rules — Non-Negotiable',               accent: 'A62639', dark: '731A27' },
+  edits: { num: '3', title: 'Common Edits — Recipes',                       accent: '2F7D32', dark: '1F5421' },
+  data:  { num: '4', title: 'The Data',                                     accent: '5B4B9E', dark: '3E3370' },
+  verify:{ num: '5', title: 'Verify Before You Show Anyone',                accent: 'B45309', dark: '7C3A06' },
+  ship:  { num: '6', title: 'Ship It',                                      accent: '1F5C8B', dark: '143E5E' },
+  fix:   { num: '7', title: 'When Something Looks Broken',                  accent: '475569', dark: '2F3A47' },
+};
+
+// ---- low-level helpers -------------------------------------------------------
+const plain = (text) => new TextRun({ text, font: BODY_FONT, size: 21, color: INK });
+const bold = (text) => new TextRun({ text, font: BODY_FONT, size: 21, bold: true, color: INK });
+const mono = (text) => new TextRun({ text, font: CODE_FONT, size: 19, color: INK });
 
 const p = (runs, opts = {}) =>
   new Paragraph({
@@ -38,11 +49,13 @@ const p = (runs, opts = {}) =>
     children: Array.isArray(runs) ? runs : [plain(runs)],
   });
 
-const h1 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 240, after: 120 }, children: [new TextRun({ text, font: BODY_FONT, size: 26, bold: true, color: HEADING_BLUE })] });
-const h2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 260, after: 100 }, children: [new TextRun({ text, font: BODY_FONT, size: 23, bold: true, color: HEADING_BLUE })] });
+const h1 = (text, color = HEADING_BLUE) =>
+  new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 200, after: 120 }, children: [new TextRun({ text, font: BODY_FONT, size: 26, bold: true, color })] });
+const h2 = (text, color = HEADING_BLUE) =>
+  new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 280, after: 100 }, children: [new TextRun({ text, font: BODY_FONT, size: 23, bold: true, color })] });
 
-const bullet = (runs, level = 0) =>
-  new Paragraph({ bullet: { level }, spacing: { after: 60 }, children: Array.isArray(runs) ? runs : [plain(runs)] });
+const bullet = (runs) =>
+  new Paragraph({ bullet: { level: 0 }, spacing: { after: 60 }, children: Array.isArray(runs) ? runs : [plain(runs)] });
 
 let numInstance = 0;
 const steps = (items) => {
@@ -71,60 +84,60 @@ const code = (lines) =>
 const caption = (text) =>
   new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { after: 160 },
+    spacing: { after: 180 },
     children: [new TextRun({ text, font: BODY_FONT, size: 18, italics: true, color: GRAY })],
   });
 
-const screenshot = (file, captionText, widthIn = 6.2) => {
-  const w = Math.round(widthIn * 96);
-  const h = Math.round(w * (800 / 1280));
-  return [
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 120, after: 60 },
-      children: [
-        new ImageRun({
-          type: 'png',
-          data: readFileSync(new URL(`../docs/guide-assets/${file}`, import.meta.url)),
-          transformation: { width: w, height: h },
-        }),
-      ],
-    }),
-    caption(captionText),
-  ];
-};
-
-const link = (text, url) =>
+const link = (text, url, size = 21) =>
   new ExternalHyperlink({
     link: url,
-    children: [new TextRun({ text, font: BODY_FONT, size: 21, color: HEADING_BLUE, underline: {} })],
+    children: [new TextRun({ text, font: BODY_FONT, size, color: HEADING_BLUE, underline: {} })],
   });
 
 const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
 const allNone = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
-const thin = (color) => ({ style: BorderStyle.SINGLE, size: 6, color });
-const boxAll = (color) => ({ top: thin(color), bottom: thin(color), left: thin(color), right: thin(color) });
+const thin = (color, size = 6) => ({ style: BorderStyle.SINGLE, size, color });
+const boxAll = (color, size = 6) => ({ top: thin(color, size), bottom: thin(color, size), left: thin(color, size), right: thin(color, size) });
 
-// Dark-blue chapter banner
-const banner = (text) =>
+const spacer = (after = 120) => new Paragraph({ spacing: { after }, children: [] });
+const pageBreak = () => new Paragraph({ children: [new PageBreak()] });
+
+// ---- signature components ----------------------------------------------------
+// Chapter banner: dark number tab + accent title bar
+const banner = (ch) =>
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
       new TableRow({
         children: [
           new TableCell({
-            shading: { type: ShadingType.CLEAR, fill: BANNER_BLUE },
+            width: { size: 9, type: WidthType.PERCENTAGE },
+            shading: { type: ShadingType.CLEAR, fill: ch.dark },
             borders: allNone,
+            verticalAlign: VerticalAlign.CENTER,
+            margins: { top: 120, bottom: 120, left: 60, right: 60 },
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({ text: ch.num, font: BODY_FONT, size: 40, bold: true, color: 'FFFFFF' })],
+              }),
+            ],
+          }),
+          new TableCell({
+            width: { size: 91, type: WidthType.PERCENTAGE },
+            shading: { type: ShadingType.CLEAR, fill: ch.accent },
+            borders: allNone,
+            verticalAlign: VerticalAlign.CENTER,
             margins: { top: 160, bottom: 160, left: 240, right: 240 },
-            children: [new Paragraph({ children: [new TextRun({ text, font: BODY_FONT, size: 28, bold: true, color: 'FFFFFF' })] })],
+            children: [new Paragraph({ children: [new TextRun({ text: ch.title, font: BODY_FONT, size: 28, bold: true, color: 'FFFFFF' })] })],
           }),
         ],
       }),
     ],
   });
 
-// Light-blue callout box
-const callout = (title, bodyChildren, fill = CALLOUT_FILL, border = CALLOUT_BORDER, titleColor = HEADING_BLUE) =>
+// Callout box (info by default; pass warn/danger palettes)
+const callout = (title, bodyChildren, fill = INFO_FILL, border = INFO_BORDER, titleColor = HEADING_BLUE, icon = 'ℹ') =>
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
@@ -132,12 +145,12 @@ const callout = (title, bodyChildren, fill = CALLOUT_FILL, border = CALLOUT_BORD
         children: [
           new TableCell({
             shading: { type: ShadingType.CLEAR, fill },
-            borders: boxAll(border),
+            borders: { top: thin(border), bottom: thin(border), right: thin(border), left: thin(border, 24) },
             margins: { top: 140, bottom: 140, left: 240, right: 240 },
             children: [
               new Paragraph({
                 spacing: { after: 80 },
-                children: [new TextRun({ text: title, font: BODY_FONT, size: 21, bold: true, color: titleColor })],
+                children: [new TextRun({ text: `${icon}  ${title}`, font: BODY_FONT, size: 21, bold: true, color: titleColor })],
               }),
               ...bodyChildren,
             ],
@@ -146,12 +159,11 @@ const callout = (title, bodyChildren, fill = CALLOUT_FILL, border = CALLOUT_BORD
       }),
     ],
   });
+const warnCallout = (title, body) => callout(title, body, WARN_FILL, WARN_DARK, WARN_DARK, '⚠');
+const dangerCallout = (title, body) => callout(title, body, BAD_FILL, BAD_DARK, BAD_DARK, '⛔');
 
-const spacer = (after = 120) => new Paragraph({ spacing: { after }, children: [] });
-const pageBreak = () => new Paragraph({ children: [new PageBreak()] });
-
-// Bordered info table; first row is the shaded header
-const infoTable = (rows, widths) =>
+// Zebra info table with accent header row
+const infoTable = (rows, widths, accent = HEADING_BLUE) =>
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: rows.map(
@@ -161,18 +173,24 @@ const infoTable = (rows, widths) =>
             (cell, c) =>
               new TableCell({
                 width: widths ? { size: widths[c], type: WidthType.PERCENTAGE } : undefined,
-                shading: r === 0 ? { type: ShadingType.CLEAR, fill: 'DEEAF6' } : undefined,
-                margins: { top: 70, bottom: 70, left: 120, right: 120 },
+                shading:
+                  r === 0
+                    ? { type: ShadingType.CLEAR, fill: accent }
+                    : r % 2 === 0
+                      ? { type: ShadingType.CLEAR, fill: ZEBRA }
+                      : undefined,
+                borders: boxAll('D9D9D9', 4),
+                margins: { top: 80, bottom: 80, left: 120, right: 120 },
                 children: [
                   new Paragraph({
                     children:
                       r === 0
-                        ? [new TextRun({ text: String(cell), font: BODY_FONT, size: 20, bold: true })]
+                        ? [new TextRun({ text: String(cell), font: BODY_FONT, size: 20, bold: true, color: 'FFFFFF' })]
                         : Array.isArray(cell)
                           ? cell
                           : cell instanceof TextRun
                             ? [cell]
-                            : [new TextRun({ text: String(cell), font: BODY_FONT, size: 20 })],
+                            : [new TextRun({ text: String(cell), font: BODY_FONT, size: 20, color: INK })],
                   }),
                 ],
               })
@@ -181,25 +199,25 @@ const infoTable = (rows, widths) =>
     ),
   });
 
-// 2x2 card grid — each card: colored title bar + a few short lines
+// 2x2 quick-reference card grid, each card with its own accent
 const cardGrid = (cards) => {
   const cardCell = (card) =>
     new TableCell({
       width: { size: 50, type: WidthType.PERCENTAGE },
-      borders: boxAll('BFBFBF'),
+      borders: boxAll(card.accent),
       margins: { top: 0, bottom: 120, left: 0, right: 0 },
       verticalAlign: VerticalAlign.TOP,
       children: [
         new Paragraph({
-          shading: { type: ShadingType.CLEAR, fill: CARD_HEADER },
-          spacing: { after: 80 },
+          shading: { type: ShadingType.CLEAR, fill: card.accent },
+          spacing: { after: 90 },
           indent: { left: 120 },
-          children: [new TextRun({ text: card.title, font: BODY_FONT, size: 22, bold: true, color: 'FFFFFF' })],
+          children: [new TextRun({ text: `${card.icon}  ${card.title}`, font: BODY_FONT, size: 22, bold: true, color: 'FFFFFF' })],
         }),
         ...card.lines.map(
           (l, i) =>
             new Paragraph({
-              spacing: { after: i === card.lines.length - 1 ? 60 : 40 },
+              spacing: { after: i === card.lines.length - 1 ? 70 : 45 },
               indent: { left: 140, right: 100 },
               children: Array.isArray(l) ? l : [l],
             })
@@ -213,23 +231,173 @@ const cardGrid = (cards) => {
   return new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: allNone, rows });
 };
 
-// Recipe strip for Common Edits — File / Edit / Verify rows, shaded label column
-const recipe = (rows) =>
+// Stat strip — big colored numbers over small gray labels
+const statStrip = (stats) =>
+  new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: allNone,
+    rows: [
+      new TableRow({
+        children: stats.map(
+          (s) =>
+            new TableCell({
+              width: { size: 100 / stats.length, type: WidthType.PERCENTAGE },
+              borders: { ...allNone, right: stats.indexOf(s) < stats.length - 1 ? thin('E0E0E0', 4) : noBorder },
+              margins: { top: 100, bottom: 100, left: 60, right: 60 },
+              children: [
+                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 }, children: [new TextRun({ text: s.n, font: BODY_FONT, size: 44, bold: true, color: s.color })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: s.label, font: BODY_FONT, size: 18, color: GRAY })] }),
+              ],
+            })
+        ),
+      }),
+    ],
+  });
+
+// Horizontal pipeline flow: colored step chips joined by arrows
+const flow = (items) => {
+  const cells = [];
+  items.forEach((it, i) => {
+    cells.push(
+      new TableCell({
+        shading: { type: ShadingType.CLEAR, fill: it.color },
+        borders: allNone,
+        verticalAlign: VerticalAlign.CENTER,
+        margins: { top: 110, bottom: 110, left: 60, right: 60 },
+        children: [
+          new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 10 }, children: [new TextRun({ text: it.step, font: BODY_FONT, size: 22, bold: true, color: 'FFFFFF' })] }),
+          new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: it.sub, font: it.monoSub ? CODE_FONT : BODY_FONT, size: 16, color: 'FFFFFF' })] }),
+        ],
+      })
+    );
+    if (i < items.length - 1) {
+      cells.push(
+        new TableCell({
+          width: { size: 4, type: WidthType.PERCENTAGE },
+          borders: allNone,
+          verticalAlign: VerticalAlign.CENTER,
+          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '→', font: BODY_FONT, size: 30, bold: true, color: GRAY })] })],
+        })
+      );
+    }
+  });
+  return new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: allNone, rows: [new TableRow({ children: cells })] });
+};
+
+// Architecture diagram built from shaded boxes and arrows
+const archBox = (fill, title, sub, width) =>
+  new TableCell({
+    width: { size: width, type: WidthType.PERCENTAGE },
+    shading: { type: ShadingType.CLEAR, fill },
+    borders: allNone,
+    verticalAlign: VerticalAlign.CENTER,
+    margins: { top: 120, bottom: 120, left: 100, right: 100 },
+    children: [
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 30 }, children: [new TextRun({ text: title, font: BODY_FONT, size: 22, bold: true, color: 'FFFFFF' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: sub, font: BODY_FONT, size: 16, color: 'FFFFFF' })] }),
+    ],
+  });
+const archArrow = (glyph = '→', w = 5) =>
+  new TableCell({
+    width: { size: w, type: WidthType.PERCENTAGE },
+    borders: allNone,
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: glyph, font: BODY_FONT, size: 30, bold: true, color: GRAY })] })],
+  });
+const archEmpty = (w) => new TableCell({ width: { size: w, type: WidthType.PERCENTAGE }, borders: allNone, children: [new Paragraph({ children: [] })] });
+
+const architecture = () =>
+  new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: allNone,
+    rows: [
+      new TableRow({
+        children: [
+          archBox('5B4B9E', 'Profiles (JSON)', 'public/profiles/* — ALL content: tabs, lots, text, colors', 30),
+          archArrow(),
+          archBox('0B7285', 'Two React apps', 'Guided Finder (permit) · Explorer (public) — static SPAs', 30),
+          archArrow(),
+          archBox('1F5C8B', 'ArcGIS Online', 'hosted feature services — anonymous, read-only', 30),
+        ],
+      }),
+      new TableRow({
+        children: [
+          archEmpty(30),
+          archEmpty(5),
+          archArrow('↓', 30),
+          archEmpty(5),
+          archEmpty(30),
+        ],
+      }),
+      new TableRow({
+        children: [
+          archEmpty(30),
+          archEmpty(5),
+          archBox('475569', 'Azure Static Web Apps', 'Free plan · one resource per app · manual deploy', 30),
+          archEmpty(5),
+          archEmpty(30),
+        ],
+      }),
+    ],
+  });
+
+// Framed screenshot (thin border) + caption
+const screenshot = (file, captionText, widthIn = 6.1) => {
+  const w = Math.round(widthIn * 96);
+  const h = Math.round(w * (800 / 1280));
+  return [
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      alignment: AlignmentType.CENTER,
+      borders: allNone,
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              borders: boxAll(FRAME, 4),
+              margins: { top: 60, bottom: 60, left: 60, right: 60 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new ImageRun({
+                      type: 'png',
+                      data: readFileSync(new URL(`../docs/guide-assets/${file}`, import.meta.url)),
+                      transformation: { width: w, height: h },
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+    spacer(40),
+    caption(captionText),
+  ];
+};
+
+// Recipe strip — accent label column
+const recipe = (rows, accent = '2F7D32') =>
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: rows.map(
-      ([label, content]) =>
+      ([label, content], r) =>
         new TableRow({
           children: [
             new TableCell({
               width: { size: 14, type: WidthType.PERCENTAGE },
-              shading: { type: ShadingType.CLEAR, fill: 'DEEAF6' },
-              margins: { top: 60, bottom: 60, left: 120, right: 120 },
-              children: [new Paragraph({ children: [new TextRun({ text: label, font: BODY_FONT, size: 19, bold: true, color: TITLE_BLUE })] })],
+              shading: { type: ShadingType.CLEAR, fill: accent },
+              borders: boxAll('D9D9D9', 4),
+              margins: { top: 70, bottom: 70, left: 120, right: 120 },
+              children: [new Paragraph({ children: [new TextRun({ text: label, font: BODY_FONT, size: 19, bold: true, color: 'FFFFFF' })] })],
             }),
             new TableCell({
               width: { size: 86, type: WidthType.PERCENTAGE },
-              margins: { top: 60, bottom: 60, left: 120, right: 120 },
+              shading: r % 2 === 1 ? { type: ShadingType.CLEAR, fill: ZEBRA } : undefined,
+              borders: boxAll('D9D9D9', 4),
+              margins: { top: 70, bottom: 70, left: 120, right: 120 },
               children: [new Paragraph({ children: Array.isArray(content) ? content : [plain(content)] })],
             }),
           ],
@@ -237,23 +405,20 @@ const recipe = (rows) =>
     ),
   });
 
-// Do / Don't two-column table
+// Do / Don't
 const doDont = (dos, donts) => {
   const col = (title, items, fill, dark, mark) =>
     new TableCell({
       width: { size: 50, type: WidthType.PERCENTAGE },
-      borders: boxAll(dark),
+      borders: { top: thin(dark, 24), bottom: thin(dark), left: thin(dark), right: thin(dark) },
       margins: { top: 100, bottom: 100, left: 160, right: 160 },
       shading: { type: ShadingType.CLEAR, fill },
       children: [
-        new Paragraph({
-          spacing: { after: 100 },
-          children: [new TextRun({ text: `${mark}  ${title}`, font: BODY_FONT, size: 23, bold: true, color: dark })],
-        }),
+        new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: `${mark}  ${title}`, font: BODY_FONT, size: 23, bold: true, color: dark })] }),
         ...items.map((t) =>
           new Paragraph({
             spacing: { after: 70 },
-            children: [new TextRun({ text: `${mark} `, font: BODY_FONT, size: 20, bold: true, color: dark }), ...(Array.isArray(t) ? t : [new TextRun({ text: t, font: BODY_FONT, size: 20 })])],
+            children: [new TextRun({ text: `${mark} `, font: BODY_FONT, size: 20, bold: true, color: dark }), ...(Array.isArray(t) ? t : [new TextRun({ text: t, font: BODY_FONT, size: 20, color: INK })])],
           })
         ),
       ],
@@ -265,33 +430,58 @@ const doDont = (dos, donts) => {
   });
 };
 
-// ---- document --------------------------------------------------------------
+// Full-width accent bar (cover)
+const accentBar = (fill, height = 60) =>
+  new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: allNone,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            shading: { type: ShadingType.CLEAR, fill },
+            borders: allNone,
+            margins: { top: height, bottom: height, left: 0, right: 0 },
+            children: [new Paragraph({ children: [] })],
+          }),
+        ],
+      }),
+    ],
+  });
+
+// ---- document ---------------------------------------------------------------
 const children = [];
 
 // Cover
 children.push(
+  accentBar('1F5C8B', 40),
+  spacer(20),
+  accentBar('0B7285', 14),
   new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { before: 2600, after: 200 },
+    spacing: { before: 1400, after: 160 },
     children: [new TextRun({ text: 'MGP Inc. — GIS & Web Applications', font: BODY_FONT, size: 24, bold: true, color: '404040' })],
   }),
   new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { after: 160 },
-    children: [new TextRun({ text: 'La Grange Parking Apps', font: BODY_FONT, size: 52, bold: true, color: TITLE_BLUE })],
+    spacing: { after: 140 },
+    children: [new TextRun({ text: 'La Grange Parking Apps', font: BODY_FONT, size: 56, bold: true, color: TITLE_BLUE })],
   }),
   new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { after: 400 },
-    children: [new TextRun({ text: 'Developer Guide', font: BODY_FONT, size: 30, italics: true, color: '595959' })],
+    spacing: { after: 320 },
+    children: [new TextRun({ text: 'DEVELOPER GUIDE', font: BODY_FONT, size: 26, bold: true, color: '0B7285', characterSpacing: 60 })],
   }),
+  ...screenshot('permit-picker.png', '', 5.4).slice(0, 1),
+  spacer(160),
   new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { after: 300 },
+    spacing: { after: 220 },
     children: [new TextRun({ text: 'What the two parking maps are, where every piece of content lives, and how to edit, verify, and deploy safely.', font: BODY_FONT, size: 21, color: '404040' })],
   }),
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [link('Permit app — mango-cliff-087d26410.7.azurestaticapps.net', 'https://mango-cliff-087d26410.7.azurestaticapps.net')] }),
-  new Paragraph({ alignment: AlignmentType.CENTER, children: [link('Public app — ashy-mud-0b906db10.7.azurestaticapps.net', 'https://ashy-mud-0b906db10.7.azurestaticapps.net')] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 70 }, children: [link('Permit app — mango-cliff-087d26410.7.azurestaticapps.net', 'https://mango-cliff-087d26410.7.azurestaticapps.net', 20)] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 220 }, children: [link('Public app — ashy-mud-0b906db10.7.azurestaticapps.net', 'https://ashy-mud-0b906db10.7.azurestaticapps.net', 20)] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'September 2026 · regenerated by scripts/generate-dev-guide.mjs', font: BODY_FONT, size: 17, italics: true, color: GRAY })] }),
   pageBreak()
 );
 
@@ -304,12 +494,12 @@ children.push(
 );
 
 // ------------------------------------------------------------ Quick Reference
-children.push(banner('Quick Reference — 90% of the job on one page'), spacer());
-children.push(h1('Quick Reference'));
+children.push(banner(CH.qr), spacer());
+children.push(h1('Quick Reference', CH.qr.accent));
 children.push(
   cardGrid([
     {
-      title: '▶  Run it locally',
+      icon: '▶', title: 'Run it locally', accent: '0B7285',
       lines: [
         [mono('npm install')],
         [mono('npm run dev'), plain('   → permit app')],
@@ -318,7 +508,7 @@ children.push(
       ],
     },
     {
-      title: '✎  Edit content',
+      icon: '✎', title: 'Edit content', accent: '5B4B9E',
       lines: [
         [plain('Nearly everything is JSON, not code:')],
         [mono('public/profiles/lagrange-permit.json')],
@@ -327,7 +517,7 @@ children.push(
       ],
     },
     {
-      title: '✓  Verify',
+      icon: '✓', title: 'Verify', accent: '2F7D32',
       lines: [
         [mono('node scripts/verify-permit-pages.mjs')],
         [mono('node scripts/verify-basemaps.mjs')],
@@ -335,11 +525,11 @@ children.push(
       ],
     },
     {
-      title: '⇪  Deploy',
+      icon: '⇪', title: 'Deploy', accent: 'B45309',
       lines: [
         [mono('npm run build')],
         [mono('git push origin master:main'), plain('  ← not plain push!')],
-        [plain('SWA deploy — see Chapter 7.')],
+        [plain('SWA deploy — see Chapter 6.')],
       ],
     },
   ]),
@@ -364,17 +554,28 @@ children.push(
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 1
-children.push(banner('1. The Two Apps'), spacer());
-children.push(h1('1. The Two Apps'));
-children.push(p('One codebase, two static apps — no server, no login. What is deployed is the reference for "how it should look": keep a live site open next to your dev server.'));
+children.push(banner(CH.apps), spacer());
+children.push(h1('1. The Two Apps', CH.apps.accent));
+children.push(
+  statStrip([
+    { n: '1', label: 'codebase', color: CH.apps.accent },
+    { n: '2', label: 'static apps', color: CH.apps.accent },
+    { n: '4', label: 'permit pages', color: CH.apps.accent },
+    { n: '0', label: 'servers · logins · databases', color: CH.apps.accent },
+  ]),
+  spacer(60)
+);
+children.push(architecture(), spacer());
+children.push(p('What is deployed is the reference for "how it should look" — keep a live site open next to your dev server.'));
 children.push(
   infoTable(
     [
       ['App', 'Who it serves', 'Runs with', 'Live site'],
-      ['Permit', '4 permit-type pages', [mono('npm run dev')], [link('mango-cliff-087d26410…', 'https://mango-cliff-087d26410.7.azurestaticapps.net')]],
-      ['Public', 'Visitors — time-based parking', [mono('npm run dev:public')], [link('ashy-mud-0b906db10…', 'https://ashy-mud-0b906db10.7.azurestaticapps.net')]],
+      ['Permit', '4 permit-type pages', [mono('npm run dev')], [link('mango-cliff-087d26410…', 'https://mango-cliff-087d26410.7.azurestaticapps.net', 20)]],
+      ['Public', 'Visitors — time-based parking', [mono('npm run dev:public')], [link('ashy-mud-0b906db10…', 'https://ashy-mud-0b906db10.7.azurestaticapps.net', 20)]],
     ],
-    [12, 32, 26, 30]
+    [12, 32, 26, 30],
+    CH.apps.accent
   ),
   spacer()
 );
@@ -382,7 +583,6 @@ children.push(...screenshot('permit-picker.png', 'The permit app — the visitor
 children.push(...screenshot('public-overview.png', 'The public app — legend categories, consolidated on-street row, and the lot list.'));
 children.push(
   bullet([bold('Stack: '), plain('React 19 · TypeScript · Vite 7 · ArcGIS JS SDK v5 — hooks only, no state library')]),
-  bullet([bold('Everything is profile-driven: '), plain('layer URLs, tabs, lots, rules, all sidebar text, colors — in '), mono('public/profiles/'), plain(' JSON')]),
   bullet([bold('Hidden layouts: '), mono('#/explorer'), plain(' and '), mono('#/directory'), plain(' exist for internal comparison only — nothing links to them')]),
   bullet([bold('Stale copy: '), plain('the nested '), mono('lagrange-parking/'), plain(' folder is an old duplicate — never touch it')])
 );
@@ -396,14 +596,15 @@ children.push(
       [[mono('docs/BACKLOG.md')], 'Open items — check before changing behaviour'],
       [[mono('CLAUDE.md'), plain('  ·  '), mono('DEPLOY.md')], 'Condensed working notes · deploy runbook'],
     ],
-    [35, 65]
+    [35, 65],
+    CH.apps.accent
   )
 );
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 2
-children.push(banner('2. Content Rules — Non-Negotiable'), spacer());
-children.push(h1('2. Content Rules — Non-Negotiable'));
+children.push(banner(CH.rules), spacer());
+children.push(h1('2. Content Rules — Non-Negotiable', CH.rules.accent));
 children.push(p('From the Village stakeholder (Charity). Easy to violate by accident — check every change against this table.'));
 children.push(
   doDont(
@@ -422,17 +623,17 @@ children.push(
   ),
   spacer()
 );
-children.push(callout('Several "bugs" are decisions, not bugs', [
+children.push(warnCallout('Several "bugs" are decisions, not bugs', [
   p([plain('Lots with empty detail cards, 5 lint errors on main, odd RULETYPE values — all known, with decisions recorded in '), mono('docs/BACKLOG.md'), plain('. Read it before changing behaviour.')]),
 ]));
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 3
-children.push(banner('3. Common Edits — Recipes'), spacer());
-children.push(h1('3. Common Edits — Recipes'));
-children.push(p([plain('Every recipe is a JSON edit — no component changes. Dev: save + hard-reload. Production: deploy (Chapter 7). Property reference: '), mono('src/config/types.ts'), plain('.')]));
+children.push(banner(CH.edits), spacer());
+children.push(h1('3. Common Edits — Recipes', CH.edits.accent));
+children.push(p([plain('Every recipe is a JSON edit — no component changes. Dev: save + hard-reload. Production: deploy (Chapter 6). Property reference: '), mono('src/config/types.ts'), plain('.')]));
 
-children.push(h2('3.1 — Change sidebar text on a permit page'));
+children.push(h2('3.1 — Change sidebar text on a permit page', CH.edits.accent));
 children.push(
   recipe([
     ['File', [mono('lagrange-permit.json')]],
@@ -442,7 +643,7 @@ children.push(
   caption('Example: adding "Effective October 1st, …" to two resident bullets was a one-line edit each.')
 );
 
-children.push(h2('3.2 — Add / remove a lot on a permit page'));
+children.push(h2('3.2 — Add / remove a lot on a permit page', CH.edits.accent));
 children.push(
   recipe([
     ['File', [mono('lagrange-permit.json'), plain('  →  the tab\u2019s '), mono('areaIds'), plain(' array')]],
@@ -450,13 +651,13 @@ children.push(
     ['Verify', [mono('node scripts/verify-permit-pages.mjs'), plain(' — every id must resolve')]],
   ]),
   spacer(60),
-  callout('The lot must also pass the layer baseWhere', [
+  warnCallout('The lot must also pass the layer baseWhere', [
     p([plain('Permit app filter: '), mono("USERCLASS = 'PERMIT'"), plain('. A VISITOR-class lot will be listed but never draw — check with an anonymous query first (Chapter 4).')]),
   ]),
   spacer()
 );
 
-children.push(h2('3.3 — Rename a lot / add a note'));
+children.push(h2('3.3 — Rename a lot / add a note', CH.edits.accent));
 children.push(
   recipe([
     ['Rename', [mono('profile.nameOverrides'), plain(' keyed by AREAID — e.g. '), mono('"VILLAGEHALLPARKINGSTRUCTURE": "VH Garage"')]],
@@ -464,8 +665,8 @@ children.push(
   ])
 );
 
-children.push(h2('3.4 — Designated spaces inside a lot'));
-children.push(p('Two mechanisms — same lot can use either, per page:'));
+children.push(h2('3.4 — Designated spaces inside a lot', CH.edits.accent));
+children.push(p('Two mechanisms — the same lot can use either, per page:'));
 children.push(
   infoTable(
     [
@@ -473,14 +674,15 @@ children.push(
       [[bold('Subzones')], 'Resident overnight bands (hosted subzone layer)', [mono('tab.showSubzones: true')]],
       [[bold('Overlay layers')], 'Any filtered polygon (e.g. Lot 5 CBD employee rows)', [mono('overlayLayers[]'), plain(' + '), mono('showForAreaId'), plain(' + '), mono('showForTabIds')]],
     ],
-    [20, 45, 35]
+    [20, 45, 35],
+    CH.edits.accent
   ),
   spacer(60)
 );
 children.push(...screenshot('resident-lot5-subzones.png', 'Same lot, page 1: Resident Overnight — green subzone bands mark the only spaces valid overnight.'));
 children.push(...screenshot('employees-lot5-overlay.png', 'Same lot, page 2: Employees — the CBD rows overlay draws instead (showForTabIds: ["employees"]).'));
 children.push(
-  callout('Absence of green is ambiguous — and it fails quiet', [
+  warnCallout('Absence of green is ambiguous — and it fails quiet', [
     bullet('Only permitted areas were digitized: "no bands" can mean "not permitted" or "not drawn yet" (VH Garage, Lot 15)'),
     bullet('The "park only in the highlighted areas" sentence must stay gated by useSubzoneAreaIds — never show it unconditionally'),
     bullet('If the subzone service stops answering anonymously, every band and note silently disappears (docs/DATA.md §3.6)'),
@@ -488,7 +690,7 @@ children.push(
 );
 children.push(spacer());
 
-children.push(h2('3.5 — Public map "Availability / Time limit" text'));
+children.push(h2('3.5 — Public map "Availability / Time limit" text', CH.edits.accent));
 children.push(
   recipe([
     ['File', [mono('lagrange-public.json'), plain('  →  '), mono('areaInfo'), plain(' (per-AREAID overrides — NOT the GIS rules)')]],
@@ -500,8 +702,8 @@ children.push(...screenshot('public-vh-surface-lot.png', 'Village Hall Surface L
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 4
-children.push(banner('4. The Data'), spacer());
-children.push(h1('4. The Data'));
+children.push(banner(CH.data), spacer());
+children.push(h1('4. The Data', CH.data.accent));
 children.push(p('Both apps read public ArcGIS Online services anonymously. Full model + defects: docs/DATA.md.'));
 children.push(
   infoTable(
@@ -512,18 +714,19 @@ children.push(
       [[mono('LaGrange_Overnight_Resident_Subzones/…/0')], 'Designated overnight bands (YES-only digitization)'],
       [[mono('LaGrangeImportantPlaces_ParkingContext_/…/0')], 'Reference polygons — parks, civic, Metra'],
     ],
-    [50, 50]
+    [50, 50],
+    CH.data.accent
   ),
   spacer()
 );
 children.push(
-  callout('⚠ Republishing the service breaks both apps — every time', [
+  dangerCallout('Republishing the service breaks both apps — every time', [
     p('Republishing resets AGOL sharing to org-only → both apps fail with {"code":499, "Token Required"}. After ANY republish: re-share Public, then confirm an untokened query returns a count:'),
     ...code(['…/FeatureServer/2/query?where=1=1&returnCountOnly=true&f=json']),
-  ], 'FBE4E4', BAD_DARK, BAD_DARK)
+  ])
 );
 children.push(spacer());
-children.push(h2('Check the data before you edit a profile'));
+children.push(h2('Check the data before you edit a profile', CH.data.accent));
 children.push(...code([
   "node -e 'fetch(\"https://services2.arcgis.com/FwavjPsU0K1YB1vX/arcgis/rest/services/\" +",
   "  \"LaGrange_Parking_Permits/FeatureServer/2/query?where=AREAID=%27LOT4%27\" +",
@@ -533,8 +736,8 @@ children.push(...code([
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 5
-children.push(banner('5. Verify Before You Show Anyone'), spacer());
-children.push(h1('5. Verify Before You Show Anyone'));
+children.push(banner(CH.verify), spacer());
+children.push(h1('5. Verify Before You Show Anyone', CH.verify.accent));
 children.push(
   infoTable(
     [
@@ -544,11 +747,12 @@ children.push(
       [[mono('node scripts/inspect-service.mjs')], 'Schema + value distributions'],
       [[mono('npm run lint')], 'Only NEW errors matter — 5 are pre-existing on main'],
     ],
-    [42, 58]
+    [42, 58],
+    CH.verify.accent
   ),
   spacer()
 );
-children.push(h2('2-minute browser pass'));
+children.push(h2('2-minute browser pass', CH.verify.accent));
 children.push(
   ...steps([
     'Permit app — open all four pages, click one lot on each',
@@ -565,15 +769,24 @@ children.push(
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 6
-children.push(banner('6. Ship It'), spacer());
-children.push(h1('6. Ship It'));
+children.push(banner(CH.ship), spacer());
+children.push(h1('6. Ship It', CH.ship.accent));
 children.push(
-  ...steps([
-    [bold('Build:  '), mono('npm run build'), plain('   → dist/permit + dist/public')],
-    [bold('Push:  '), mono('git push origin master:main')],
-    [bold('Deploy both SWAs'), plain(' (PowerShell, verified 2026-09-01):')],
-  ])
+  flow([
+    { step: '1 · BUILD', sub: 'npm run build', color: '0B7285', monoSub: true },
+    { step: '2 · PUSH', sub: 'git push origin master:main', color: '5B4B9E', monoSub: true },
+    { step: '3 · DEPLOY', sub: 'SWA CLI × 2', color: '1F5C8B', monoSub: true },
+    { step: '4 · SMOKE TEST', sub: 'live profiles + click-through', color: '2F7D32' },
+  ]),
+  spacer()
 );
+children.push(
+  warnCallout('Branch gotcha', [
+    p([plain('Local branch is '), mono('master'), plain('; GitHub default is '), mono('main'), plain('. A plain '), mono('git push'), plain(' creates a stray remote branch — always push '), mono('master:main'), plain('.')]),
+  ]),
+  spacer()
+);
+children.push(h2('Deploy both SWAs (PowerShell, verified 2026-09-01)', CH.ship.accent));
 children.push(...code([
   '$TOKEN = az staticwebapp secrets list -n lagrange-parking-permit -g rg-lagrange-parking `',
   '           --query "properties.apiKey" -o tsv',
@@ -583,23 +796,19 @@ children.push(...code([
   '           --query "properties.apiKey" -o tsv',
   'npx -y "@azure/static-web-apps-cli" deploy ./dist/public --deployment-token $TOKEN --env production',
 ]));
+children.push(h2('Smoke test', CH.ship.accent));
 children.push(
   ...steps([
-    [bold('Smoke test:  '), plain('fetch each site\u2019s '), mono('/profiles/*.json'), plain(' and confirm your edits are live, then click through once')],
+    [plain('Fetch each site\u2019s '), mono('/profiles/*.json'), plain(' and confirm your edits are live')],
+    'Click through one permit page and one public lot card',
   ])
 );
-children.push(
-  callout('Branch gotcha', [
-    p([plain('Local branch is '), mono('master'), plain('; GitHub default is '), mono('main'), plain('. A plain '), mono('git push'), plain(' creates a stray remote branch — always '), mono('master:main'), plain('.')]),
-  ]),
-  spacer(60)
-);
-children.push(p([plain('Azure: tenant '), bold('Spark by MGP'), plain(' · subscription '), bold('Microsoft Azure Sponsorship'), plain(' · resource group '), mono('rg-lagrange-parking'), plain('. Recreate-from-scratch commands: '), mono('DEPLOY.md'), plain('. CI builds but does not deploy.')]));
+children.push(p([plain('Azure: tenant '), bold('Spark by MGP'), plain(' · subscription '), bold('Microsoft Azure Sponsorship'), plain(' · resource group '), mono('rg-lagrange-parking'), plain('. Recreate-from-scratch: '), mono('DEPLOY.md'), plain('. CI builds but does not deploy.')]));
 children.push(pageBreak());
 
 // ---------------------------------------------------------------- Chapter 7
-children.push(banner('7. When Something Looks Broken'), spacer());
-children.push(h1('7. When Something Looks Broken'));
+children.push(banner(CH.fix), spacer());
+children.push(h1('7. When Something Looks Broken', CH.fix.accent));
 children.push(
   infoTable(
     [
@@ -612,11 +821,12 @@ children.push(
       ['profile.branding change does nothing', 'Branding applies only inside the internal Explorer; live look = hardcoded CSS defaults'],
       ['5 lint errors', 'Pre-existing — only chase NEW ones'],
     ],
-    [38, 62]
+    [38, 62],
+    CH.fix.accent
   )
 );
 
-// ---- assemble --------------------------------------------------------------
+// ---- assemble ----------------------------------------------------------------
 const doc = new Document({
   numbering: {
     config: [
@@ -657,6 +867,7 @@ const doc = new Document({
 });
 
 const buf = await Packer.toBuffer(doc);
-const out = new URL('../docs/LaGrange-Parking-Developer-Guide.docx', import.meta.url);
-writeFileSync(out, buf);
-console.log('Wrote', out.pathname);
+// Allow an alternate output path (e.g. when the default is locked open in Word)
+const target = process.argv[2] ?? new URL('../docs/LaGrange-Parking-Developer-Guide.docx', import.meta.url);
+writeFileSync(target, buf);
+console.log('Wrote', typeof target === 'string' ? target : target.pathname);
