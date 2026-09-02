@@ -35,6 +35,7 @@ const CH = {
   verify:{ num: '5', title: 'Verify Before You Show Anyone',                accent: 'B45309', dark: '7C3A06' },
   ship:  { num: '6', title: 'Ship It',                                      accent: '1F5C8B', dark: '143E5E' },
   fix:   { num: '7', title: 'When Something Looks Broken',                  accent: '475569', dark: '2F3A47' },
+  gis:   { num: '8', title: 'GIS Analyst Documentation',                    accent: '0E7C66', dark: '095443' },
 };
 
 // ---- low-level helpers -------------------------------------------------------
@@ -449,6 +450,24 @@ const accentBar = (fill, height = 60) =>
     ],
   });
 
+// Fill-in table: header row + n blank rows for the GIS analyst to complete
+const fillTable = (headers, blankRows, widths, accent) =>
+  infoTable(
+    [headers, ...Array.from({ length: blankRows }, () => headers.map(() => ' '))],
+    widths,
+    accent
+  );
+
+// Ruled writing lines for free-form notes
+const writeLines = (n) =>
+  Array.from({ length: n }, () =>
+    new Paragraph({
+      spacing: { before: 260 },
+      border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: 'BFBFBF' } },
+      children: [new TextRun({ text: ' ', font: BODY_FONT, size: 21 })],
+    })
+  );
+
 // ---- document ---------------------------------------------------------------
 const children = [];
 
@@ -825,6 +844,44 @@ children.push(
     CH.fix.accent
   )
 );
+children.push(pageBreak());
+
+// ---------------------------------------------------------------- Chapter 8
+children.push(banner(CH.gis), spacer());
+children.push(h1('8. GIS Analyst Documentation', CH.gis.accent));
+children.push(p([plain('This chapter is '), bold('reserved for the GIS analyst'), plain(' who maintains the LGDM → FGDB → AGOL pipeline. Fill in the tables below and keep them current — the app developers depend on this page when data changes. Technical background: '), mono('docs/DATA.md'), plain(' and '), mono('docs/GIS-PUBLISH.md'), plain('.')]));
+
+children.push(h2('8.1 — Data ownership & contacts', CH.gis.accent));
+children.push(
+  fillTable(['Role', 'Name', 'Organization / team', 'Contact', 'As of (date)'], 3, [22, 20, 24, 22, 12], CH.gis.accent),
+  spacer()
+);
+
+children.push(h2('8.2 — Source data & pipeline notes', CH.gis.accent));
+children.push(p('Where the authoritative source lives (LGDM feature classes, APRX, FGDB), how the AGOL service is produced, and anything a successor must know to reproduce a publish:'));
+children.push(...writeLines(8));
+children.push(spacer());
+
+children.push(h2('8.3 — Publish / republish checklist', CH.gis.accent));
+children.push(p('Complete one row every time the hosted service is overwritten or republished:'));
+children.push(
+  fillTable(['Date', 'What changed', 'Republished by', 'Re-shared Public? (Y/N)', 'Anonymous query verified? (Y/N)'], 5, [12, 34, 18, 18, 18], CH.gis.accent),
+  spacer(60),
+  warnCallout('Reminder — republishing resets sharing', [
+    p([plain('After every republish the service returns to org-only and both apps break with '), mono('{"code":499}'), plain(' until it is re-shared Public. The verification query is in Chapter 4.')]),
+  ]),
+  spacer()
+);
+
+children.push(h2('8.4 — Known data issues & decisions', CH.gis.accent));
+children.push(p([plain('Log upstream data defects here as they are found (mirror them into '), mono('docs/BACKLOG.md'), plain(' with the decision taken):')]));
+children.push(
+  fillTable(['Date found', 'Layer / field', 'Issue', 'Decision / workaround'], 4, [14, 24, 32, 30], CH.gis.accent),
+  spacer()
+);
+
+children.push(h2('8.5 — Free-form notes', CH.gis.accent));
+children.push(...writeLines(10));
 
 // ---- assemble ----------------------------------------------------------------
 const doc = new Document({
