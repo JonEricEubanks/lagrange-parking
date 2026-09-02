@@ -839,29 +839,35 @@ children.push(pageBreak());
 // ---------------------------------------------------------------- Chapter 8
 children.push(banner(CH.gis), spacer());
 children.push(h1('8. GIS Analyst Documentation', CH.gis.accent));
-children.push(p([plain('The GIS side of the project — who is involved, where every source lives, how data flows to the apps, and the decisions that shaped the deliverable. Maintained by the GIS analyst; the running log is '), mono('PROJECTDOCUMENTATION.md'), plain(' on the X: drive.')]));
+children.push(p([plain('The GIS side of the project, as documented by the GIS analyst. The running log is '), mono('PROJECTDOCUMENTATION.md'), plain(' on the X: drive.')]));
 
-children.push(h2('8.1 — Client outcome', CH.gis.accent));
+children.push(h2('8.1 — Project overview', CH.gis.accent));
 children.push(
-  callout('What the Village gets', [
+  callout('Client outcome', [
     p('Village of La Grange stakeholders and the public have accurate, clear maps that show where each parking permit applies, who is eligible for it, and where visitors may park — supporting the Village\u2019s parking management revamp and its move from "decals" to "permits."'),
   ], INFO_FILL, CH.gis.accent, CH.gis.accent, '◎'),
   spacer()
 );
-children.push(p([bold('Deliverable: '), plain('two public, mobile-friendly parking maps from one React codebase, deployed as separate Azure Static Web Apps, both reading one publicly shared ArcGIS Online feature service — no login. Supporting GIS work: the Village\u2019s flat parking inventory restructured into a related area-and-rule model, published to the Village\u2019s AGOL organization with the designated overnight-resident areas digitized from engineering drawings.')]));
-children.push(p([bold('Status (2026-08-05): '), plain('both apps live, in an iterate-on-feedback phase. Every item from the 2026-07-28 stakeholder meeting is complete. Open items wait on the Village — the real permit purchase URL, a landing-page cover photo, and the missing engineering sheet for the Village Hall garage.')]));
-children.push(p([bold('Timeline: '), plain('Village\u2019s stated program go-live was end of June 2026; MGP follows Charity Jones\u2019s lead on timing. MGP hours: TBD.')]));
+children.push(p([bold('Deliverable description. '), plain('Two public, mobile-friendly parking map applications, built from one React codebase and deployed as separate Azure Static Web Apps. Both read a single publicly shared ArcGIS Online feature service; neither requires a login.')]));
+children.push(p('Supporting GIS work: the Village\u2019s flat parking inventory restructured into a related area-and-rule model, published to the Village\u2019s ArcGIS Online organization along with the designated overnight-resident parking areas digitized from Village engineering drawings.'));
+children.push(
+  bullet([bold('Permit app — '), link('https://mango-cliff-087d26410.7.azurestaticapps.net', 'https://mango-cliff-087d26410.7.azurestaticapps.net'), plain(' — four permit-type pages: Resident Overnight Only, Resident Day/Night (24 hr.), Commuter & LTHS Students, Employees.')]),
+  bullet([bold('Public app — '), link('https://ashy-mud-0b906db10.7.azurestaticapps.net', 'https://ashy-mud-0b906db10.7.azurestaticapps.net'), plain(' — visitor, shopper and diner parking colored by time limit. Contains no permit content.')])
+);
+children.push(spacer(60));
+children.push(p([bold('Status as of 2026-08-05: '), plain('both apps are live and in an iterate-on-feedback phase with the Village. Nothing is in flight. Every item from the 2026-07-28 stakeholder meeting is complete, including the designated overnight areas that went live 2026-07-29. Remaining open items are waiting on the Village — principally the real permit purchase URL (the apply button currently points at the Village homepage), a landing-page cover photo, and the missing engineering sheet for the Village Hall garage.')]));
+children.push(p([bold('Timeline. '), plain('Due Date: The Village\u2019s originally stated parking program go-live was the end of June 2026; MGP is following Charity Jones\u2019s lead on timing. MGP Hours: TBD.')]));
 
 children.push(h2('8.2 — Stakeholders', CH.gis.accent));
 children.push(
   infoTable(
     [
       ['Who', 'Role'],
-      [[bold('Charity Jones')], 'Village of La Grange, Assistant Village Manager — primary contact and reviewer; all design and content decisions route through her'],
-      [[bold('Susan Mika')], 'Village of La Grange — stakeholder'],
-      [[bold('Esri')], 'ArcGIS Pro · ArcGIS Online · ArcGIS Maps SDK for JavaScript'],
-      [[bold('Passport')], 'The Village\u2019s parking permit system — source of the eligibility list'],
-      [[bold('Microsoft Azure')], 'Static Web Apps hosting for both applications'],
+      [[bold('Charity Jones')], 'Village of La Grange, Assistant Village Manager. Primary contact and reviewer; all design and content decisions route through her.'],
+      [[bold('Susan Mika')], 'Village of La Grange, stakeholder.'],
+      [[bold('Esri')], 'ArcGIS Pro, ArcGIS Online, ArcGIS Maps SDK for JavaScript.'],
+      [[bold('Passport')], 'The Village\u2019s parking permit system; source of the eligibility list.'],
+      [[bold('Microsoft Azure')], 'Static Web Apps hosting for both applications.'],
     ],
     [22, 78],
     CH.gis.accent
@@ -869,34 +875,38 @@ children.push(
 );
 children.push(pageBreak());
 
-children.push(h2('8.3 — Data lineage', CH.gis.accent));
+children.push(h2('8.3 — Changing the data, and the trap to avoid', CH.gis.accent));
+children.push(p('Data flows LGDM → file geodatabase → hosted service → apps.'));
 children.push(
   flow([
     { step: 'LGDM', sub: 'mgp-sql02 · Parking_Restriction_POLY', color: '095443', monoSub: true },
     { step: 'FILE GDB', sub: 'lagrange_build_fgdb.py', color: '0E7C66', monoSub: true },
-    { step: 'AGOL SERVICE', sub: 'LaGrange_Parking_Permits', color: '1F5C8B', monoSub: true },
+    { step: 'HOSTED SERVICE', sub: 'LaGrange_Parking_Permits', color: '1F5C8B', monoSub: true },
     { step: 'APPS', sub: 'permit + public', color: '0B7285' },
   ]),
   spacer()
 );
 children.push(
-  dangerCallout('The trap — edit the LGDM, not the geodatabase', [
-    p([plain('Editing the file geodatabase alone is '), bold('not durable'), plain(': '), mono('lagrange_build_fgdb.py'), plain(' rebuilds ParkingArea and ParkingRule from the LGDM, so anything added only to the geodatabase is lost on the next rebuild. '), bold('Lot 15 is in that state today.'), plain(' Real changes go into the LGDM first, then rebuild and republish.')]),
+  dangerCallout('The trap to avoid', [
+    p([plain('Editing the geodatabase alone is not durable: '), mono('lagrange_build_fgdb.py'), plain(' rebuilds ParkingArea and ParkingRule from the LGDM, so anything added only to the geodatabase is lost on the next rebuild. Lot 15 is in that state today. Real changes go into the LGDM first, then rebuild and republish.')]),
   ]),
   spacer()
 );
+children.push(p([plain('Known upstream data defects are catalogued in the repository\u2019s '), mono('docs/DATA.md'), plain(' — chiefly that RULETYPE is a heuristic label, which currently leaves three lots with an empty detail card.')]));
+children.push(spacer(60));
+children.push(h2('8.4 — Data sources', CH.gis.accent));
 children.push(
   infoTable(
     [
       ['Layer / resource', 'Where', 'Notes'],
-      [[bold('Source of record')], [mono('mgp-sql02 › GISC_PRODUCTION › DBO.Parking_Restriction_POLY')], 'GEODBID \u2018024\u2019. The Village\u2019s authoritative parking inventory and the origin of everything below. Edited in ArcGIS Pro.'],
-      [[bold('Working geodatabase')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\APRX\\Parking_Permit_Restructure\\ParkingPermits.gdb')], 'ParkingArea, ParkingRule, OvernightResidentSubzones, PermitEligibleAddress, StudyZone + domains. Rebuilt from the LGDM by lagrange_build_fgdb.py.'],
-      [[bold('ArcGIS Pro project')], [mono('…\\Parking_Permit_Restructure\\Parking_Permit_Restructure.aprx')], 'Maps: Permit Parking, Visitor Parking, Permit-Eligible Addresses. Editing + QA only — the apps do not read it. Superseded original is in the adjacent "Parking Decal Maps" folder.'],
-      [[bold('Live service (apps read this)')], [mono('LaGrange_Parking_Permits'), plain(' on lagrangeil.maps.arcgis.com · item '), mono('f13e7fa3199141a2be6c2eea816de8d4')], 'Sublayer /2 ParkingArea (144 polygons) · /3 ParkingRule (173 rows, 1:many on AREAID). Shared publicly.'],
-      [[bold('Designated overnight areas')], [mono('LaGrange_Overnight_Resident_Subzones')], '8 polygons over Lots 2, 5, 11, 12, 13 — digitized from Heuer and Associates engineering drawings dated 12/30/2016. Deliberately its own service.'],
-      [[bold('Context layer')], [mono('LaGrangeImportantPlaces_ParkingContext_')], '23 civic, park, landmark and Metra features curated from GISC_PUBLISH_FGDB.gdb\\Base\\ImportantPlace_POLY. Map context only.'],
-      [[bold('Eligibility addresses')], [mono('…\\20240829_ParkingPermitMaps\\Data\\')], 'Passport v2 permit-holder list ("Residential parking - address list for geocode.xlsx") + geocode outputs. Geocoded against X:\\GISC\\Publish\\Geocoder, Esri World geocoder as fallback.'],
-      [[bold('Village policy documents')], [mono('…\\Village Policies and Documentation\\')], 'Permit policy PDFs — supply the rule text absent from the GIS data. Finished exhibits in the adjacent Deliverables folder.'],
+      [[bold('Source of record')], [mono('mgp-sql02 > GISC_PRODUCTION > DBO.Parking_Restriction_POLY')], '(GEODBID \u2018024\u2019) — the Village\u2019s authoritative parking inventory and the origin of everything below. Edited in ArcGIS Pro.'],
+      [[bold('Working geodatabase')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\APRX\\Parking_Permit_Restructure\\ParkingPermits.gdb')], 'Holds ParkingArea, ParkingRule, OvernightResidentSubzones, PermitEligibleAddress, StudyZone and the domains. Rebuilt from the LGDM by lagrange_build_fgdb.py.'],
+      [[bold('ArcGIS Pro project and maps')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\APRX\\Parking_Permit_Restructure\\Parking_Permit_Restructure.aprx')], 'The current ArcGIS Pro project and its maps (Permit Parking, Visitor Parking, Permit-Eligible Addresses). Used for editing and QA; the apps do not read it. The superseded original project is in the adjacent "Parking Decal Maps" folder.'],
+      [[bold('Live service the apps read')], [mono('LaGrange_Parking_Permits'), plain(' on https://lagrangeil.maps.arcgis.com, item '), mono('f13e7fa3199141a2be6c2eea816de8d4')], 'Sublayer /2 ParkingArea (144 polygons) and /3 ParkingRule (173 rows, related 1:many on AREAID) are what both apps query. Shared publicly.'],
+      [[bold('Designated overnight areas')], [mono('LaGrange_Overnight_Resident_Subzones')], '8 polygons over Lots 2, 5, 11, 12 and 13, digitized from Heuer and Associates engineering drawings dated 12/30/2016. Deliberately its own service, not a sublayer of the above.'],
+      [[bold('Context layer')], [mono('LaGrangeImportantPlaces_ParkingContext_')], '23 civic, park, landmark and Metra features curated from X:\\GISC\\Publish\\GeoDB\\GISC_PUBLISH_FGDB.gdb\\Base\\ImportantPlace_POLY. Map context only.'],
+      [[bold('Eligibility addresses')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\Data\\')], 'The Passport v2 permit-holder list ("Residential parking - address list for geocode.xlsx") and the geocode outputs derived from it. Geocoded against X:\\GISC\\Publish\\Geocoder with Esri\u2019s World geocoder as fallback.'],
+      [[bold('Village policy documents')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\Village Policies and Documentation\\')], 'The Village\u2019s permit policy PDFs, which supply the rule text absent from the GIS data. Finished exhibits are in the adjacent Deliverables folder.'],
     ],
     [20, 40, 40],
     CH.gis.accent
@@ -904,16 +914,15 @@ children.push(
 );
 children.push(pageBreak());
 
-children.push(h2('8.4 — Other resources', CH.gis.accent));
+children.push(h2('8.5 — Other resources', CH.gis.accent));
 children.push(
   infoTable(
     [
       ['Resource', 'Location / detail'],
-      [[bold('Application repository')], [link('github.com/mgp-inc/lagrange-parking', 'https://github.com/mgp-inc/lagrange-parking', 20), plain(' — self-contained and portable; docs/ carries app-side context, data notes, backlog. Working copy: '), mono('E:\\lagrange-parking')]],
-      [[bold('Running project log')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\PROJECTDOCUMENTATION.md'), plain(' — full decision and progress history for the GIS side')]],
-      [[bold('Hosting')], [plain('Azure tenant '), mono('Community-Essentials.com'), plain(' · resource group '), mono('rg-lagrange-parking'), plain(' (centralus) · two Static Web Apps, Free plan · steps in '), mono('DEPLOY.md')]],
-      [[bold('Branding')], 'Village of La Grange Brand Guidelines (0719) — Dark Blue #00306C · La Grange Blue #126BB5 · Green #43B749 · Nunito Sans + Oswald'],
-      [[bold('Basemap')], 'GISC Light Canvas — in both the apps and the ArcGIS Pro maps'],
+      [[bold('Application repository')], [link('https://github.com/mgp-inc/lagrange-parking', 'https://github.com/mgp-inc/lagrange-parking', 20), plain(' — the application source, self-contained and portable. Its docs folder carries the app-side context, data notes and open-item backlog. Working copy on the project lead\u2019s machine at '), mono('E:\\lagrange-parking'), plain('.')]],
+      [[bold('Running project log')], [mono('X:\\GISC\\Community\\LaGrange\\Project\\20240829_ParkingPermitMaps\\PROJECTDOCUMENTATION.md'), plain(' — the internal running log; full decision and progress history for the GIS side.')]],
+      [[bold('Hosting')], [plain('Azure tenant Community-Essentials.com, resource group rg-lagrange-parking (centralus), two Static Web Apps on the Free plan. Deployment steps are in the repository\u2019s '), mono('DEPLOY.md'), plain('.')]],
+      [[bold('Branding and basemap')], 'Village of La Grange Brand Guidelines (0719) — Dark Blue #00306C, La Grange Blue #126BB5, Green #43B749; Nunito Sans and Oswald. GISC Light Canvas is the basemap in both the apps and the ArcGIS Pro maps.'],
     ],
     [24, 76],
     CH.gis.accent
@@ -921,15 +930,15 @@ children.push(
   spacer()
 );
 
-children.push(h2('8.5 — Decisions that shaped the deliverable', CH.gis.accent));
+children.push(h2('8.6 — Decisions that shaped the deliverable', CH.gis.accent));
 children.push(
   infoTable(
     [
-      ['Decision', 'Why it matters'],
-      [[bold('Two apps, not StoryMaps')], 'Charity ended the single all-in-one map on 2026-06-18. Two audience-targeted apps replaced it; the StoryMaps in the original scope were dropped. The June AGOL web maps still exist but are QA aids only.'],
-      [[bold('The parking data was de-fragmented')], 'One physical lot arrived as several overlapping polygons, one per restriction type. Dissolved into one area per lot with its rules in a related table — this is what makes the data answerable.'],
-      [[bold('Lot lists and content are the Village\u2019s')], 'Lots on each permit page come from the Village\u2019s verbatim list, not a data-derived guess. Rates exist in the data but are never displayed; "decal" appears in no public text.'],
-      [[bold('Designated overnight areas are GIS features')], 'Only the permitted areas inside each lot were drawn, not the prohibited remainder — so the apps must state the rule in words. Scanned drawings were rejected in favor of real map features.'],
+      ['Decision', 'Detail'],
+      [[bold('Two apps, not StoryMaps.')], 'Charity ended the single all-in-one map on 2026-06-18. The deliverable became two separate audience-targeted apps, and the ArcGIS StoryMaps in the original scope were dropped. The AGOL web maps built in June still exist but are QA aids only.'],
+      [[bold('The parking data was de-fragmented.')], 'One physical lot arrived as several overlapping polygons, one per restriction type. These were dissolved into one area per lot carrying its rules in a related table, which is what makes the data answerable.'],
+      [[bold('Lot lists and content are the Village\u2019s, not inferred.')], 'The lots shown on each permit page come from the Village\u2019s own verbatim list, not from a data-derived guess. Rates exist in the data but are never displayed, and the word "decal" does not appear in any public text.'],
+      [[bold('Designated overnight areas are drawn as GIS features.')], 'Only the permitted areas inside each lot were drawn, not the prohibited remainder, so the apps must state the rule in words. Scanned drawings were rejected in favor of real map features.'],
     ],
     [30, 70],
     CH.gis.accent
@@ -938,17 +947,17 @@ children.push(
 );
 children.push(
   dangerCallout('The one that will bite you', [
-    p([plain('Republishing '), mono('LaGrange_Parking_Permits'), plain(' resets its sharing to organization-only, and both public apps immediately fail with "Token Required." Re-share it publicly and re-test anonymous access after '), bold('every'), plain(' republish.')]),
+    p([plain('Republishing '), mono('LaGrange_Parking_Permits'), plain(' resets its sharing to organization-only, and both public apps immediately fail with "Token Required." Re-share it publicly and re-test anonymous access after every republish.')]),
   ]),
   spacer(60),
-  warnCallout('AREAID is the join key — spelling is everything', [
-    p([plain('AREAID is the lot name uppercased with non-alphanumerics stripped: "Lot 15" → '), mono('LOT15'), plain('. Any other spelling silently drops the lot from its page. Verify against the live services rather than trusting the configuration: '), mono('node scripts/verify-permit-pages.mjs'), plain(' confirms every listed lot resolves and returns rules.')]),
+  warnCallout('AREAID is the join key between the data and the apps', [
+    p([plain('It is the lot name uppercased with non-alphanumerics stripped, so "Lot 15" becomes "LOT15"; any other spelling silently drops the lot from its page.')]),
+    p([plain('Verify against the live services rather than trusting the configuration: '), mono('node scripts/verify-permit-pages.mjs'), plain(' confirms every listed lot resolves and returns rules.')]),
   ]),
   spacer()
 );
-children.push(p([plain('Known upstream data defects are catalogued in '), mono('docs/DATA.md'), plain(' — chiefly that RULETYPE is a heuristic label, which currently leaves three lots with an empty detail card.')]));
 
-children.push(h2('8.6 — Publish / republish log', CH.gis.accent));
+children.push(h2('8.7 — Publish / republish log', CH.gis.accent));
 children.push(p('Complete one row every time the hosted service is overwritten or republished:'));
 children.push(
   fillTable(['Date', 'What changed', 'Republished by', 'Re-shared Public? (Y/N)', 'Anonymous query verified? (Y/N)'], 5, [12, 34, 18, 18, 18], CH.gis.accent)
