@@ -21,7 +21,7 @@
       "alt": "Village of La Grange parking sign"
     }
   },
-  "apply": { "label": "Apply for a Permit Now →", "url": "https://lagrangepermits.rmcpay.com/#account_start" },
+  "apply": { "label": "Apply for a Permit Now →", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3775/Online-Purchasing-Currently-Unavailable" },
 
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
@@ -210,7 +210,7 @@
                 "links": [{ "text": "eligible areas", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3768/2026-Eligible-Areas-Maps" }],
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
-                  "Live in a building built prior to 1993."
+                  "Live in a building built prior to 1991."
                 ]
               }
             ]
@@ -243,7 +243,7 @@
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
         "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",
-        "apply": { "label": "Purchase a Permit →", "url": "https://lagrangepermits.rmcpay.com/#account_start" },
+        "apply": { "label": "Purchase a Permit →", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3775/Online-Purchasing-Currently-Unavailable" },
         "sections": [
           {
             "title": "How it works",
@@ -274,7 +274,7 @@
                 "links": [{ "text": "eligible areas", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3768/2026-Eligible-Areas-Maps" }],
                 "items": [
                   "Live within the eligible areas near the CBD or West End business districts. Address verification is required at application and renewal.",
-                  "Live in a building built prior to 1993.",
+                  "Live in a building built prior to 1991.",
                   "Live in a residential building with no on-site parking, or in a mixed use (commercial & residential) building."
                 ]
               }
