@@ -2,6 +2,15 @@
 
 Newest meeting at the top. Anything "blocked" names who it is blocked on.
 
+> **⏰ Scheduled — October 2026.** The Village asked for two dated changes; full runbook in
+> [`docs/SCHEDULED-UPDATES.md`](SCHEDULED-UPDATES.md).
+> - **10/1**: point both purchase buttons to the new online store (confirm `lagrangeil.cmrpay.com`
+>   vs. the old `rmcpay` domain first).
+> - **10/20, by noon**: add `LOT15` back to the Resident Day/Night and Employees `areaIds`.
+>
+> Already live 2026-09-28 (`c8629c0`): buttons point to the "online purchasing unavailable"
+> notice, and resident eligibility reads "prior to 1991".
+
 > **Status 2026-08-13.** Both apps live; `main` clean. Meeting with Charity on 2026-08-11 generated
 > a full round of permit-app card changes and a public-map redesign. **Hard deadline: all maps and
 > communications finalized before end of August 2026** for October 1 Passport permit platform go-live.

@@ -17,8 +17,13 @@ This project was handed off. The docs below are self-contained on purpose — th
 without any `.env` (see the API-key note under Architecture; the repo's own comments overstate it).
 Repo lives at `E:\lagrange-parking`; remote is `mgp-inc/lagrange-parking`.
 
+> ⏰ **Dated client changes are pending — check `docs/SCHEDULED-UPDATES.md` first.** 10/1: purchase
+> buttons move to the new online store. 10/20: Lot 15 comes back on Resident Day/Night and Employees.
+> It has the exact edits, the checks and the deploy steps.
+
 | Read | For |
 |---|---|
+| **`docs/SCHEDULED-UPDATES.md`** | The **10/1 and 10/20 updates**, step by step. Do these on their dates. |
 | **`docs/PROJECT-CONTEXT.md`** | Who the client is, how the deliverable got its shape, and the **content rules you must not violate** (no pricing, no "decal", `areaIds` is policy) |
 | **`docs/DATA.md`** | The hosted service, the LGDM→FGDB→AGOL pipeline, and **every known data defect** the app works around |
 | **`docs/BACKLOG.md`** | Open items, who each is blocked on, and the latest stakeholder meeting |
