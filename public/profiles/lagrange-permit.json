@@ -21,7 +21,7 @@
       "alt": "Village of La Grange parking sign"
     }
   },
-  "apply": { "label": "Apply for a Permit Now →", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3775/Online-Purchasing-Currently-Unavailable" },
+  "apply": { "label": "Apply for a Permit Now →", "url": "https://lagrangeil.cmrpay.com" },
 
   "nameOverrides": {
     "VILLAGEHALLPARKINGSTRUCTURE": "VH Garage",
@@ -243,7 +243,7 @@
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
       "guide": {
         "who": "Parking all day and overnight, for residents of older buildings near downtown La Grange and the West End that have no other parking.",
-        "apply": { "label": "Purchase a Permit →", "url": "https://www.villageoflagrange.com/DocumentCenter/View/3775/Online-Purchasing-Currently-Unavailable" },
+        "apply": { "label": "Purchase a Permit →", "url": "https://lagrangeil.cmrpay.com" },
         "sections": [
           {
             "title": "How it works",
