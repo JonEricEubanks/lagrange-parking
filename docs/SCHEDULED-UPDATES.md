@@ -9,7 +9,7 @@ does not change.
 |---|---|---|
 | 9/25 close of business | Purchase buttons → "Online purchasing currently unavailable" notice | ✅ Done 2026-09-28 (`c8629c0`) |
 | 9/28 | Resident eligibility "prior to 1993" → "prior to 1991" | ✅ Done 2026-09-28 (`c8629c0`) |
-| **10/1**, 12:01 a.m. or start of business | Purchase buttons → the new online store | ⏳ To do |
+| **10/1**, 12:01 a.m. or start of business | Purchase buttons → the new online store | 🟡 Committed & pushed 2026-09-30 (`4f78c5f`); **SWA deploy pending** |
 | **10/20**, start of business, **no later than noon** | Show Lot 15 again on Resident Day/Night and Employees | ⏳ To do |
 
 Once an update ships, mark it ✅ in this table with the date and commit hash.
@@ -40,6 +40,10 @@ Once an update ships, mark it ✅ in this table with the date and commit hash.
 
 ## October 1 — switch purchase buttons to the new online store
 
+> **Status 2026-09-30:** profile edit done, built, `verify-permit-pages.mjs` clean (only the 3 known
+> warnings), checked locally, committed and pushed as `4f78c5f`. **Only remaining step: deploy the
+> permit app to SWA on 10/1** (see "Ship it" → deploy and "Confirm it's live"), then mark ✅ above.
+
 **Client request:** "10/1 – At 12:01 am or at start of business, the 'Apply for a Permit Now' link
 needs to be redirected to https://lagrangeil.cmrpay.com. This will remain the link for the
 foreseeable future."
@@ -48,6 +52,9 @@ foreseeable future."
 > but the store the site used before the blackout was `lagrangepermits.rmcpay.com` ("rmc", not
 > "cmr"). Open the new URL in a browser; if it doesn't load a La Grange permit store, ask the
 > Village before deploying.
+>
+> **2026-09-30:** `https://lagrangeil.cmrpay.com` responds 200 and redirects to `/dashboard`, a
+> "Passport Customer Portal" (Passport is the Village's new permit platform). Shipped as written.
 
 ### What to change
 
