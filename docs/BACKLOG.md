@@ -4,8 +4,8 @@ Newest meeting at the top. Anything "blocked" names who it is blocked on.
 
 > **⏰ Scheduled — October 2026.** The Village asked for two dated changes; full runbook in
 > [`docs/SCHEDULED-UPDATES.md`](SCHEDULED-UPDATES.md).
-> - **10/1**: point both purchase buttons to `https://lagrangeil.cmrpay.com` (Passport portal).
->   Committed & pushed 2026-09-30 (`4f78c5f`); **SWA deploy of the permit app pending for 10/1**.
+> - ~~**10/1**: point both purchase buttons to `https://lagrangeil.cmrpay.com` (Passport portal).~~
+>   ✅ Live 2026-10-01 (`4f78c5f`, permit app deployed to SWA).
 > - **10/20, by noon**: add `LOT15` back to the Resident Day/Night and Employees `areaIds`.
 >
 > Already live 2026-09-28 (`c8629c0`): buttons point to the "online purchasing unavailable"
