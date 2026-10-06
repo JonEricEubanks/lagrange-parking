@@ -94,6 +94,9 @@ export interface TabDef {
   note?: string;
   /** Per-lot overrides for `note`, keyed by AREAID. Wins over `note` when present. */
   lotNotes?: Record<string, string>;
+  /** AREAIDs whose GIS "Parking rules" box is hidden on the card, e.g. when the
+   *  hosted rule data contradicts what the lot card already says. */
+  hideRulesFor?: string[];
   /** Per-lot schedules (e.g. a library's opening hours), keyed by AREAID. */
   lotHours?: Record<string, LotHours>;
   /**
@@ -266,11 +269,18 @@ export interface AreaExhibit {
   credit?: string;
 }
 
-/** A short schedule shown as a days/hours table on a lot's detail card. */
+/** A lot's hours on its detail card: either a days/hours list, or a pointer
+ *  to an outside page (e.g. the Library's website) when someone else keeps
+ *  the hours current. */
 export interface LotHours {
   title: string;
-  rows: { days: string; hours: string }[];
+  rows?: { days: string; hours: string }[];
+  /** Short text shown instead of (or above) a schedule. If it contains
+   *  `link.label`, that phrase becomes the link. */
+  text?: string;
   footnote?: string;
+  /** Opens in a new tab. */
+  link?: { label: string; url: string };
 }
 
 /** Per-area availability and time-limit text authored in the profile (e.g. from

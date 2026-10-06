@@ -305,7 +305,12 @@ export function GuidedFinder({
                 symbology={profile.symbology}
                 layerFields={layerFields}
                 rules={rules}
-                ruleConfig={chosen.showRules === false ? undefined : profile.relatedRules}
+                ruleConfig={
+                  chosen.showRules === false ||
+                  (selectedAreaId != null && chosen.hideRulesFor?.includes(String(selectedAreaId)))
+                    ? undefined
+                    : profile.relatedRules
+                }
                 ruleSymbology={profile.ruleSymbology}
                 exhibit={exhibit}
                 areaInfo={areaInfo}

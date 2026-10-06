@@ -2105,6 +2105,25 @@ body,
   color: #777;
 }
 
+/* Hours box directly under the lot note — a little air above, a clear gap before the facts table. */
+.lot-card-hours {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+/* Link in a lot's hours box — plain text, not a button, so "Get directions"
+   stays the card's only call to action. */
+.lot-card-hours-link {
+  color: var(--lf-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lot-card-hours-link:hover {
+  color: var(--lf-midnight);
+}
+
 /* ─── Designated-space exhibit ─── */
 .lot-card-exhibit {
   margin-top: 12px;

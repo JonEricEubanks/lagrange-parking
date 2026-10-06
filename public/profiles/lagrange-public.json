@@ -168,15 +168,13 @@
         "VILLAGEHALLSURFACELOT": "This lot also includes three 15-minute spaces for Village Hall business."
       },
 
+      "hideRulesFor": ["LIBRARYLOT"],
+
       "lotHours": {
         "LIBRARYLOT": {
           "title": "Library hours",
-          "rows": [
-            { "days": "Monday – Thursday", "hours": "9 am to 9 pm" },
-            { "days": "Friday – Saturday", "hours": "9 am to 5 pm" },
-            { "days": "Sunday*", "hours": "1 pm to 5 pm" }
-          ],
-          "footnote": "*The Library is closed on Sundays from Memorial Day to Labor Day."
+          "text": "Please visit the Library's website to view their operating hours.",
+          "link": { "label": "Library's website", "url": "https://lagrangelibrary.org/hours-location/" }
         }
       }
     }

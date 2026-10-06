@@ -36,6 +36,23 @@ function formatValue(value: unknown, format?: string): string {
   return String(value);
 }
 
+/** Hours text, with `link.label` turned into the link when it appears in the sentence. */
+function renderHoursText(hours: LotHours) {
+  const text = hours.text ?? '';
+  const link = hours.link;
+  const at = link ? text.indexOf(link.label) : -1;
+  if (!link || at < 0) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <a className="lot-card-hours-link" href={link.url} target="_blank" rel="noopener noreferrer">
+        {link.label}
+      </a>
+      {text.slice(at + link.label.length)}
+    </>
+  );
+}
+
 export function LotDetailCard({
   feature,
   fields,
@@ -180,6 +197,35 @@ export function LotDetailCard({
       {subzoneNote && <p className="lot-card-subzone-note">{subzoneNote}</p>}
       {cardNote && <p className="lot-card-tab-note">{cardNote}</p>}
 
+      {/* Sits right under the lot note so the "who / when" information reads as one
+          block before the lot facts. Same box style as "Public parking". */}
+      {hours && (!!hours.rows?.length || !!hours.text || !!hours.link) && (
+        <div className="lot-card-rules lot-card-hours">
+          <h4 className="lot-card-details-heading">{hours.title}</h4>
+          <div className="rule-row">
+            {hours.text && <div className="rule-row-detail">{renderHoursText(hours)}</div>}
+            {hours.rows?.map((r) => (
+              <div key={r.days} className="rule-row-detail">
+                <span className="rule-row-detail-label">{r.days}:</span> {r.hours}
+              </div>
+            ))}
+            {hours.footnote && (
+              <div className="rule-row-detail lot-card-hours-footnote">{hours.footnote}</div>
+            )}
+            {hours.link && !hours.text?.includes(hours.link.label) && (
+              <a
+                className="lot-card-hours-link"
+                href={hours.link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {hours.link.label}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {mainFields.length > 0 && (
         <table className="lot-card-table">
           <tbody>
@@ -204,23 +250,6 @@ export function LotDetailCard({
             <div className="rule-row-detail">
               <span className="rule-row-detail-label">Time limit:</span> {areaInfo.timeLimit}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Same layout as "Public parking" above so every lot's hours read alike. */}
-      {hours && hours.rows.length > 0 && (
-        <div className="lot-card-rules">
-          <h4 className="lot-card-details-heading">{hours.title}</h4>
-          <div className="rule-row">
-            {hours.rows.map((r) => (
-              <div key={r.days} className="rule-row-detail">
-                <span className="rule-row-detail-label">{r.days}:</span> {r.hours}
-              </div>
-            ))}
-            {hours.footnote && (
-              <div className="rule-row-detail lot-card-hours-footnote">{hours.footnote}</div>
-            )}
           </div>
         </div>
       )}

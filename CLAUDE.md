@@ -53,6 +53,13 @@ Village reviews. The Explorer and Directory were built as review alternatives an
 landing page asking the visitor to pick a layout (the old `HomePage.tsx` — in git history if needed).
 Do not reintroduce one.
 
+> ⚠️ **But the Village does use the public Explorer.** As of 2026-10-06 the client's working link is
+> `https://ashy-mud-0b906db10.7.azurestaticapps.net/#/explorer`. So check any public-map change in
+> **both** `#/` (Guided Finder) and `#/explorer` (`ParkingApp`). They behave differently: the Explorer
+> ignores `tab.showRules` and shows the GIS "Parking rules" box on lots without `areaInfo`. Per-lot
+> exceptions go in `tab.hideRulesFor`, which both views respect. Example: the Library Lot hides its
+> rules (the GIS says "No Time Limit / After 9pm") and links out for hours via `tab.lotHours`.
+
 ## Architecture
 
 React 19 + TypeScript + Vite + ArcGIS JS SDK v5. No state library — React hooks. Custom CSS with

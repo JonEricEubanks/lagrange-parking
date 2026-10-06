@@ -180,6 +180,8 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   const lotHours = selectedAreaId
     ? activeTabDef?.lotHours?.[String(selectedAreaId)]
     : undefined;
+  const hideRules =
+    selectedAreaId != null && !!activeTabDef?.hideRulesFor?.includes(String(selectedAreaId));
 
   const walkRoute = useWalkRoute(mapView, walkMode);
   const walkEnabled = !!profile.enableWalkTime;
@@ -353,7 +355,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             symbology={profile.symbology}
             layerFields={layerFields}
             rules={rules}
-            ruleConfig={profile.relatedRules}
+            ruleConfig={hideRules ? undefined : profile.relatedRules}
             ruleSymbology={profile.ruleSymbology}
             exhibit={exhibit}
             welcome={profile.welcome}
