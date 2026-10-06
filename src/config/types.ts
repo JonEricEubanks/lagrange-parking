@@ -94,6 +94,8 @@ export interface TabDef {
   note?: string;
   /** Per-lot overrides for `note`, keyed by AREAID. Wins over `note` when present. */
   lotNotes?: Record<string, string>;
+  /** Per-lot schedules (e.g. a library's opening hours), keyed by AREAID. */
+  lotHours?: Record<string, LotHours>;
   /**
    * Per-lot notes shown with the green subzone callout style, for lots whose
    * overnight areas exist but the GIS query hasn't returned them yet.
@@ -262,6 +264,13 @@ export interface AreaExhibit {
   image: string;
   caption?: string;
   credit?: string;
+}
+
+/** A short schedule shown as a days/hours table on a lot's detail card. */
+export interface LotHours {
+  title: string;
+  rows: { days: string; hours: string }[];
+  footnote?: string;
 }
 
 /** Per-area availability and time-limit text authored in the profile (e.g. from

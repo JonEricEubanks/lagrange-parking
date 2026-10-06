@@ -177,6 +177,9 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
   const cardNote = selectedAreaId
     ? (activeTabDef?.lotNotes?.[String(selectedAreaId)] ?? activeTabDef?.note)
     : activeTabDef?.note;
+  const lotHours = selectedAreaId
+    ? activeTabDef?.lotHours?.[String(selectedAreaId)]
+    : undefined;
 
   const walkRoute = useWalkRoute(mapView, walkMode);
   const walkEnabled = !!profile.enableWalkTime;
@@ -357,6 +360,7 @@ export function ParkingApp({ profile, onHome }: { profile: ParkingProfile; onHom
             legendFilter={legendFilter}
             areaInfo={profile.areaInfo}
             cardNote={cardNote}
+            hours={lotHours}
             subzoneNote={subzoneNote}
             showDirections={profile.showDirections}
             consolidateList={profile.consolidateList}

@@ -310,6 +310,7 @@ export function GuidedFinder({
                 exhibit={exhibit}
                 areaInfo={areaInfo}
                 cardNote={cardNote}
+                hours={selectedAreaId ? chosen.lotHours?.[String(selectedAreaId)] : undefined}
                 subzoneNote={subzoneNote}
                 showDirections={profile.showDirections}
               />

@@ -2098,6 +2098,13 @@ body,
   font-weight: 600;
 }
 
+/* Footnote under a lot's hours (profile `lotHours`), e.g. the Library's summer Sunday closure. */
+.lot-card-hours-footnote {
+  margin-top: 4px;
+  font-style: italic;
+  color: #777;
+}
+
 /* ─── Designated-space exhibit ─── */
 .lot-card-exhibit {
   margin-top: 12px;

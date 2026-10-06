@@ -5,6 +5,7 @@ import type {
   AreaExhibit,
   AreaInfo,
   FieldDef,
+  LotHours,
   SymbologyEntry,
   LayerFields,
   ParkingProfile,
@@ -33,6 +34,7 @@ interface DetailPanelProps {
   legendFilter?: string | null;
   areaInfo?: Record<string, AreaInfo>;
   cardNote?: string;
+  hours?: LotHours;
   subzoneNote?: string;
   showDirections?: boolean;
   consolidateList?: ParkingProfile['consolidateList'];
@@ -65,6 +67,7 @@ export function DetailPanel({
   legendFilter,
   areaInfo,
   cardNote,
+  hours,
   subzoneNote,
   showDirections,
   consolidateList,
@@ -156,6 +159,7 @@ export function DetailPanel({
                 : undefined
             }
             cardNote={cardNote}
+            hours={hours}
             subzoneNote={subzoneNote}
             showDirections={showDirections}
             onWalkHere={!walkMode ? onWalkHere : undefined}

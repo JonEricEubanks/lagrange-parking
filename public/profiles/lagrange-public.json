@@ -166,6 +166,18 @@
       "lotNotes": {
         "LIBRARYLOT": "For library customers only during Library operating hours.",
         "VILLAGEHALLSURFACELOT": "This lot also includes three 15-minute spaces for Village Hall business."
+      },
+
+      "lotHours": {
+        "LIBRARYLOT": {
+          "title": "Library hours",
+          "rows": [
+            { "days": "Monday – Thursday", "hours": "9 am to 9 pm" },
+            { "days": "Friday – Saturday", "hours": "9 am to 5 pm" },
+            { "days": "Sunday*", "hours": "1 pm to 5 pm" }
+          ],
+          "footnote": "*The Library is closed on Sundays from Memorial Day to Labor Day."
+        }
       }
     }
   ],

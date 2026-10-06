@@ -8,6 +8,7 @@ import type {
   AreaExhibit,
   AreaInfo,
   FieldDef,
+  LotHours,
   SymbologyEntry,
   LayerFields,
   RelatedRulesConfig,
@@ -47,6 +48,7 @@ export function LotDetailCard({
   areaInfo,
   subzoneNote,
   cardNote,
+  hours,
   showDirections,
   onWalkHere,
   walkMode,
@@ -75,6 +77,8 @@ export function LotDetailCard({
   subzoneNote?: string;
   /** Tab-level or lot-specific note (e.g. daytime guidance, level restrictions). */
   cardNote?: string;
+  /** Profile-authored schedule for this lot, shown as a days/hours table. */
+  hours?: LotHours;
   /** Show a "Get directions" link to the lot in the user's maps app. */
   showDirections?: boolean;
   onWalkHere?: (centroid: Point) => void;
@@ -200,6 +204,23 @@ export function LotDetailCard({
             <div className="rule-row-detail">
               <span className="rule-row-detail-label">Time limit:</span> {areaInfo.timeLimit}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Same layout as "Public parking" above so every lot's hours read alike. */}
+      {hours && hours.rows.length > 0 && (
+        <div className="lot-card-rules">
+          <h4 className="lot-card-details-heading">{hours.title}</h4>
+          <div className="rule-row">
+            {hours.rows.map((r) => (
+              <div key={r.days} className="rule-row-detail">
+                <span className="rule-row-detail-label">{r.days}:</span> {r.hours}
+              </div>
+            ))}
+            {hours.footnote && (
+              <div className="rule-row-detail lot-card-hours-footnote">{hours.footnote}</div>
+            )}
           </div>
         </div>
       )}
