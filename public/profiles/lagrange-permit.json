@@ -187,7 +187,7 @@
             "title": "Where you can park",
             "bullets": [
               {
-                "text": "Effective October 1st, there are two types of resident overnight parking permits:",
+                "text": "There are two types of resident overnight parking permits:",
                 "items": [
                   "West End permits are valid in Lot 13 only.",
                   "Central Business District (CBD) permits are valid in Lots 2, 5, 11 and 12 and the Village Hall Garage."
@@ -237,7 +237,7 @@
         "VILLAGEHALLPARKINGSTRUCTURE": "Between 2 a.m. and 6 a.m., park only on Level 1E. Overnight parking elsewhere in the garage is not permitted."
       },
       "audience": ["RESIDENT"],
-      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE"],
+      "areaIds": ["LOT2", "LOT5", "VILLAGEHALLPARKINGSTRUCTURE", "LOT15"],
       "where": "HASRESIDENT = 1",
       "showSubzones": true,
       "ruleWhere": "RULETYPE IN ('OVERNIGHT_RESIDENT', 'DAYTIME_RESIDENT', 'DECAL_ZONE')",
@@ -249,7 +249,7 @@
             "title": "How it works",
             "bullets": [
               { "text": "The Village makes a limited number of public parking spaces available to residents of older buildings near the downtown that have no parking on their private properties." },
-              { "text": "Effective October 1st, there are two types of resident 24 hr. permits: Central Business District (CBD) and West End." }
+              { "text": "There are two types of resident 24 hr. permits: Central Business District (CBD) and West End." }
             ]
           },
           {
@@ -360,6 +360,7 @@
         "LOT4",
         "LOT5",
         "VILLAGEHALLPARKINGSTRUCTURE",
+        "LOT15",
         "OS115798",
         "OS115799",
         "OS115797",

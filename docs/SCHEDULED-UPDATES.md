@@ -82,8 +82,8 @@ https://lagrangeil.cmrpay.com
 Afterwards the string `Online-Purchasing-Currently-Unavailable` must not appear anywhere in the
 profile.
 
-Leave the "Effective October 1st, …" sentences on the two resident pages as they are unless the
-Village asks otherwise.
+The "Effective October 1st, …" wording was removed from both resident pages on 2026-10-19 at the
+Village's request (no longer relevant now that the date has passed).
 
 ---
 
