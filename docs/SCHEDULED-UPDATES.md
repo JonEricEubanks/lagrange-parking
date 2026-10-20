@@ -10,7 +10,7 @@ does not change.
 | 9/25 close of business | Purchase buttons → "Online purchasing currently unavailable" notice | ✅ Done 2026-09-28 (`c8629c0`) |
 | 9/28 | Resident eligibility "prior to 1993" → "prior to 1991" | ✅ Done 2026-09-28 (`c8629c0`) |
 | **10/1**, 12:01 a.m. or start of business | Purchase buttons → the new online store | ✅ Done 2026-10-01 (`4f78c5f`, deployed to SWA) |
-| **10/20**, start of business, **no later than noon** | Show Lot 15 again on Resident Day/Night and Employees | ⏳ To do |
+| **10/20**, start of business, **no later than noon** | Show Lot 15 again on Resident Day/Night and Employees | ✅ Done 2026-10-20 (`9171767`, deployed to SWA) |
 
 Once an update ships, mark it ✅ in this table with the date and commit hash.
 
